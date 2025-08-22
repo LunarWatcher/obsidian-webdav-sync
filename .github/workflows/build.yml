@@ -1,0 +1,27 @@
+name: Test and build nightly artefacts
+on:
+  push:
+  pull_request:
+
+jobs:
+  artefacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deps
+        run: npm i
+      - name: Build
+        run: npm run build
+      - name: Assemble artefacts
+        run: |
+          OUTPUT=obsidian-webdav-sync
+          mkdir $OUTPUT
+          cp styles.css $OUTPUT
+          cp main.js $OUTPUT
+          cp manifest.json $OUTPUT
+          ls $OUTPUT
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "plugin"
+          path: obsidian-webdav-sync
+          if-no-files-found: error
