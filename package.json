@@ -1,6 +1,6 @@
 {
     "name": "obsidian-webdav-sync",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "description": "Simple manually-controlled WebDAV sync plugin",
     "main": "main.js",
     "scripts": {

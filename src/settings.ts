@@ -1,12 +1,13 @@
+import {DAVServerConfig, DEFAULT_DAV_CONFIG} from "fs_webdav";
 import MyPlugin from "main";
 import { App, PluginSettingTab, Setting } from "obsidian";
 
 export interface settings_t {
-  mySetting: string;
+  server_conf: DAVServerConfig;
 }
 
 export const DEFAULT_SETTINGS: settings_t = {
-  mySetting: 'default'
+  server_conf: DEFAULT_DAV_CONFIG,
 }
 
 export class WebDAVSettingsTab extends PluginSettingTab {
@@ -22,15 +23,39 @@ export class WebDAVSettingsTab extends PluginSettingTab {
 
     containerEl.empty();
 
+    // TODO: use headers to create categories rather than this shit
     new Setting(containerEl)
-      .setName('Setting #1')
-      .setDesc('It\'s a secret')
+      .setName('WebDAV URL')
+      .setDesc('URL to your WebDAV share')
       .addText(text => text
-        .setPlaceholder('Enter your secret')
-        .setValue(this.plugin.settings.mySetting)
+        .setPlaceholder('https://example.com')
+        .setValue(this.plugin.settings.server_conf.url || "")
         .onChange(async (value) => {
-          this.plugin.settings.mySetting = value;
+          this.plugin.settings.server_conf.url = value;
           await this.plugin.saveSettings();
         }));
+    new Setting(containerEl)
+      .setName('WebDAV username')
+      .setDesc('The username to use for authentication')
+      .addText(text => text
+        .setPlaceholder('LunarWatcher')
+        .setValue(this.plugin.settings.server_conf.username || "")
+        .onChange(async (value) => {
+          this.plugin.settings.server_conf.username = value == "" ? undefined : value;
+          await this.plugin.saveSettings();
+        }));
+    new Setting(containerEl)
+      .setName('WebDAV username')
+      .setDesc('The username to use for authentication (warning: will be stored in plain text)')
+      .addText(text => text
+        .setPlaceholder('password69420')
+        .setValue(this.plugin.settings.server_conf.username || "")
+        .onChange(async (value) => {
+          this.plugin.settings.server_conf.username = value == "" ? undefined : value;
+          await this.plugin.saveSettings();
+        })
+        // Has to be last because this returns a void
+        .inputEl.setAttribute("type", "password")
+      );
   }
 }
