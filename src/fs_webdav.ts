@@ -29,11 +29,7 @@ export class Connection {
     this.client = createClient(server_config.url, {
       username: server_config.username,
       password: server_config.password,
-      authType: AuthType.Digest,
+      authType: AuthType.Auto,
     })
-  }
-
-  async server_info() {
-    return this.client.getDAVCompliance("")
   }
 }

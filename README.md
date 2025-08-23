@@ -39,3 +39,25 @@ Once this plugin is release-ready, you can grab the latest release from [GitHub]
 ### Additional devices
 
 The major disadvantage with this plugin is that some setup is required to get the vault over to other devices. The suggested strategy is to manually copy your vault from your computer (or whereever you installed the plugin) over to your other devices. After that, usage should just be as usual.
+
+### DAV server setup
+
+#### General requirements (all servers)
+
+Due to how obsidian works, CORS is in play. CORS is just as much of a pain in the ass here as anywhere else. For obsidian to work, if your WebDAV server has CORS, you need to do one of two things:
+
+1. Disable CORS; this is, by far, the easiest option, but obviously has security tradeoffs.
+2. Set up CORS to allow `app://obsidian.md` and [a whole bunch of other stuff](https://github.com/remotely-save/remotely-save/blob/34db181af002f8d71ea0a87e7965abc57b294914/docs/remote_services/webdav_general/webav_cors.md?plain=1#L5) that I cannot easily summarise. Even that documentation does not include an exhaustive list.
+
+#### Copyparty setup
+
+If you're using copyparty, note that your user needs access to dotfiles (the `.` permission) if you're doing full vault sync. Without it, the `.obsidian` folder is omitted. It's also strongly suggested that you don't keep the `hist` cache inside the folder, as it can and almost certainly will cause issues with copyparty.
+```conf
+[global]
+    hist: ~/.cache/copyparty
+    # For reasons described at the top of the DAV server section
+    # This may or may not be the only way to achieve the goal, but it's easy and I don't care
+    # If you do, you're welcome to change this to whatever allows app://obsidian.md and apparently
+    # many other things instead.
+    allow-csrf
+```

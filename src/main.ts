@@ -36,7 +36,16 @@ export default class MyPlugin extends Plugin {
 
   async initRibbon() {
     const ribbonIconEl = this.addRibbonIcon('upload', 'Open sync settings', (evt: MouseEvent) => {
-      new Notice('This is a notice!');
+      if (this.client == null) {
+        new Notice("Client is null, dumbass");
+        return;
+      }
+      this.client.client.getDirectoryContents("/livi/obsidian/")
+        .then(res => {
+          new Notice(
+            JSON.stringify(res)
+          );
+        });
     });
 
   }

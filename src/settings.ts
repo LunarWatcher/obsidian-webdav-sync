@@ -28,7 +28,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
       .setName('WebDAV URL')
       .setDesc('URL to your WebDAV share')
       .addText(text => text
-        .setPlaceholder('https://example.com')
+        .setPlaceholder('https://dav.example.com')
         .setValue(this.plugin.settings.server_conf.url || "")
         .onChange(async (value) => {
           this.plugin.settings.server_conf.url = value;
@@ -45,13 +45,13 @@ export class WebDAVSettingsTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         }));
     new Setting(containerEl)
-      .setName('WebDAV username')
-      .setDesc('The username to use for authentication (warning: will be stored in plain text)')
+      .setName('WebDAV password')
+      .setDesc('The password to use for authentication (warning: will be stored in plain text)')
       .addText(text => text
         .setPlaceholder('password69420')
-        .setValue(this.plugin.settings.server_conf.username || "")
+        .setValue(this.plugin.settings.server_conf.password || "")
         .onChange(async (value) => {
-          this.plugin.settings.server_conf.username = value == "" ? undefined : value;
+          this.plugin.settings.server_conf.password = value == "" ? undefined : value;
           await this.plugin.saveSettings();
         })
         // Has to be last because this returns a void
