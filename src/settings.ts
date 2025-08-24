@@ -1,6 +1,6 @@
 import {DAVServerConfig, DEFAULT_DAV_CONFIG} from "./fs/webdav";
 import MyPlugin from "./main";
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 import { DEFAULT_SYNC_SETTINGS, SyncSettings } from "./sync/sync_settings";
 
 export interface settings_t {
@@ -50,7 +50,8 @@ export class WebDAVSettingsTab extends PluginSettingTab {
           .setPlaceholder('https://dav.example.com')
           .setValue(this.plugin.settings.server_conf.url || "")
           .onChange(async (value) => {
-            this.plugin.settings.server_conf.url = value;
+            console.log(value);
+            this.plugin.settings.server_conf.url = value || null;
             await this.plugin.saveSettings();
           }));
       new Setting(containerEl)
@@ -102,6 +103,34 @@ export class WebDAVSettingsTab extends PluginSettingTab {
               await this.plugin.saveSettings()
             })
         )
+
+      const testButton = document.createElement("button");
+      testButton.innerText = "Test connection";
+      testButton.addEventListener("click", async (ev) => {
+        this.plugin.reloadClient();
+        if (this.plugin.client != null) {
+          const client = this.plugin.client.client;
+          if (this.plugin.settings.sync.root_folder.dest != "") {
+            try {
+              let contents = client.getDirectoryContents(this.plugin.settings.sync.root_folder.dest);
+              // TODO: tsserver whines about the .length because one of the two doesn't have length
+              // (the array has .length, the other appears to have .size()). Figure out if this will ever
+              // be returned
+              new Notice(
+                `Connection succeeded. Found folder with ${(await contents).length} direct files and folders.`
+              )
+            } catch (ex) {
+              console.error(ex);
+              new Notice("Connection failed");
+            }
+          } else {
+            new Notice(
+              "Can't test connection without a vault folder"
+            );
+          }
+        }
+      });
+      containerEl.append(testButton);
     }
     containerEl.insertAdjacentHTML("beforeend", `<h2>Meta</h2>
     <p>Running into issues? Open an issue on <a href="https://github.com/LunarWatcher/obsidian-webdav-sync">GitHub</a>.</p>
