@@ -27,7 +27,7 @@ jobs:
 
       - name: Compress folder
         run: |
-          zip -r obsidian-webdav-sync.zip obsidian-webdav-sync/
+          zip -r obsidian-webdav-sync.zip obsidian-webdav-sync/*
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
