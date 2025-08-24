@@ -1,4 +1,4 @@
-import {Connection} from 'fs_webdav';
+import {Connection} from './fs/webdav';
 import { App, Editor, MarkdownView, Modal, Notice, Plugin } from 'obsidian';
 import { DEFAULT_SETTINGS, settings_t, WebDAVSettingsTab } from 'settings';
 

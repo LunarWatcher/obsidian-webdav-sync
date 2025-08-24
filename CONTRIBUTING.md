@@ -41,3 +41,16 @@ There's also `./scripts/bundle.sh`, which creates a folder in the repo containin
 
 Some functionality is tested via jest. Running these tests can be done with `npm run test`. They're also run automatically in the CI when a PR is made.
 
+
+## Making a release
+
+(You do not need to follow this unless you're me)
+
+The version has to be bumped in two places:
+
+* `package.json`
+* `manifest.json`
+
+
+There's also a [`versions.json`, described by obsidian](https://docs.obsidian.md/Reference/Versions), but this is not in use yet, as it doesn't seem to be required.
+
