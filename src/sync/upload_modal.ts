@@ -1,7 +1,8 @@
 import {App, Modal, setIcon, Setting} from "obsidian";
 import MyPlugin from "../main";
 import {canConnectWithSettings} from "settings";
-import {FileData, Files, Path} from "./sync";
+import {Actions, actionToDescriptiveString, calculateSyncActions, FileData, Files, Path} from "./sync";
+import {FileStat} from "webdav";
 
 export class UploadModal extends Modal {
   plugin: MyPlugin;
@@ -42,8 +43,8 @@ export class UploadModal extends Modal {
 
     const up = document.getElementById("webdav-sync-up") as HTMLElement;
     const down = document.getElementById("webdav-sync-down") as HTMLElement;
-    up.addEventListener("click", this.upload);
-    down.addEventListener("click", this.download);
+    up.addEventListener("click", async (ev) => {await this.upload(ev)});
+    down.addEventListener("click", async (ev) => {await this.download(ev)});
 
     setIcon(up, "upload");
     setIcon(down, "download");
@@ -51,17 +52,74 @@ export class UploadModal extends Modal {
     // TODO: This is nasty
     up.innerHTML += "<span>&nbsp;Upload</span>";
     down.innerHTML += "<span>&nbsp;Download</span>";
+
+    contentEl.insertAdjacentHTML("beforeend", `<table style="display: none" id="dry-run-info">
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="dry-run-data">
+
+      </tbody>
+    </table>`);
   }
 
-  upload(ev: any) {
+  showTaskGraph(actions: Actions, upload: boolean) {
+    const tab = document.getElementById("dry-run-info") as HTMLTableElement;
+    const body = document.getElementById("dry-run-data") as HTMLTableSectionElement;
+
+    for (let [file, action] of actions) {
+      // HTMLTableRowElement: *exists*
+      // Typescript: I HAVE LITERALLY NEVER HEARD ABOUT THIS IN MY LIFE BEFORE WTF COULD YOU POSSIBLY MEEEAAANNNNN
+      const elem = document.createElement("tr");
+      const fromElem = document.createElement("td");
+      const actionElem = document.createElement("td");
+
+      fromElem.innerText = file;
+      actionElem.innerText = actionToDescriptiveString(action);
+
+      elem.append(
+        fromElem,
+        actionElem
+      )
+
+      body.append(elem);
+    }
+    tab.setAttr("style", "display: inline-block");
+  }
+
+  async upload(ev: any) {
+    let local = await this.getVaultFiles();
+    if (this.plugin.settings.sync.full_vault_sync) {
+      let remote = await this.getRemoteFiles(this.plugin.settings.sync.root_folder.dest);
+      let actions = calculateSyncActions(local, remote);
+
+      if (!this.dryRun) {
+        // TODO
+      } else {
+        this.showTaskGraph(actions, true);
+      }
+    }
+  }
+
+  async download(ev: any) {
+    let local = await this.getVaultFiles();
+    if (this.plugin.settings.sync.full_vault_sync) {
+      let remote = await this.getRemoteFiles(this.plugin.settings.sync.root_folder.dest);
+      let actions = calculateSyncActions(remote, local);
+
+      if (!this.dryRun) {
+        // TODO
+      } else {
+        this.showTaskGraph(actions, false);
+      }
+    }
 
   }
 
-  download(ev: any) {
-
-  }
-
-  getVaultFiles(): Files {
+  async getVaultFiles(): Promise<Files> {
     const files = this.app.vault.getFiles();
     const out = new Map<Path, FileData>();
 
@@ -77,8 +135,25 @@ export class UploadModal extends Modal {
     return out;
   }
 
-  getRemoteFiles() {
+  async getRemoteFiles(folder: string): Promise<Files> {
+    if (this.plugin.client == null) {
+      return new Map();
+    }
+    const files = await this.plugin.client.client.getDirectoryContents(
+      folder
+    ) as FileStat[];
+    const out = new Map();
 
+    for (const file of files) {
+      out.set(
+        file.filename,
+        {
+          lastModified: Date.parse(file.lastmod)
+        } as FileData
+      )
+    }
+
+    return out;
   }
 
   onClose() {

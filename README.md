@@ -1,5 +1,9 @@
 # Obsidian WebDAV sync
 
+> [!warning]
+>
+> The plugin is nowhere near production-ready. You should not download it yet; it can and will act in unexpected ways, break hard, and potentially take your vault with it.
+
 This is a very simple sync plugin based on WebDAV. You need to bring your own server to use this plugin.
 
 This sync plugins differs substantially from many of the other sync plugins, due to:

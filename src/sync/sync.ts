@@ -13,6 +13,19 @@ export enum ActionType {
   NOOP
 };
 
+export function actionToDescriptiveString(action: ActionType): string {
+  switch (action) {
+  case ActionType.ADD:
+    return "Add or update";
+  case ActionType.REMOVE:
+    return "Remove";
+  case ActionType.ADD_LOCAL:
+    return "Conflict identified; ask user";
+  case ActionType.NOOP:
+    return "No changes made";
+  }
+}
+
 export type Path = string;
 export type Files = Map<Path, FileData>;
 export type Actions = Map<Path, ActionType>;

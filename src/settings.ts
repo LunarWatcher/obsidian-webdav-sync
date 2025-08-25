@@ -28,7 +28,6 @@ export class WebDAVSettingsTab extends PluginSettingTab {
 
   display(): void {
     const {containerEl} = this;
-    console.log("rerender");
 
     containerEl.empty();
     // TODO: Obsidian's documentation claims
