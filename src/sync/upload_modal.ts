@@ -99,6 +99,8 @@ export class UploadModal extends Modal {
       if (!this.dryRun) {
         // TODO
       } else {
+        console.log("remote: ", remote);
+        console.log("local: ", local);
         this.showTaskGraph(actions, true);
       }
     }
@@ -136,17 +138,25 @@ export class UploadModal extends Modal {
   }
 
   async getRemoteFiles(folder: string): Promise<Files> {
+    console.log(folder);
     if (this.plugin.client == null) {
       return new Map();
     }
     const files = await this.plugin.client.client.getDirectoryContents(
-      folder
+      folder, {
+        deep: true,
+      }
     ) as FileStat[];
     const out = new Map();
 
     for (const file of files) {
+      // Obsidian does not include directories, so this is necessary to avoid every folder
+      // being marked for removal
+      if (file.type == "directory") {
+        continue;
+      }
       out.set(
-        file.filename,
+        file.filename.replace(folder + (folder.endsWith("/") ? "" : "/"), ""),
         {
           lastModified: Date.parse(file.lastmod)
         } as FileData

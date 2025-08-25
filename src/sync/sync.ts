@@ -30,6 +30,9 @@ export type Path = string;
 export type Files = Map<Path, FileData>;
 export type Actions = Map<Path, ActionType>;
 
+function dateRounder(a: number): number {
+  return Math.floor(a / 1000);
+}
 
 /**
  * Calculates the sync changes to do.
@@ -63,11 +66,11 @@ export function calculateSyncActions(
         throw Error("wtf typescript");
       }
 
-      if (remoteData.lastModified == data.lastModified) {
+      if (dateRounder(remoteData.lastModified) == dateRounder(data.lastModified)) {
         if (includeNoop) {
           out.set(file, ActionType.NOOP);
         }
-      } else if (remoteData.lastModified > data.lastModified) {
+      } else if (dateRounder(remoteData.lastModified) > dateRounder(data.lastModified)) {
         // remote is newer; likely forgotten pull. ADD_LOCAL gives an option of which to pick
         out.set(file, ActionType.ADD_LOCAL);
       } else {

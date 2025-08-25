@@ -53,6 +53,10 @@ Due to how obsidian works, CORS is in play. CORS is just as much of a pain in th
 1. Disable CORS; this is, by far, the easiest option, but obviously has security tradeoffs.
 2. Set up CORS to allow `app://obsidian.md` and [a whole bunch of other stuff](https://github.com/remotely-save/remotely-save/blob/34db181af002f8d71ea0a87e7965abc57b294914/docs/remote_services/webdav_general/webav_cors.md?plain=1#L5) that I cannot easily summarise. Even that documentation does not include an exhaustive list.
 
+Other requirements:
+
+* It must be possible to index the DAV share infinitely, as no manual recursion logic is implemented on the client side.
+
 #### Copyparty setup
 
 If you're using copyparty, note that your user needs access to dotfiles (the `.` permission) if you're doing full vault sync. Without it, the `.obsidian` folder is omitted. It's also strongly suggested that you don't keep the `hist` cache inside the folder, as it can and almost certainly will cause issues with copyparty.
@@ -64,4 +68,5 @@ If you're using copyparty, note that your user needs access to dotfiles (the `.`
     # If you do, you're welcome to change this to whatever allows app://obsidian.md and apparently
     # many other things instead.
     allow-csrf
+    dav-inf
 ```
