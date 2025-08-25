@@ -1,6 +1,8 @@
 dist/
 .env.dev
 
+/coverage/
+
 # vscode
 .vscode 
 
