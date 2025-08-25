@@ -112,7 +112,8 @@ export class WebDAVSettingsTab extends PluginSettingTab {
           const client = this.plugin.client.client;
           if (this.plugin.settings.sync.root_folder.dest != "") {
             try {
-              let contents = client.getDirectoryContents(this.plugin.settings.sync.root_folder.dest);
+              // I hate typescript so fucking much
+              let contents = client.getDirectoryContents(this.plugin.settings.sync.root_folder.dest) as any;
               // TODO: tsserver whines about the .length because one of the two doesn't have length
               // (the array has .length, the other appears to have .size()). Figure out if this will ever
               // be returned
