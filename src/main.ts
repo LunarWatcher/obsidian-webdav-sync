@@ -26,7 +26,7 @@ export default class MyPlugin extends Plugin {
         new Notice("You don't appear to have set up the plugin. Go to settings before continuing.");
         return;
       }
-      new UploadModal(this.app).open();
+      new UploadModal(this.app, this).open();
     });
 
   }

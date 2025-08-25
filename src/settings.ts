@@ -1,16 +1,21 @@
 import {DAVServerConfig, DEFAULT_DAV_CONFIG} from "./fs/webdav";
 import MyPlugin from "./main";
 import { App, Notice, PluginSettingTab, Setting } from "obsidian";
-import { DEFAULT_SYNC_SETTINGS, SyncSettings } from "./sync/sync_settings";
+import { DEFAULT_SYNC_SETTINGS, FolderDestination, SyncSettings } from "./sync/sync_settings";
 
 export interface settings_t {
   server_conf: DAVServerConfig;
-  sync: SyncSettings,
+  sync: SyncSettings;
+
 }
 
 export const DEFAULT_SETTINGS: settings_t = {
   server_conf: DEFAULT_DAV_CONFIG,
   sync: DEFAULT_SYNC_SETTINGS
+}
+
+export function canConnectWithSettings(settings: settings_t): boolean {
+  return !!settings.server_conf.url
 }
 
 export class WebDAVSettingsTab extends PluginSettingTab {
@@ -23,6 +28,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
 
   display(): void {
     const {containerEl} = this;
+    console.log("rerender");
 
     containerEl.empty();
     // TODO: Obsidian's documentation claims
@@ -132,11 +138,85 @@ export class WebDAVSettingsTab extends PluginSettingTab {
         }
       });
       containerEl.append(testButton);
+
+      let newShare: string = "";
+      let newVaultFolder: string = "";
+      new Setting(containerEl)
+        .setName("Folder mapping")
+        .setDesc("Used to add sub-maps of the obsidian vault, meaning a specific subfolder that's "
+                + "synced when the rest of the vault isn't.")
+        .addText(text => 
+          text.setPlaceholder("/webdav/share/path")
+            .onChange(value => {
+              newShare = value;
+            })
+        )
+        .addText(text => 
+          text.setPlaceholder("absolute/path/in/vault")
+            .onChange(value => {
+              newVaultFolder = value;
+            })
+        )
+        .addButton(button =>
+          button.setButtonText("Add")
+            .setCta()
+            .onClick(async () => {
+              if (!newShare?.startsWith("/")) {
+                new Notice("WebDAV share must start with a /");
+                return;
+              }
+              if (newVaultFolder?.startsWith("/")) {
+                new Notice("Vault folder must not start with a /");
+                return;
+              }
+
+              // Typescript is a fucking worthless pile of shit.
+              // See regenerateFolderMappings for why this is converted to any
+              (this.plugin.settings.sync.subfolders as any)[newVaultFolder] = {
+                dest: newShare
+              } as FolderDestination;
+              await this.plugin.saveSettings()
+              this.display();
+            })
+        );
+      containerEl.insertAdjacentHTML("beforeend", "<div id=\"folder-mappings\"></div>");
+      this.regenerateFolderMappings();
     }
     containerEl.insertAdjacentHTML("beforeend", `<h2>Meta</h2>
     <p>Running into issues? Open an issue on <a href="https://github.com/LunarWatcher/obsidian-webdav-sync">GitHub</a>.</p>
+    <p>Trans rights are human rights 🏳️‍⚧️ 🏳️‍🌈</p>
     `);
   }
 
+  regenerateFolderMappings() {
+    const container = document.getElementById("folder-mappings") as HTMLDivElement;
+    container.empty();
+
+    // Fuck you javascript, why can I not `of` a dict?
+    for (const path in this.plugin.settings.sync.subfolders) {
+      // Typescript: are you fucking stupid?
+      const dest = (this.plugin.settings.sync.subfolders as any)[path] as FolderDestination;
+
+      new Setting(container)
+        .setName("WebDAV target folder for vault path: " + path)
+        .addText(text => {
+          text.setValue(dest.dest)
+            .onChange(async (value) => {
+              const lastDest = (this.plugin.settings.sync.subfolders as any)[path] as FolderDestination | null;
+              if (lastDest?.dest.startsWith("/")) {
+                lastDest.dest = value;
+
+                (this.plugin.settings.sync.subfolders as any)[path] = lastDest;
+                await this.plugin.saveSettings()
+              }
+            })
+        })
+        .addButton(button => button.setIcon("trash").setWarning().onClick(async () => {
+          delete (this.plugin.settings.sync.subfolders as any)[path];
+          await this.plugin.saveSettings();
+          this.display();
+        }))
+    }
+  }
   
 }
