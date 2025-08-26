@@ -1,5 +1,5 @@
 export interface FileData {
-  lastModified: number;
+  lastModified: number | null;
 };
 
 export enum ActionType {
@@ -30,7 +30,8 @@ export type Path = string;
 export type Files = Map<Path, FileData>;
 export type Actions = Map<Path, ActionType>;
 
-function dateRounder(a: number): number {
+function dateRounder(a: number | null): number {
+  if (a == null) return 0;
   return Math.floor(a / 1000);
 }
 

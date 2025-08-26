@@ -69,4 +69,17 @@ If you're using copyparty, note that your user needs access to dotfiles (the `.`
     # many other things instead.
     allow-csrf
     dav-inf
+
+    # Enables full webdav writes - for copyparty, this means redundant files aren't 
+    # made on PUT that require deleting. 
+    # Omitting this means the actual files will always be out of sync.
+    daw
+
 ```
+
+## Things to note
+
+### Race conditions
+
+WebDAV sync is not thread-safe. If you run two pushes at once, you will end up with an inconsistent state. There _is_ error recovery for dealing with various conflicts
+
