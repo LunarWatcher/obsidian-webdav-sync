@@ -2,7 +2,7 @@ import {App, Modal, normalizePath, Notice, setIcon, Setting} from "obsidian";
 import MyPlugin from "../main";
 import {canConnectWithSettings} from "settings";
 import {Actions, actionToDescriptiveString, ActionType, calculateSyncActions, FileData, Files, Path} from "./sync";
-import {BufferLike, FileStat} from "webdav";
+import {FileStat} from "webdav";
 
 export class UploadModal extends Modal {
   plugin: MyPlugin;
@@ -185,8 +185,10 @@ export class UploadModal extends Modal {
                 this.resolvePath(
                   this.plugin.settings.sync.root_folder.dest,
                   file
-                )
-              ) as BufferLike, {
+                ), {
+                  format: "binary"
+                }
+              ) as ArrayBuffer, {
                 mtime: remoteData.lastModified as number
               }
             );
