@@ -36,6 +36,14 @@ WebDAV, on the other hand, is both simple enough and well-established enough tha
     * macOS and iOS will not receive support from me, as I refuse to spend thousands of euros for inferior hardware and an inferior platform. If you need iOS or macOS support and it doesn't work due to Apple-specific problems, you're welcome to add it in a PR, but it will not be created, maintained, or tested any other way.
 * A WebDAV server. In theory, it should work with any WebDAV-compatible server, though I only test against [copyparty](https://github.com/9001/copyparty).
 
+### Android notes
+
+Due to a [16 year old bug](https://issuetracker.google.com/issues/36906982), the vault shouldn't be on an SD card. If you put it on an SD card, when pulling the vault, the last modified time of the file won't be correctly set. This results in a situation where the android copy of the vault is always considered fully out of sync with the WebDAV server.
+
+Sync will still work if you put the vault on an SD card, but if you have a large vault, you'll need to download and upload the entire thing every time you sync. 
+
+The [underlying bug](https://github.com/LunarWatcher/obsidian-webdav-sync/issues/1) could be resolved by relying on hashes rather than `mtime`, but these are difficult to generate on the fly. Since it requires reading the full contents of the files, it'll still tank performance in large vaults, so it's not particularly helpful. Alternate solutions are welcome.
+
 ## Installation and setup
 
 Once this plugin is release-ready, you can grab the latest release from [GitHub](https://github.com/LunarWatcher/obsidian-webdav-sync/releases). Download it, and add the `obsidian-webdav-sync` folder to your vault's `.obsidian/plugins/` folder. The plugin is not yet available through the plugin store thing, so it'll need to be updated manually as well; this is done the same way.

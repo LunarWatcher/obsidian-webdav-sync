@@ -67,6 +67,13 @@ export function calculateSyncActions(
         throw Error("wtf typescript");
       }
 
+      if (remoteData.lastModified == null || data.lastModified == null) {
+        // If either of the dates are null, the underlying filesystem or remote webdav server doesn't support
+        // it/has it disabled. We need to add just in case.
+        out.set(file, ActionType.ADD);
+        continue;
+      }
+
       if (dateRounder(remoteData.lastModified) == dateRounder(data.lastModified)) {
         if (includeNoop) {
           out.set(file, ActionType.NOOP);

@@ -266,9 +266,12 @@ export class UploadModal extends Modal {
     for (const file of files) {
       // Obsidian does not include directories, so this is necessary to avoid every folder
       // being marked for removal
+      // TODO: this should mean that stub folders aren't deleted either. Separating them into a separate map
+      // with special deletion logic is probably a good idea.
       if (file.type == "directory") {
         continue;
       }
+
       out.set(
         file.filename.replace(folder + (folder.endsWith("/") ? "" : "/"), ""),
         {
