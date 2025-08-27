@@ -2,6 +2,10 @@ export interface FileData {
   lastModified: number | null;
 };
 
+export interface SyncResult {
+  actionedCount: number;
+};
+
 export enum ActionType {
   ADD,
   REMOVE,
@@ -30,6 +34,16 @@ export type Path = string;
 export type Files = Map<Path, FileData>;
 export type Actions = Map<Path, ActionType>;
 
+export enum SyncDir {
+  UP,
+  DOWN
+};
+
+/**
+ * Utility function that turns millisecond timestamps into second timestamps. 
+ * The division is floored. This helps avoid floating point inaccuracies between
+ * the local filesystem and remote filesystem.
+ */
 function dateRounder(a: number | null): number {
   if (a == null) return 0;
   return Math.floor(a / 1000);
@@ -89,4 +103,78 @@ export function calculateSyncActions(
   }
 
   return out;
+}
+
+/**
+ * General template for the sync system, since it's the same shit in both places with some minor differences
+ *
+ * @param direction   The sync direction; used for some actions that require knowing whether the source is local
+ *                    or not
+ * @param sourceFiles The files in the source directory. Does not have to be local
+ * @param destFiles   The files in the destination directory. Does not have to be remote.
+ * @param onError     invoked on error. What did you expect?
+ * @param onUpdate    Called when an update is made; used to perform the specific action on the source or dest files
+ *                    with the corresponding adapter
+ * @param onConflict  Called when a conflict happens. In production, this just shows a dialog to the user. In unit tests,
+ *                    it's a noop or an otherwise fixed result.
+ */
+export async function runSync(
+  direction: SyncDir,
+  sourceFiles: Files,
+  destFiles: Files,
+  actions: Actions,
+  onError: (message: string) => void,
+  onUpdate: (
+    type: ActionType,
+    path: string,
+    localData: FileData,
+    remoteData: FileData
+  ) => Promise<string | null>,
+  onConflict: (path: string, src: FileData, dest: FileData, direction: SyncDir) => Promise<ActionType>,
+): Promise<SyncResult> {
+  let actionedCount = 0;
+  for (let [file, action] of actions) {
+    let srcData = sourceFiles.get(file) as FileData;
+    let destData = destFiles.get(file) as FileData;
+    // ADD_LOCAL needs to be first, so we don't have to redo value checks for action
+    // TODO: this cannot be here, and needs to be refactored out. The conflict resolution
+    // needs to take place before anything else happens so it can be done in bulk with 
+    // obsidian's clunky input stuff.
+    // Hijacking the dry run stuff with input fields might be an idea as well
+    if (action == ActionType.ADD_LOCAL) {
+      action = await onConflict(
+        file,
+        srcData,
+        destData,
+        direction
+      );
+    }
+
+    if (action == ActionType.NOOP) {
+      continue; 
+    } else {
+      try {
+        onUpdate(
+          action,
+          file,
+          srcData,
+          destData
+        );
+        actionedCount += 1;
+      } catch (ex) {
+        // TODO: would be nice if this could be done atomically, but that feels involved.
+        // Especially remotely. But I'm pretty sure there's move functions in the client,
+        // so might be relatively easy
+        console.log(ex);
+        if (ex instanceof Error) {
+          onError(ex.message);
+        } else {
+          onError("An unknown error occurred");
+        }
+      }
+    }
+  }
+  return {
+    actionedCount,
+  }
 }

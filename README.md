@@ -14,7 +14,7 @@ This sync plugins differs substantially from many of the other sync plugins, due
 
 ## Rationale
 
-I have 20TB of self-hosted NAS storage, and 500GB of Proton Drive storage (part of what my 135 EUR/year gets me when I wanted protonmail, Proton VPN, and Proton Pass); I do not want to pay another 96 USD/year + bank currency conversion costs, so my data can sync to a different cloud than either of the two options I already have available. Until August 2025, I used syncthing, but the official Android app was discontinued. Although the client was forked, jumping from an official app developed by one person to an unofficial app developed by one person does not sound particularly tempting.
+I have 18TB of self-hosted NAS storage, and 500GB of Proton Drive storage (part of what my 135 EUR/year gets me when I wanted protonmail, Proton VPN, and Proton Pass); I do not want to pay another 96 USD/year + bank currency conversion costs, so my data can sync to a different cloud than either of the two options I already have available. Until August 2025, I used syncthing, but the official Android app was discontinued. Although the client was forked, jumping from an official app developed by one person to an unofficial app developed by one person does not sound particularly tempting.
 
 WebDAV, although being an open standard, has been heavily undermined by cloud services using proprietary protocols to vendor lock people into their specific ecosystem - a strategy that has been wildly successful. The additional consequence of this is that no free options exist for syncing WebDAV in a similar way to Obsidian. The hardest part here is file deletion, and this is a hard problem the sync plugins are struggling with as well. The solutions that claim to solve this are proprietary or otherwise expensive.
 
@@ -34,7 +34,11 @@ WebDAV, on the other hand, is both simple enough and well-established enough tha
 
 * Android or desktop (Windows or Linux)
     * macOS and iOS will not receive support from me, as I refuse to spend thousands of euros for inferior hardware and an inferior platform. If you need iOS or macOS support and it doesn't work due to Apple-specific problems, you're welcome to add it in a PR, but it will not be created, maintained, or tested any other way.
-* A WebDAV server. In theory, it should work with any WebDAV-compatible server, though I only test against [copyparty](https://github.com/9001/copyparty).
+* A WebDAV server. In theory, it should work with any WebDAV-compatible server, though I only test against [copyparty](https://github.com/9001/copyparty). More specific requirements:
+    * No inline  backups can be made, unless the calls to read the entire folder omits these as if they didn't exist, and only the latest version is exposed. For example, copyparty's default behaviour on push (without `daw`) is to create copies (such as `README.md-bunch of garbage here`), which then is exposed when accessing the directory. This means the vault is always out of sync, and treats the added history files as bad.
+    * `X-OC-MTime` should be supported. It's supported in copyparty out of the box. Without this, the last modified time cannot be synced in the remote, so a pull is required after the push to sync mtimes to the client. This is obviously a waste of download and resources.
+    * Dotfile reading; if folders and files starting with `.` are omitted, the obsidian folder cannot be synced across devices. This is described later
+    * **Not sure how to implement these?** Some known DAV servers are described later in this documentation.
 
 ### Android notes
 
@@ -43,6 +47,10 @@ Due to a [16 year old bug](https://issuetracker.google.com/issues/36906982), the
 Sync will still work if you put the vault on an SD card, but if you have a large vault, you'll need to download and upload the entire thing every time you sync. 
 
 The [underlying bug](https://github.com/LunarWatcher/obsidian-webdav-sync/issues/1) could be resolved by relying on hashes rather than `mtime`, but these are difficult to generate on the fly. Since it requires reading the full contents of the files, it'll still tank performance in large vaults, so it's not particularly helpful. Alternate solutions are welcome.
+
+### Stability notes
+
+Although the plugin shouldn't cause any problems, I strongly suggest taking backups of your vault, **especially** before the first sync. After the first sync, your devices act as a form of backup that can push a clean state back to the WebDAV server, provided it's correctly configured. However, the process of verifying that everything has been set up correctly and works correctly together is somewhat risky. You should back your vault up before using the plugin for the first time. You should also keep regular backups even if the risk is low - this is just good practice in general.
 
 ## Installation and setup
 

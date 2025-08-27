@@ -1,8 +1,13 @@
 import {App, Modal, normalizePath, Notice, setIcon, Setting} from "obsidian";
 import MyPlugin from "../main";
 import {canConnectWithSettings} from "settings";
-import {Actions, actionToDescriptiveString, ActionType, calculateSyncActions, FileData, Files, Path} from "./sync";
+import {Actions, actionToDescriptiveString, ActionType, calculateSyncActions, FileData, Files, Path, runSync, SyncDir } from "./sync";
 import {FileStat} from "webdav";
+
+export interface RemoteFileResult {
+  files: Files | null;
+  error: string | null;
+};
 
 export class UploadModal extends Modal {
   plugin: MyPlugin;
@@ -100,47 +105,36 @@ export class UploadModal extends Modal {
     elem.innerText = "";
   }
 
+  setError(err: string) {
+    new Notice(err);
+  }
+
   async upload(ev: any) {
     if (this.plugin.client == null) {
       return;
     }
     let local = await this.getVaultFiles();
     if (this.plugin.settings.sync.full_vault_sync) {
-      let remote = await this.getRemoteFiles(this.plugin.settings.sync.root_folder.dest);
+      let remoteResult = await this.getRemoteFiles(this.plugin.settings.sync.root_folder.dest);
+      if (remoteResult.error) {
+        this.setError(remoteResult.error);
+        return;
+      }
+
+      const remote = remoteResult.files as Files;
       let actions = calculateSyncActions(local, remote);
       
       if (!this.dryRun) {
         this.setLoading(ev.target);
-        let actionedCount = 0;
-        for (let [file, action] of actions) {
-          let localData = local.get(file);
-          // ADD_LOCAL needs to be first, so we don't have to redo value checks for action
-          if (action == ActionType.ADD_LOCAL) {
-            // Shut up typescript, you're drunk
-            action = this.resolveConflict(file, localData as FileData, remote.get(file) as FileData);
-          }
-
-          if (action == ActionType.NOOP) {
-            continue; 
-          } else if (action == ActionType.REMOVE) {
-            this.plugin.client.client.deleteFile(
-              this.plugin.settings.sync.root_folder.dest 
-                + "/"
-                + file
-            );
-          } else if (action == ActionType.ADD) {
-            this.plugin.client.client.putFileContents(
-              this.plugin.settings.sync.root_folder.dest 
-                + "/"
-                + file,
-                await this.app.vault.adapter.readBinary(file), {
-                  overwrite: true,
-                }
-            );
-          }
-
-          actionedCount += 1;
-        }
+        const { actionedCount } = await runSync(
+          SyncDir.DOWN,
+          local,
+          remote,
+          actions,
+          this.setError,
+          this.updateUpload.bind(this),
+          this.resolveConflict
+        )
 
         new Notice(`Push complete. ${actionedCount} files were updated.`);
         this.close();
@@ -158,43 +152,26 @@ export class UploadModal extends Modal {
     }
     let local = await this.getVaultFiles();
     if (this.plugin.settings.sync.full_vault_sync) {
-      let remote = await this.getRemoteFiles(this.plugin.settings.sync.root_folder.dest);
+      let remoteResult = await this.getRemoteFiles(this.plugin.settings.sync.root_folder.dest);
+      if (remoteResult.error) {
+        this.setError(remoteResult.error);
+        return;
+      }
+
+      const remote = remoteResult.files as Files;
       let actions = calculateSyncActions(remote, local);
 
       if (!this.dryRun) {
         this.setLoading(ev.target);
-        let actionedCount = 0;
-        for (let [file, action] of actions) {
-          // ADD_LOCAL needs to be first, so we don't have to redo value checks for action
-          if (action == ActionType.ADD_LOCAL) {
-            // Shut up typescript, you're drunk
-            action = this.resolveConflict(file, local.get(file) as FileData, remote.get(file) as FileData);
-          }
-
-          if (action == ActionType.NOOP) {
-            continue; 
-          } else if (action == ActionType.REMOVE) {
-            this.app.vault.adapter.remove(
-              normalizePath(file)
-            );
-          } else if (action == ActionType.ADD) {
-            let remoteData = remote.get(file) as FileData;
-            this.app.vault.adapter.writeBinary(
-              normalizePath(file),
-              await this.plugin.client.client.getFileContents(
-                this.resolvePath(
-                  this.plugin.settings.sync.root_folder.dest,
-                  file
-                ), {
-                  format: "binary"
-                }
-              ) as ArrayBuffer, {
-                mtime: remoteData.lastModified as number
-              }
-            );
-            actionedCount += 1;
-          }
-        }
+        const { actionedCount } = await runSync(
+          SyncDir.DOWN,
+          remote,
+          local,
+          actions,
+          this.setError,
+          this.updateDownload.bind(this),
+          this.resolveConflict
+        )
         new Notice(`Pull complete. ${actionedCount} files were updated.`);
         this.close();
       } else {
@@ -203,7 +180,80 @@ export class UploadModal extends Modal {
         this.showTaskGraph(actions, false);
       }
     }
+  }
 
+  async updateDownload(
+    type: ActionType,
+    file: string,
+    _localData: FileData,
+    remoteData: FileData
+  ): Promise<string | null> {
+    if (this.plugin.client == null) {
+      throw Error("This should never throw");
+    }
+    if (type == ActionType.ADD_LOCAL) {
+      throw Error("Unexpected ADD_LOCAL; this should've been processed by now");
+    }
+    switch (type) {
+      case ActionType.ADD:
+        await this.app.vault.adapter.writeBinary(
+          normalizePath(file),
+          await this.plugin.client.client.getFileContents(
+            this.resolvePath(
+              this.plugin.settings.sync.root_folder.dest,
+              file
+            ), {
+              format: "binary"
+            }
+          ) as ArrayBuffer, {
+            mtime: remoteData.lastModified as number
+          }
+        );
+        break;
+      case ActionType.REMOVE:
+        await this.app.vault.adapter.remove(
+          normalizePath(file)
+        );
+        break;
+    }
+    return null;
+  }
+
+  async updateUpload(
+    type: ActionType,
+    file: string,
+    localData: FileData,
+    _remoteData: FileData
+  ): Promise<string | null> {
+    if (this.plugin.client == null) {
+      throw Error("This should never throw");
+    }
+    if (type == ActionType.ADD_LOCAL) {
+      throw Error("Unexpected ADD_LOCAL; this should've been processed by now");
+    }
+    switch (type) {
+      case ActionType.ADD:
+        await this.plugin.client.client.putFileContents(
+          this.plugin.settings.sync.root_folder.dest 
+          + "/"
+          + file,
+          await this.app.vault.adapter.readBinary(file), {
+            overwrite: true,
+            headers: {
+              "X-OC-MTime": Math.floor((localData.lastModified || -1) / 1000).toString()
+            }
+          }
+        );
+        break;
+      case ActionType.REMOVE:
+        await this.plugin.client.client.deleteFile(
+          this.plugin.settings.sync.root_folder.dest 
+          + "/"
+          + file
+        );
+        break;
+    }
+    return null;
   }
 
   resolvePath(webdav: string, file: string) {
@@ -218,7 +268,6 @@ export class UploadModal extends Modal {
     const files: { path: string, lastModified: number | null }[] = [];
     while (queue.length > 0) {
       const elem = queue.pop() as string;
-      console.log(elem);
       const next = await this.app.vault.adapter.list(
         normalizePath(elem)
       );
@@ -246,45 +295,63 @@ export class UploadModal extends Modal {
     return out;
   }
 
-  resolveConflict(file: string, src: FileData, dest: FileData): ActionType {
+  async resolveConflict(file: string, src: FileData, dest: FileData, dir: SyncDir): Promise<ActionType> {
     // TODO: handle properly
+    // TODO: this likely cannot be a 
     return ActionType.ADD;
   }
 
-  async getRemoteFiles(folder: string): Promise<Files> {
-    console.log(folder);
+  async getRemoteFiles(folder: string): Promise<RemoteFileResult> {
     if (this.plugin.client == null) {
-      return new Map();
+      return {
+        files: null,
+        error: "No connection established"
+      };
     }
-    const files = await this.plugin.client.client.getDirectoryContents(
-      folder, {
-        deep: true,
-      }
-    ) as FileStat[];
-    const out = new Map();
+    try {
+      const files = await this.plugin.client.client.getDirectoryContents(
+        folder, {
+          deep: true,
+        }
+      ) as FileStat[];
+      const out = new Map();
 
-    for (const file of files) {
-      // Obsidian does not include directories, so this is necessary to avoid every folder
-      // being marked for removal
-      // TODO: this should mean that stub folders aren't deleted either. Separating them into a separate map
-      // with special deletion logic is probably a good idea.
-      if (file.type == "directory") {
-        continue;
+      for (const file of files) {
+        // Obsidian does not include directories, so this is necessary to avoid every folder
+        // being marked for removal
+        // TODO: this should mean that stub folders aren't deleted either. Separating them into a separate map
+        // with special deletion logic is probably a good idea.
+        if (file.type == "directory") {
+          continue;
+        }
+
+        out.set(
+          file.filename.replace(folder + (folder.endsWith("/") ? "" : "/"), ""),
+          {
+            lastModified: Date.parse(file.lastmod)
+          } as FileData
+        )
       }
 
-      out.set(
-        file.filename.replace(folder + (folder.endsWith("/") ? "" : "/"), ""),
-        {
-          lastModified: Date.parse(file.lastmod)
-        } as FileData
-      )
+      return {
+        files: out,
+        error: null
+      };
+    } catch (ex) {
+      if (ex instanceof Error) {
+        if (ex.message.contains("Failed to fetch")) {
+          return {
+            files: null,
+            error: "Failed to fetch from remote server. Has the server gone down?"
+          };
+        }
+      } 
+      throw ex;
     }
-
-    return out;
   }
 
   onClose() {
     const { contentEl } = this;
     contentEl.empty();
   }
-};
+}

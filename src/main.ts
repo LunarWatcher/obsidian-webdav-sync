@@ -1,7 +1,7 @@
+import {Notice, Plugin} from 'obsidian';
+import {DEFAULT_SETTINGS, settings_t, WebDAVSettingsTab} from 'settings';
 import {Connection} from './fs/webdav';
-import { App, Editor, MarkdownView, Modal, Notice, Plugin } from 'obsidian';
-import { DEFAULT_SETTINGS, settings_t, WebDAVSettingsTab } from 'settings';
-import { UploadModal } from './sync/upload_modal'
+import {UploadModal} from './sync/upload_modal';
 
 export default class MyPlugin extends Plugin {
   settings: settings_t;

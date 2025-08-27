@@ -169,8 +169,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
                 return;
               }
 
-              // Typescript is a fucking worthless pile of shit.
-              // See regenerateFolderMappings for why this is converted to any
+              // Typescript is a fucking worthless pile of shit. This is a load-bearing `any`
               (this.plugin.settings.sync.subfolders as any)[newVaultFolder] = {
                 dest: newShare
               } as FolderDestination;
