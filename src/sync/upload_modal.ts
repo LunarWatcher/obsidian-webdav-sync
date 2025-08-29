@@ -95,7 +95,7 @@ export class UploadModal extends Modal {
         actionElem
       )
 
-      body.append(elem);
+      body.insertAdjacentElement("beforeend", elem);
     }
     tab.setAttr("style", "display: inline-block");
   }
