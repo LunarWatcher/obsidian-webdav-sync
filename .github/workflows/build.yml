@@ -29,6 +29,7 @@ jobs:
           path: obsidian-webdav-sync
           if-no-files-found: error
   integration:
+    needs: artefacts
     strategy:
       fail-fast: false
       matrix:
