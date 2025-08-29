@@ -52,12 +52,13 @@ These tests may be harder to run locally, as you need the following installed:
 
 * Python (obviously)
 * Obsidian (surprised pikachu)
-* A chromedriver corresponding to the Chromium version used by Obsidian. This version differs from the latest version of Chrome/chromium, so simply having one of those installed is not enough. This is hard
 
-GitHub Actions automates step 3 via the [setup-chromedriver action](https://github.com/marketplace/actions/setup-chromedriver), so no scripts have been written for this. There's also no guarantee that obsidian won't interfere with your local state. There are safeties in place to avoid this, but you could still get a new default vault.
+Plus an npm dependency.
 
-These are automatically run on the CI, so there's no requirements to run them locally. Should you wish to do so anyway:
 ```
+# Required for the electron-chromedriver
+npm i --include=dev
+
 cd integration-tests
 python3 -m venv env 
 # This varies by OS and shell
