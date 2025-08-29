@@ -185,8 +185,8 @@ export class UploadModal extends Modal {
   async updateDownload(
     type: ActionType,
     file: string,
-    _localData: FileData,
-    remoteData: FileData
+    srcData: FileData,
+    _destData: FileData
   ): Promise<string | null> {
     if (this.plugin.client == null) {
       throw Error("This should never throw");
@@ -206,7 +206,7 @@ export class UploadModal extends Modal {
               format: "binary"
             }
           ) as ArrayBuffer, {
-            mtime: remoteData.lastModified as number
+            mtime: srcData.lastModified as number
           }
         );
         break;
@@ -222,8 +222,8 @@ export class UploadModal extends Modal {
   async updateUpload(
     type: ActionType,
     file: string,
-    localData: FileData,
-    _remoteData: FileData
+    srcData: FileData,
+    _destData: FileData
   ): Promise<string | null> {
     if (this.plugin.client == null) {
       throw Error("This should never throw");
@@ -240,7 +240,7 @@ export class UploadModal extends Modal {
           await this.app.vault.adapter.readBinary(file), {
             overwrite: true,
             headers: {
-              "X-OC-MTime": Math.floor((localData.lastModified || -1) / 1000).toString()
+              "X-OC-MTime": Math.floor((srcData.lastModified || -1) / 1000).toString()
             }
           }
         );
@@ -276,7 +276,7 @@ export class UploadModal extends Modal {
         const stat = await this.app.vault.adapter.stat(file);
         files.push({
           path: file,
-          lastModified: stat?.mtime || null,
+          lastModified: stat?.mtime || stat?.ctime || null,
         });
       }
     }
@@ -297,7 +297,7 @@ export class UploadModal extends Modal {
 
   async resolveConflict(file: string, src: FileData, dest: FileData, dir: SyncDir): Promise<ActionType> {
     // TODO: handle properly
-    // TODO: this likely cannot be a 
+    // TODO: this likely cannot be a separate function
     return ActionType.ADD;
   }
 

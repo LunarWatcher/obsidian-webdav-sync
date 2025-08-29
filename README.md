@@ -14,7 +14,7 @@ This sync plugins differs substantially from many of the other sync plugins, due
 
 ## Rationale
 
-I have 18TB of self-hosted NAS storage, and 500GB of Proton Drive storage (part of what my 135 EUR/year gets me when I wanted protonmail, Proton VPN, and Proton Pass); I do not want to pay another 96 USD/year + bank currency conversion costs, so my data can sync to a different cloud than either of the two options I already have available. Until August 2025, I used syncthing, but the official Android app was discontinued. Although the client was forked, jumping from an official app developed by one person to an unofficial app developed by one person does not sound particularly tempting.
+I have 18TB of self-hosted NAS storage, and 500GB of Proton Drive storage (part of what my 120 EUR/year gets me when I wanted protonmail, Proton VPN, and Proton Pass); I do not want to pay another 96 USD/year + bank currency conversion costs, so my data can sync to a different cloud than either of the two options I already have available. Until August 2025, I used syncthing, but the official Android app was discontinued. Although the client was forked, jumping from an official app developed by one person to an unofficial app developed by one person does not sound particularly tempting.
 
 WebDAV, although being an open standard, has been heavily undermined by cloud services using proprietary protocols to vendor lock people into their specific ecosystem - a strategy that has been wildly successful. The additional consequence of this is that no free options exist for syncing WebDAV in a similar way to Obsidian. The hardest part here is file deletion, and this is a hard problem the sync plugins are struggling with as well. The solutions that claim to solve this are proprietary or otherwise expensive.
 
@@ -38,7 +38,7 @@ WebDAV, on the other hand, is both simple enough and well-established enough tha
     * No inline  backups can be made, unless the calls to read the entire folder omits these as if they didn't exist, and only the latest version is exposed. For example, copyparty's default behaviour on push (without `daw`) is to create copies (such as `README.md-bunch of garbage here`), which then is exposed when accessing the directory. This means the vault is always out of sync, and treats the added history files as bad.
     * `X-OC-MTime` should be supported. It's supported in copyparty out of the box. Without this, the last modified time cannot be synced in the remote, so a pull is required after the push to sync mtimes to the client. This is obviously a waste of download and resources.
     * Dotfile reading; if folders and files starting with `.` are omitted, the obsidian folder cannot be synced across devices. This is described later
-    * **Not sure how to implement these?** Some known DAV servers are described later in this documentation.
+    * **Not sure how to toggle these?** Some known DAV servers are described later in this documentation.
 
 ### Android notes
 
