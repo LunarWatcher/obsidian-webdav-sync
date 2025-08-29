@@ -28,3 +28,23 @@ jobs:
           name: obsidian-webdav-sync
           path: obsidian-webdav-sync
           if-no-files-found: error
+  integration:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            mobile-mock: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - run: printenv
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+      - name: Npm dev deps
+        run: |
+          npm i --include=dev
+      - uses: actions/download-artifact@v5
+        with:
+          name: obsidian-webdav-sync
+      - name: Show artefact tree
+        run: ls obsidian-webdav-sync
