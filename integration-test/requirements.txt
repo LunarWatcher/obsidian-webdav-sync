@@ -1,0 +1,4 @@
+selenium
+pytest
+
+copyparty>=1.19.7

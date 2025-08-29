@@ -41,6 +41,36 @@ There's also `./scripts/bundle.sh`, which creates a folder in the repo containin
 
 Some functionality is tested via jest. Running these tests can be done with `npm run test`. They're also run automatically in the CI when a PR is made.
 
+### Integration testing
+
+The integration tests make up the majority of the tests, as the majority of the functionality requires obsidian available to be reliably tested. These tests are written in python for two major reasons:
+
+1. It gives easier access to copyparty, a fantastic WebDAV server that happens to be written in Python
+2. Fuck TypeScript, with a cactus. 
+
+These tests may be harder to run locally, as you need the following installed:
+
+* Python (obviously)
+* Obsidian (surprised pikachu)
+* A chromedriver corresponding to the Chromium version used by Obsidian. This version differs from the latest version of Chrome/chromium, so simply having one of those installed is not enough. This is hard
+
+GitHub Actions automates step 3 via the [setup-chromedriver action](https://github.com/marketplace/actions/setup-chromedriver), so no scripts have been written for this. There's also no guarantee that obsidian won't interfere with your local state. There are safeties in place to avoid this, but you could still get a new default vault.
+
+These are automatically run on the CI, so there's no requirements to run them locally. Should you wish to do so anyway:
+```
+cd integration-tests
+python3 -m venv env 
+# This varies by OS and shell
+source ./env/bin/activate
+
+pip3 install -r requirements.txt
+# Equivalent instructions for windows is left as an exercise to
+# the masochistic reader
+export OBSIDIAN_LOCATION=$(which obsidian)
+
+python3 -m pytest
+```
+For Linux users, at least X11 users, you can run `xvfb-run python3 -m pytest` to hide the GUI.
 
 ## Making a release
 

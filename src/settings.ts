@@ -96,6 +96,23 @@ export class WebDAVSettingsTab extends PluginSettingTab {
                 await this.plugin.saveSettings();
               })
         )
+      new Setting(containerEl)
+        .setName("Ignore workspace files")
+        .setDesc(
+          "Whether or not to sync worksapce.json and workspace-mobile.json. Leaving this off is strongly encouraged. "
+          + "The workspace files contain some information about editor state. As such, it's highly prone to "
+          + "conflicts, because any change in the layout will also update these files. "
+          + "There's no consequences for turning it beyond needing to decide which to keep at a potentially "
+          + "higher rate, as simply opening files in obsidian is enough to cause conflicts."
+        )
+        .addToggle(toggle =>
+            toggle
+              .setValue(this.plugin.settings.sync.ignore_workspace)
+              .onChange(async (value) => {
+                this.plugin.settings.sync.ignore_workspace = value
+                await this.plugin.saveSettings();
+              })
+        )
 
       new Setting(containerEl)
         .setName("WebDAV share for the full vault")
