@@ -23,7 +23,6 @@ jobs:
           cp manifest.json $OUTPUT
           ls $OUTPUT
       - uses: actions/upload-artifact@v4
-        if: github.ref == 'refs/heads/master'
         with:
           name: obsidian-webdav-sync
           path: obsidian-webdav-sync
