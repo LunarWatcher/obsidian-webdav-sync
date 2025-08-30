@@ -63,11 +63,14 @@ jobs:
         with:
           repository: obsidianmd/obsidian-releases
           latest: true
+          tarBall: false
+          zipBall: false
           fileName: ${{ matrix.artefact }}
           out-file-path: obsidian_inst
       - name: DEBUG
         run: |
           ls 
+          ls obsidian_inst || 0
       - name: Install obsidian (Ubuntu)
         if: ${{ matrix.os }} == "ubuntu-latest"
         run: |
