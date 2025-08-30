@@ -1,12 +1,12 @@
-import pytest
-from selenium.common.exceptions import NoSuchWindowException
-from selenium.webdriver import ActionChains, Chrome, ChromeOptions, Keys
 import os
+import shutil
 from time import sleep
 
+import pytest
+from selenium.common.exceptions import NoSuchWindowException
+from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-import shutil
 
 from tests.utils import execute
 
