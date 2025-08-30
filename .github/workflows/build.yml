@@ -71,7 +71,8 @@ jobs:
       - name: Install obsidian (Ubuntu)
         if: ${{ matrix.os }} == "ubuntu-latest"
         run: |
-          sudo apt install -y ./obsidian_inst
+          mv obsidian_inst obsidian_inst.deb
+          sudo apt install -y ./obsidian_inst.deb
       - name: Python deps
         working-directory: integration-tests/
         run: |
