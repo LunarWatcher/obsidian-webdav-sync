@@ -53,3 +53,8 @@ jobs:
           path: obsidian-webdav-sync
       - name: Show artefact tree
         run: ls obsidian-webdav-sync
+      - name: Python deps
+        working-directory: ./integration-tests/
+        run: |
+          pip3 install --break-system-packages -r requirements.txt 
+        
