@@ -50,5 +50,6 @@ jobs:
       - uses: actions/download-artifact@v5
         with:
           name: obsidian-webdav-sync
+          path: obsidian-webdav-sync
       - name: Show artefact tree
         run: ls obsidian-webdav-sync
