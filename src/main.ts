@@ -28,6 +28,7 @@ export default class MyPlugin extends Plugin {
       }
       new UploadModal(this.app, this).open();
     });
+    ribbonIconEl.id = "webdav-ribbon-btn"
 
   }
 

@@ -41,6 +41,47 @@ There's also `./scripts/bundle.sh`, which creates a folder in the repo containin
 
 Some functionality is tested via jest. Running these tests can be done with `npm run test`. They're also run automatically in the CI when a PR is made.
 
+### Integration testing
+
+The integration tests make up the majority of the tests, as the majority of the functionality requires obsidian available to be reliably tested. These tests are written in python for two major reasons:
+
+1. It gives easier access to copyparty, a fantastic WebDAV server that happens to be written in Python
+2. Fuck TypeScript, with a cactus. 
+
+These tests may be harder to run locally, as you need the following installed:
+
+* Python (obviously)
+* Obsidian (surprised pikachu)
+
+Plus an npm dependency.
+
+```
+# Required for the electron-chromedriver
+npm i --include=dev
+# Build
+npm run build 
+# !!!OR!!!
+npm run dev
+# Both work
+
+# Create dist/obsidian-webdav-sync and move the stuff into it
+# This is where the tests look for the plugin for copying into
+# the test vault
+./scripts/bundle.sh
+
+cd integration-tests
+python3 -m venv env 
+# This varies by OS and shell
+source ./env/bin/activate
+
+pip3 install -r requirements.txt
+# Equivalent instructions for windows is left as an exercise to
+# the masochistic reader
+export OBSIDIAN_LOCATION=$(which obsidian)
+
+python3 -m pytest
+```
+For Linux users, at least X11 users, you can run `xvfb-run python3 -m pytest` to hide the GUI.
 
 ## Making a release
 

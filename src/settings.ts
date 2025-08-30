@@ -44,7 +44,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
     //
     // Some other solutions seem to involve using react, but I'd sooner die than use react. It's already bad enough
     // that obsidian is Electron-based
-    containerEl.insertAdjacentHTML("beforeend", "<h1>WebDAV Sync settings</h1>");
+    containerEl.insertAdjacentHTML("beforeend", "<h1 id='webdav-sync-settings-header'>WebDAV Sync settings</h1>");
     { 
       containerEl.insertAdjacentHTML("beforeend", "<h2>Server connection settings</h2>");
 
@@ -93,6 +93,23 @@ export class WebDAVSettingsTab extends PluginSettingTab {
               .setValue(this.plugin.settings.sync.full_vault_sync)
               .onChange(async (value) => {
                 this.plugin.settings.sync.full_vault_sync = value
+                await this.plugin.saveSettings();
+              })
+        )
+      new Setting(containerEl)
+        .setName("Ignore workspace files")
+        .setDesc(
+          "Whether or not to sync workspace.json and workspace-mobile.json. Leaving this off is strongly encouraged. "
+          + "The workspace files contain some information about editor state. As such, it's highly prone to "
+          + "conflicts, because any change in the layout will also update these files. "
+          + "There's no consequences for turning it beyond needing to decide which to keep at a potentially "
+          + "higher rate, as simply opening files in obsidian is enough to cause conflicts."
+        )
+        .addToggle(toggle =>
+            toggle
+              .setValue(this.plugin.settings.sync.ignore_workspace)
+              .onChange(async (value) => {
+                this.plugin.settings.sync.ignore_workspace = value
                 await this.plugin.saveSettings();
               })
         )

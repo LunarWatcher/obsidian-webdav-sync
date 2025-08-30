@@ -31,6 +31,7 @@ export interface SyncSettings {
   root_folder: FolderDestination;
   // Thanks, typescript. You're super good at making types reliable
   subfolders: object;
+  ignore_workspace: boolean;
 };
 
 export const DEFAULT_SYNC_SETTINGS: SyncSettings = {
@@ -39,4 +40,5 @@ export const DEFAULT_SYNC_SETTINGS: SyncSettings = {
     dest: ""
   },
   subfolders: {},
+  ignore_workspace: true,
 };

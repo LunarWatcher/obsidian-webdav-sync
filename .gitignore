@@ -1,7 +1,13 @@
 dist/
 .env.dev
 
+# Jest coverage output folder
 /coverage/
+
+# Python venv
+integration-test/env/
+integration-test/chromedriver
+
 
 # vscode
 .vscode 
