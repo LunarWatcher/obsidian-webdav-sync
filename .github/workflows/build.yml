@@ -47,6 +47,8 @@ jobs:
       - run: printenv
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
       - name: Npm dev deps
         run: |
           npm i --include=dev
