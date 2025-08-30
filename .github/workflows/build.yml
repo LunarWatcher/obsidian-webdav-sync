@@ -40,7 +40,7 @@ jobs:
           - os: ubuntu-latest
             artefact: '*_amd64.deb'
             command-extras: xvfb-run
-          - os: windows-latest
+          - os: windows-2025
             artefact: null
     runs-on: ${{ matrix.os }}
     steps:
