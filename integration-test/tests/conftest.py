@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 from time import sleep
 
 import pytest
@@ -32,6 +33,35 @@ def obsidian(vault: str):
     yield driver
 
     driver.quit()
+
+@pytest.fixture
+def copyparty():
+    def nuke_dirs():
+        if os.path.exists(CACHE):
+            shutil.rmtree(CACHE)
+        if os.path.exists(DATA_DIR):
+            shutil.rmtree(DATA_DIR)
+    assert os.path.exists("./copyparty.conf"), \
+        "You're probably in the wrong working directory"
+    CACHE = "./copyparty-cache"
+    DATA_DIR = "./copyparty/"
+    BASE_URL = "http://localhost:62169"
+
+    nuke_dirs()
+    proc = subprocess.Popen(
+        ["copyparty", "-c", "./copyparty.conf"]
+    )
+    sleep(2)
+    assert proc.poll() is None, \
+        "Failed to start copyparty"
+
+    yield BASE_URL
+
+    try:
+        proc.terminate()
+        proc.wait(1)
+    finally:
+        nuke_dirs()
 
 def _install_plugin(vault_path: str, plugin_dist_path: str):
     if not os.path.exists(plugin_dist_path):

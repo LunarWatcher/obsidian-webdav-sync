@@ -1,4 +1,5 @@
 selenium
 pytest
 
-copyparty>=1.19.7
+# Pinned just in case later changes makes it incompatible
+copyparty==1.19.7
