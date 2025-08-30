@@ -70,7 +70,7 @@ jobs:
           name: ${{ matrix.artefact }}
           name_is_regexp: true
           path: .
-          repo: github.com/obsidianmd/obsidian-releases
+          repo: obsidianmd/obsidian-releases
       - name: DEBUG
         run: |
           ls 
