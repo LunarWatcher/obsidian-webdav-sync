@@ -58,6 +58,16 @@ Plus an npm dependency.
 ```
 # Required for the electron-chromedriver
 npm i --include=dev
+# Build
+npm run build 
+# !!!OR!!!
+npm run dev
+# Both work
+
+# Create dist/obsidian-webdav-sync and move the stuff into it
+# This is where the tests look for the plugin for copying into
+# the test vault
+./scripts/bundle.sh
 
 cd integration-tests
 python3 -m venv env 

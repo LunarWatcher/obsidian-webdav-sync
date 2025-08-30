@@ -38,7 +38,6 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            mobile-mock: false
             artefact: '*_amd64.deb'
     runs-on: ${{ matrix.os }}
     steps:
@@ -55,9 +54,10 @@ jobs:
       - uses: actions/download-artifact@v5
         with:
           name: obsidian-webdav-sync
-          path: obsidian-webdav-sync
+          path: dist/obsidian-webdav-sync
       - name: Show artefact tree
-        run: ls obsidian-webdav-sync
+        run: ls dist/obsidian-webdav-sync
+
       - name: Yoink Obsidian .deb
         uses: robinraju/release-downloader@v1
         with:

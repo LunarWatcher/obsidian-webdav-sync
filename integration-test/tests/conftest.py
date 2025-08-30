@@ -1,6 +1,6 @@
 import pytest
 from selenium.common.exceptions import NoSuchWindowException
-from selenium.webdriver import Chrome, ChromeOptions
+from selenium.webdriver import ActionChains, Chrome, ChromeOptions, Keys
 import os
 from time import sleep
 
@@ -12,10 +12,18 @@ from tests.utils import execute
 
 @pytest.fixture
 def vault():
-    dummy_vault = os.path.join(os.getcwd(), "test_vault")
-    yield dummy_vault
+    test_vault = os.path.join(os.getcwd(), "test_vault")
+    if os.path.exists(test_vault):
+        # Probably an internal fixture failure; clean up after the fact
+        shutil.rmtree(test_vault)
+    shutil.copytree(
+        "./test-vaults/trans-rights-are-human-rights/",
+        test_vault
+    )
+    _install_plugin(test_vault, "../dist/obsidian-webdav-sync")
+    yield test_vault
 
-    shutil.rmtree(dummy_vault)
+    shutil.rmtree(test_vault)
 
 @pytest.fixture
 def obsidian(vault: str):
@@ -25,16 +33,27 @@ def obsidian(vault: str):
 
     driver.quit()
 
-def _load_vault(driver: Chrome, vault_path: str):
-    # No IDs, brute force
-    # This will fall apart if not english
-    for btn in driver.find_elements(By.TAG_NAME, "button"):
-        if (btn.text == "Create"):
-            btn.click()
-            break
-    else:
-        raise RuntimeError("Failed to locate create button")
+def _install_plugin(vault_path: str, plugin_dist_path: str):
+    if not os.path.exists(plugin_dist_path):
+        raise RuntimeError(
+            "Developer error: <git root>/dist/obsidian-webdav-sync doesn't exist"
+        )
+    shutil.copytree(
+        plugin_dist_path,
+        # The three hardest problems in software:
+        # * Naming things
+        # * Cache invalidation
+        # * Telling whether directory operations are inclusive or exclusive of
+        #   the specified target directory
+        os.path.join(
+            vault_path,
+            ".obsidian",
+            "plugins",
+            "obsidian-webdav-sync"
+        ),
+    )
 
+def _load_vault(driver: Chrome, vault_path: str):
     # Forcibly mock the file dialogs
     # You have no power here, electron >:3
     # (This is necessary because obsidian doesn't provide a CLI)
@@ -48,32 +67,58 @@ def _load_vault(driver: Chrome, vault_path: str):
         }};
         """.format(vault_path)
     )
-
-    elem = driver.find_element(
-        By.CSS_SELECTOR,
-        'input[placeholder="Vault name"]'
-    )
-    elem.send_keys("trans-rights-are-human-rights")
-    sleep(1)
-
-    for btn in driver.find_elements(By.TAG_NAME, "button"):
-        if (btn.text == "Browse"):
-            btn.click()
-            break
+    if os.path.exists(vault_path):
+        print("Vault found; assuming from the vault fixture")
+        for btn in driver.find_elements(By.TAG_NAME, "button"):
+            if (btn.text == "Open"):
+                btn.click()
+                break
+        else:
+            raise RuntimeError("Failed to locate open button")
     else:
-        raise RuntimeError("Failed to initialise URL")
-
-    try:
+        print("Creating new vault")
+        # No IDs, brute force
+        # This will fall apart if not english
         for btn in driver.find_elements(By.TAG_NAME, "button"):
             if (btn.text == "Create"):
                 btn.click()
                 break
+        else:
+            raise RuntimeError("Failed to locate create button")
+
+        elem = driver.find_element(
+            By.CSS_SELECTOR,
+            'input[placeholder="Vault name"]'
+        )
+        elem.send_keys("trans-rights-are-human-rights")
+        sleep(1)
+
+        for btn in driver.find_elements(By.TAG_NAME, "button"):
+            if (btn.text == "Browse"):
+                btn.click()
+                break
+        else:
+            raise RuntimeError("Failed to initialise URL")
+
+        for btn in driver.find_elements(By.TAG_NAME, "button"):
+            if (btn.text == "Create"):
+                btn.click()
+                break
+    try:
         sleep(1)
         driver.page_source
 
     except NoSuchWindowException:
         assert len(driver.window_handles) == 1
         driver.switch_to.window(driver.window_handles[0])
+
+        for btn in driver.find_elements(By.TAG_NAME, "button"):
+            if (btn.text == "Trust author and enable plugins"):
+                btn.click()
+                break
+        else:
+            raise RuntimeError("Failed to locate trust button")
+
         return
     # No exception means the window wasn't closed. When obsidian boots, it
     # closes the launcher and opens obsidian proper. Under the hood, these are
