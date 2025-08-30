@@ -1,3 +1,4 @@
+from typing import Literal
 import pytest
 from selenium.webdriver import ActionChains, Chrome, Keys
 from selenium.webdriver.common.by import By
@@ -90,3 +91,38 @@ def get_settings_data(driver: Chrome):
         """
     )["result"]["value"])
 
+def default_settings(
+    username: Literal["full", "limited"] = "full"
+):
+    """
+    Returns the default settings that'll be used for most tests.
+    This doesn't need to be explicitly called unless the object is modified, as
+    inject_settings with settings_object = None will call this function
+    automagically to get the defaults.
+    """
+    return {
+        "server_conf": {
+            "username": username,
+            "password": {
+                "full": "password",
+                "limited": "password2"
+            }[username],
+            "url": "http://localhost:62169"
+        },
+        "sync": {
+            "full_vault_sync": True,
+            "root_folder": "/vault",
+            "subfolders": {},
+            "ignore_workspace": True,
+        }
+    }
+
+def inject_settings(driver: Chrome, settings_object = None):
+    """
+    Injects the provided settings into the app.
+    If settings_object is none, default settings are used.
+    """
+    if settings_object is None:
+        settings_object = default_settings()
+
+    pass

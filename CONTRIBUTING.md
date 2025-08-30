@@ -10,6 +10,18 @@ Generative AI uses training data [based on plagiarism and piracy](https://web.ar
 
 PRs should be made to the `master` branch, which is also the main development branch. Releases don't go on a branch, they're tags.
 
+### Aside: Windows and Mac users
+
+Windows and Linux are the only two desktop operating systems receiving active support. Mac does not. This  section contains things to look out for as a result.
+
+MacOS users should probably assume that most things can and will break. If you'd like to fix them, open a PR.
+
+#### Windows-specific issues
+
+Windows lacks support for most of the scripts used to support development. You're on your own with these, as no equivalents will be supported.
+
+You also will run into problems with the integration tests, as several of the paths are hard-coded to UNIX-compatible paths. These will eventually be fixed, and Windows on the CI is a priority, provided it's possible to install obsidian headlessly on Windows.
+
 ## Development setup
 
 After cloning:
@@ -83,6 +95,16 @@ python3 -m pytest
 ```
 For Linux users, at least X11 users, you can run `xvfb-run python3 -m pytest` to hide the GUI.
 
+## Making changes
+
+This section does not describe how to actually make the changes (it's assumed you know how to code and use git; if you don't, see https://opensource.guide/ ), but describes some pitfalls with certain specific changes.
+
+### Changes to settings
+
+One consequence of the integration tests being written in python rather than TS is that there's no type sync between the tests and the plugin. If you make changes to the settings objects, a corresponding change needs to me made in `integration-test/tests/utils.py`, in the `default_settings` function.
+
+The default settings correspond to the expected default behaviour of the vault, but these may differ from the real default values. For example, the default URL is null, while in `default_settings`, it's set to a test environment-specific URL. If you're unsure about what to set the value to, you can set it to match the default.
+
 ## Making a release
 
 (You do not need to follow this unless you're me)
@@ -93,5 +115,5 @@ The version has to be bumped in two places:
 * `manifest.json`
 
 
-There's also a [`versions.json`, described by obsidian](https://docs.obsidian.md/Reference/Versions), but this is not in use yet, as it doesn't seem to be required.
+There's also a [`versions.json`, described by obsidian](https://docs.obsidian.md/Reference/Versions), but this is not in use yet, as it doesn't seem to be required (plus, nothing has been released yet).
 

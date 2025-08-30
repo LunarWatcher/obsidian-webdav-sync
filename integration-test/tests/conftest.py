@@ -176,12 +176,26 @@ def _get_driver() -> Chrome:
         service=service,
         options=opts
     )
+
+    # The default timeouts are set low to speed up the tests in the event of
+    # failure. THe default is either 10 or 30 (I forget), which is _way_ too
+    # long to wait for tests to fail.
+    # Obsidian is relatively fast, and because it's an electron app, no weird
+    # network conditions need to be addressed in its load.
+    # 2 seconds is still too high, but it's either 5 fails (10s default) or
+    # 15 fails (30s default) in the time it would take one to fail with the
+    # standards.
+    # It might be possible to reduce this to 1, but I don't feel like debugging
+    # weird edge-cases caused by the CI being slow
+    driver.set_script_timeout(2)
+    driver.implicitly_wait(2)
+
     return driver
 
 
 def create_service():
     return Service(
-        # TODO: probably not portable
+        # TODO: probably not portable, I assume windows has chromedriver.exe
         "../node_modules/.bin/chromedriver"
     )
 
