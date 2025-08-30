@@ -39,7 +39,7 @@ jobs:
         include:
           - os: ubuntu-latest
             mobile-mock: false
-            artefact: obsidian_[^_]_amd64.deb
+            artefact: '*_amd64.deb'
     runs-on: ${{ matrix.os }}
     steps:
       - run: printenv
@@ -59,21 +59,19 @@ jobs:
       - name: Show artefact tree
         run: ls obsidian-webdav-sync
       - name: Yoink Obsidian .deb
-        id: download-artifact
-        # Yes, this is a different artefact downloader. The official one does not support
-        # releases
-        uses: dawidd6/action-download-artifact@v11
+        uses: robinraju/release-downloader@v1
         with:
-          github_token: ${{secrets.GITHUB_TOKEN}}
-          workflow: workflow_name.yml
-          ref: v1.9.12
-          name: ${{ matrix.artefact }}
-          name_is_regexp: true
-          path: .
-          repo: obsidianmd/obsidian-releases
+          repository: obsidianmd/obsidian-releases
+          latest: true
+          fileName: ${{ matrix.artefact }}
+          out-file-path: obsidian_inst
       - name: DEBUG
         run: |
           ls 
+      - name: Install obsidian (Ubuntu)
+        if: ${{ matrix.os }} == "ubuntu-latest"
+        run: |
+          sudo apt install -y ./obsidian_inst
       - name: Python deps
         working-directory: integration-tests/
         run: |
