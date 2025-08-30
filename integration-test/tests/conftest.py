@@ -8,6 +8,8 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 import shutil
 
+from tests.utils import execute
+
 @pytest.fixture
 def vault():
     dummy_vault = os.path.join(os.getcwd(), "test_vault")
@@ -36,18 +38,15 @@ def _load_vault(driver: Chrome, vault_path: str):
     # Forcibly mock the file dialogs
     # You have no power here, electron >:3
     # (This is necessary because obsidian doesn't provide a CLI)
-    driver.execute_cdp_cmd(
-        "Runtime.evaluate",
-        {"expression": """
-            electron.remote.dialog.showOpenDialog = async () => {{
-                return {{ canceled: false, filePaths: ['{0}'] }};
-            }};
+    execute(driver, """
+        electron.remote.dialog.showOpenDialog = async () => {{
+            return {{ canceled: false, filePaths: ['{0}'] }};
+        }};
 
-            electron.remote.dialog.showOpenDialogSync = () => {{
-                return ['{0}'];
-            }};
-            """.format(vault_path)
-         }
+        electron.remote.dialog.showOpenDialogSync = () => {{
+            return ['{0}'];
+        }};
+        """.format(vault_path)
     )
 
     elem = driver.find_element(
