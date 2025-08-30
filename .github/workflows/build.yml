@@ -39,6 +39,9 @@ jobs:
         include:
           - os: ubuntu-latest
             artefact: '*_amd64.deb'
+            command-extras: xvfb-run
+          - os: windows-latest
+            artefact: null
     runs-on: ${{ matrix.os }}
     steps:
       - run: printenv
@@ -58,7 +61,8 @@ jobs:
       - name: Show artefact tree
         run: ls dist/obsidian-webdav-sync
 
-      - name: Yoink Obsidian .deb
+      - name: Yoink Obsidian artefact
+        if: ${{ matrix.os != 'windows-latest' }}
         uses: robinraju/release-downloader@v1
         with:
           repository: obsidianmd/obsidian-releases
@@ -67,19 +71,25 @@ jobs:
           zipBall: false
           fileName: ${{ matrix.artefact }}
           out-file-path: obsidian_inst
-      - name: DEBUG
-        run: |
-          ls obsidian_inst
-      - name: Install obsidian (Ubuntu)
-        if: ${{ matrix.os }} == "ubuntu-latest"
+      - name: Install obsidian artefact (Ubuntu)
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           sudo apt install -y ./obsidian_inst/*.deb
+      - name: Yoink Obsidian via winget (ew)
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          winget install --id=Obsidian.Obsidian  -e
       - name: Python deps
         working-directory: integration-test/
         run: |
           pip3 install --break-system-packages -r requirements.txt 
+      - name: Ubuntu deps
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
           sudo apt install -y xvfb
       - name: Run tests
         working-directory: integration-test/
         run: |
-          xvfb-run python3 -m pytest
+          ${{ matrix.command_extras }} python3 -m pytest
+        with:
+          shell: bash
