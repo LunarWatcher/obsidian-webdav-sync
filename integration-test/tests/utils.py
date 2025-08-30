@@ -1,6 +1,8 @@
 import pytest
 from selenium.webdriver import ActionChains, Chrome, Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
+import json
 
 def execute(driver: Chrome, script: str):
     return driver.execute_cdp_cmd(
@@ -37,4 +39,54 @@ def click_settings_nav(driver: Chrome, text: str = "WebDAV sync"):
             return
 
     raise RuntimeError("Failed to locate {} in settings menu", text)
+
+def reload(driver: Chrome):
+    """
+    Uses the command palette to perform a reload.
+    DO NOT run this command unnecessarily! This will mostly need to be run once
+    per test that uses config, but reloads are a last resort.
+
+    The majority of other choices are better than reloading.
+    """
+    ActionChains(driver) \
+        .key_down(Keys.CONTROL) \
+        .send_keys("p") \
+        .key_up(Keys.CONTROL) \
+        .send_keys("reload") \
+        .send_keys(Keys.ENTER) \
+        .perform()
+
+def find_setting(driver: Chrome, name: str) -> WebElement:
+    """
+    Finds and returns a settings-item for a given setting-item-name.
+    """
+    for item in driver.find_elements(By.CLASS_NAME, "setting-item-name"):
+        if item.text == name:
+            # Selenium apparently doesn't have built-in support for
+            # .parentNode. Not sure why 
+            return driver.execute_script(
+                "return arguments[0].parentNode.parentNode;",
+                item
+            )
+    raise RuntimeError("Failed to find container")
+
+def find_setting_input(driver: Chrome, name: str) -> WebElement:
+    setting_container = find_setting(driver, name)
+    return setting_container.find_element(
+        By.CLASS_NAME,
+        "setting-item-control"
+    )
+
+def get_settings_data(driver: Chrome):
+    # Extracting objects as anything but a string is annoying
+    # TODO: see if  this can be canaried, or if the plugin won't be loaded
+    # enough for the state to be populated
+    # TODO: msgspec for types maybe? Not sure I want to keep the types synced
+    # though...
+    return json.loads(execute(
+        driver,
+        """
+        JSON.stringify(app.plugins.plugins["obsidian-webdav-sync"].settings)
+        """
+    )["result"]["value"])
 
