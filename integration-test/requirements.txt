@@ -1,5 +1,6 @@
 selenium
 pytest
+requests
 
 # Pinned just in case later changes makes it incompatible
 copyparty==1.19.7
