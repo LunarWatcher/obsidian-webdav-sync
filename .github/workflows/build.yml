@@ -90,4 +90,4 @@ jobs:
       - name: Run tests
         working-directory: integration-test/
         run: |
-          ${{ matrix.command_extras }} python3 -m pytest
+          ${{ matrix.command-extras }} python3 -m pytest
