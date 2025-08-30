@@ -91,5 +91,3 @@ jobs:
         working-directory: integration-test/
         run: |
           ${{ matrix.command_extras }} python3 -m pytest
-        with:
-          shell: bash
