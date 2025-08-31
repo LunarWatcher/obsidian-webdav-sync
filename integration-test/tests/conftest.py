@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 from time import sleep
+import platform
 
 import pytest
 from selenium.common.exceptions import NoSuchWindowException
@@ -196,6 +197,7 @@ def _get_driver() -> Chrome:
 def create_service():
     return Service(
         # TODO: probably not portable, I assume windows has chromedriver.exe
-        "../node_modules/.bin/chromedriver"
+        "../node_modules/.bin/chromedriver" if platform.system() != "Windows"
+        else r"..\node_modules\.bin\chromedriver.exe"
     )
 
