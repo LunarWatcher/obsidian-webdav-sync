@@ -1,4 +1,6 @@
+from functools import partial
 import os
+from pathlib import Path
 import shutil
 import subprocess
 from time import sleep
@@ -10,7 +12,8 @@ from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
-from tests.utils import execute
+from tests.constants import SCREENSHOT_DIR
+from tests.utils import close_notices, execute
 
 @pytest.fixture
 def vault():
@@ -31,13 +34,39 @@ def vault():
 
     shutil.rmtree(test_vault)
 
+
 @pytest.fixture
 def obsidian(vault: str):
     driver = _get_driver()
     _load_vault(driver, vault)
+    close_notices(driver)
     yield driver
 
     driver.quit()
+
+@pytest.fixture
+def screenshotter(obsidian: Chrome, request: pytest.FixtureRequest):
+    prefix = request.node.name
+    def _screenshot(obsidian: Chrome, prefix: str, identifier: str):
+        path = os.path.join(
+            os.getcwd(),
+            SCREENSHOT_DIR,
+            prefix,
+        )
+        if not os.path.exists(path):
+            os.makedirs(
+                path,
+                exist_ok=True
+            )
+
+        obsidian.get_screenshot_as_file(
+            os.path.join(
+                path,
+                identifier + ".png"
+            )
+        )
+
+    yield partial(_screenshot, obsidian, prefix)
 
 @pytest.fixture
 def copyparty():

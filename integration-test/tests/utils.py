@@ -5,6 +5,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 import json
 
+from tests.constants import NOTICE_CLASS
+
 def execute(driver: Chrome, script: str):
     return driver.execute_cdp_cmd(
         "Runtime.evaluate",
@@ -111,7 +113,9 @@ def default_settings(
         },
         "sync": {
             "full_vault_sync": True,
-            "root_folder": "/vault",
+            "root_folder": {
+                "dest": "/vault"
+            },
             "subfolders": {},
             "ignore_workspace": True,
         }
@@ -125,4 +129,22 @@ def inject_settings(driver: Chrome, settings_object = None):
     if settings_object is None:
         settings_object = default_settings()
 
-    pass
+    out = execute(
+        driver,
+        """
+        app.plugins.plugins["obsidian-webdav-sync"].settings = JSON.parse('{0}');
+        app.plugins.plugins["obsidian-webdav-sync"].saveSettings();
+        0
+        """.format(json.dumps(settings_object))
+    )
+    assert "value" in out["result"], \
+        json.dumps(out)
+    assert out["result"]["value"] == 0, \
+        json.dumps(out)
+
+def close_notices(driver: Chrome):
+    for elem in driver.find_elements(
+        By.CLASS_NAME,
+        NOTICE_CLASS
+    ):
+        elem.click()

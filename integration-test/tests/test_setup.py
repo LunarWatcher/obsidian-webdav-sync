@@ -13,7 +13,7 @@ import requests
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 
-from tests.utils import click_settings_nav, execute, find_setting, open_settings
+from tests.utils import click_settings_nav, default_settings, execute, find_setting, get_settings_data, inject_settings, open_settings
 
 def test_buttons_visible_and_functional(obsidian: Chrome):
     """
@@ -90,3 +90,12 @@ def test_execute_returns(obsidian: Chrome):
     # For debugging
     print(result)
     assert result["result"]["value"] == 42
+
+def test_settings_sideloading(obsidian: Chrome):
+    """
+    Canary: whether or not the settings injection works
+    """
+
+    obj = default_settings()
+    inject_settings(obsidian)
+    assert get_settings_data(obsidian) == obj

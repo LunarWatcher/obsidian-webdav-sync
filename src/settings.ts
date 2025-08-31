@@ -128,6 +128,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
 
       const testButton = document.createElement("button");
       testButton.innerText = "Test connection";
+      testButton.id = "webdav-settings-test-connection"
       testButton.addEventListener("click", async (ev) => {
         this.plugin.reloadClient();
         if (this.plugin.client != null) {

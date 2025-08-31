@@ -95,7 +95,16 @@ For Linux users, at least X11 users, you can run `xvfb-run python3 -m pytest` to
 
 #### Warnings for Windows users
 
-Because Windows is an operating system with a horrible relation to its filesystem, you can and will run into situations where tests fail on file deletions, or fail to fully delete files. If this affects you, delete the files manually and try again.
+Because Windows is an operating system with a horrible relation to its filesystem, you can and will run into situations where tests fail on file deletions, or fail to fully delete files. If this affects you, delete the files manually and try again. The tests should try to automatically recover from this when detected, but may fail if the files end up being fully locked. Powertoys has a file unlocking tool that might help in this case.
+
+Note that these are primarily test-specific problems that won't affect normal plugin use. The biggest known problem requires the following conditions:
+
+1. A Windows computer
+2. A Windows server (possibly on the same computer)
+3. A short-lived copyparty instance
+4. For copyparty's history cache to be deleted immediately after copyparty is turned off
+
+These conditions are not going to happen in the real world.
 
 ## Making changes
 
