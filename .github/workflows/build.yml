@@ -39,7 +39,6 @@ jobs:
         include:
           - os: ubuntu-latest
             artefact: '*_amd64.deb'
-            command-extras: xvfb-run
           - os: windows-2025
             artefact: '*.exe'
     runs-on: ${{ matrix.os }}
@@ -91,11 +90,9 @@ jobs:
         working-directory: integration-test/
         run: |
           pip3 install --break-system-packages -r requirements.txt 
-      - name: Ubuntu deps
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: |
-          sudo apt install -y xvfb
+      - name: Setup headless display
+        uses: pyvista/setup-headless-display-action@v3
       - name: Run tests
         working-directory: integration-test/
         run: |
-          ${{ matrix.command-extras }} python3 -m pytest
+          python3 -m pytest
