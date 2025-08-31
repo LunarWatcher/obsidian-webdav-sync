@@ -79,9 +79,9 @@ jobs:
       - name: Install obsidian artefact (Windows)
         if: ${{ matrix.os == 'windows-2025' }}
         run: |
-          ./obsidian_inst/*.exe /S
-          echo "OBSIDIAN_LOCATION=${LOCALAPPDATA}/Programs/Obsidian/Obsidian.exe >> $GITHUB_ENV"
-        shell: bash
+          .\obsidian_inst\*.exe /S
+          echo "OBSIDIAN_LOCATION=$env:LOCALAPPDATA/Programs/Obsidian/Obsidian.exe" >> $GITHUB_ENV
+        shell: powershell
       - name: Python deps
         working-directory: integration-test/
         run: |
