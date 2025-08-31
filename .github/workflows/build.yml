@@ -41,7 +41,7 @@ jobs:
             artefact: '*_amd64.deb'
             command-extras: xvfb-run
           - os: windows-2025
-            artefact: null
+            artefact: '*.exe'
     runs-on: ${{ matrix.os }}
     steps:
       - run: printenv
@@ -77,10 +77,10 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           sudo apt install -y ./obsidian_inst/*.deb
-      - name: Yoink Obsidian via winget (ew)
+      - name: Install obsidian artefact (Windows)
         if: ${{ matrix.os == 'windows-2025' }}
         run: |
-          winget install --id=Obsidian.Obsidian  -e
+          ./obsidian_inst/*.exe /S
           echo "OBSIDIAN_LOCATION=${LOCALAPPDATA}/Programs/Obsidian/Obsidian.exe >> $GITHUB_ENV"
         shell: bash
       - name: Python deps
