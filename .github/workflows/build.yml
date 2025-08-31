@@ -80,6 +80,11 @@ jobs:
         if: ${{ matrix.os == 'windows-2025' }}
         run: |
           .\obsidian_inst\*.exe /S
+          Function Wait-Local {
+            Do {
+              Start-Sleep -Seconds 5
+            } until (Test-Path -path "$env:LOCALAPPDATA\\Programs\\Obsidian\\Obsidian.exe" -PathType Leaf)
+          }
           echo "OBSIDIAN_LOCATION=$env:LOCALAPPDATA\\Programs\\Obsidian\\Obsidian.exe" >> $env:GITHUB_ENV
           ls 'C:\Program Files'
           ls $env:LOCALAPPDATA\Programs\
