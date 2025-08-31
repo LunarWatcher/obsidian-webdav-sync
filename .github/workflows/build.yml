@@ -64,7 +64,6 @@ jobs:
         run: ls dist/obsidian-webdav-sync
 
       - name: Yoink Obsidian artefact
-        if: ${{ matrix.os != 'windows-2025' }}
         uses: robinraju/release-downloader@v1
         with:
           repository: obsidianmd/obsidian-releases
