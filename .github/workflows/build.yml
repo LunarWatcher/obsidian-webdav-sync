@@ -64,7 +64,7 @@ jobs:
         run: ls dist/obsidian-webdav-sync
 
       - name: Yoink Obsidian artefact
-        if: ${{ matrix.os != 'windows-latest' }}
+        if: ${{ matrix.os != 'windows-2025' }}
         uses: robinraju/release-downloader@v1
         with:
           repository: obsidianmd/obsidian-releases
@@ -78,7 +78,7 @@ jobs:
         run: |
           sudo apt install -y ./obsidian_inst/*.deb
       - name: Yoink Obsidian via winget (ew)
-        if: ${{ matrix.os == 'windows-latest' }}
+        if: ${{ matrix.os == 'windows-2025' }}
         run: |
           winget install --id=Obsidian.Obsidian  -e
           echo "OBSIDIAN_LOCATION=${LOCALAPPDATA}/Programs/Obsidian/Obsidian.exe >> $GITHUB_ENV"
