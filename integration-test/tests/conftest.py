@@ -193,11 +193,10 @@ def _get_driver() -> Chrome:
 
     return driver
 
-
 def create_service():
     return Service(
         # TODO: probably not portable, I assume windows has chromedriver.exe
         "../node_modules/.bin/chromedriver" if platform.system() != "Windows"
-        else r"..\node_modules\.bin\chromedriver.exe"
+        else r"..\node_modules\.bin\chromedriver.cmd"
     )
 
