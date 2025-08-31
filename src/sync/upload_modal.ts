@@ -21,13 +21,17 @@ export class UploadModal extends Modal {
   onOpen() {
     const { contentEl } = this;
     contentEl.empty();
-    contentEl.insertAdjacentHTML("beforeend", "<h1>WebDAV sync controls</h1>")
+    contentEl.createEl("h1", {
+      text: "WebDAV sync controls"
+    });
     
     if (!canConnectWithSettings(this.plugin.settings)) {
-      contentEl.insertAdjacentHTML("beforeend", `
-      <h2>No vault configured</h2>
-      <p>You have not configured the sync connection settings. Please set a server, then try again</p>
-      `)
+      contentEl.createEl("h2", {
+        text: "No vault configured"
+      });
+      contentEl.createEl("p", {
+        text: "You have not configured the sync connection settings. Please set a server, then try again"
+      });
       return
     }
     new Setting(contentEl)
@@ -40,36 +44,35 @@ export class UploadModal extends Modal {
       .onChange(value => { this.dryRun = value })
       )
 
-    contentEl.insertAdjacentHTML("beforeend", `
-    <div class="webdav-button-wrapper webdav-flex">
-      <button id="webdav-sync-up"></button>
-      <button id="webdav-sync-down"></button>
-    </div>`);
-
-    const up = document.getElementById("webdav-sync-up") as HTMLElement;
-    const down = document.getElementById("webdav-sync-down") as HTMLElement;
-    up.addEventListener("click", async (ev) => {await this.upload(ev)});
-    down.addEventListener("click", async (ev) => {await this.download(ev)});
+    const btnWrapper = contentEl.createDiv({
+      cls: ["webdav-button-wrapper", "webdav-flex"]
+    });
+    // TODO: These buttons really should be styled, but I don't know which colours make sense
+    // to associate with each action, so might as well leave them plain for now.
+    const up = btnWrapper.createEl("button", {
+      attr: {
+        id: "webdav-sync-up"
+      }
+    });
+    up.addEventListener("click", async (ev) => {
+      await this.upload(ev);
+    });
+    const down = btnWrapper.createEl("button", {
+      attr: {
+        id: "webdav-sync-down"
+      }
+    });
+    down.addEventListener("click", async (ev) => {
+      await this.download(ev);
+    });
 
     setIcon(up, "upload");
     setIcon(down, "download");
 
     // TODO: This is nasty, but it appears to be the only way for setIcon to not override
-    // the text.
+    // the text. Can't find an API for icon + text buttons
     up.innerHTML += "<span>&nbsp;Upload</span>";
     down.innerHTML += "<span>&nbsp;Download</span>";
-
-    contentEl.insertAdjacentHTML("beforeend", `<table style="display: none" id="dry-run-info">
-      <thead>
-        <tr>
-          <th>File</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="dry-run-data">
-
-      </tbody>
-    </table>`);
   }
 
   showTaskGraph(actions: Actions, upload: boolean) {
@@ -77,6 +80,21 @@ export class UploadModal extends Modal {
       new Notice("No changes would be made", 15000);
       return;
     }
+
+    // I'm not doing this with Obsidian's API. Give me a table API and I'll do that, but this is
+    // 6 separate calls with tracking of nested objects, with planned expansions. This code is
+    // already unreadable enough as it is with all the non-standard API calls.
+    this.contentEl.insertAdjacentHTML("beforeend", `<table id="dry-run-info">
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="dry-run-data">
+      </tbody>
+    </table>`);
+    // The previous call is a void
     const tab = document.getElementById("dry-run-info") as HTMLTableElement;
     const body = document.getElementById("dry-run-data") as HTMLTableSectionElement;
     body.empty();
@@ -98,7 +116,6 @@ export class UploadModal extends Modal {
 
       body.insertAdjacentElement("beforeend", elem);
     }
-    tab.setAttr("style", "display: inline-block");
   }
 
   setLoading(elem: any) {

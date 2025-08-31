@@ -42,11 +42,18 @@ export class WebDAVSettingsTab extends PluginSettingTab {
     // It would be nice if this was an option rather than having to presumably parse an HTML string in JS before 
     // inserting it.
     //
-    // Some other solutions seem to involve using react, but I'd sooner die than use react. It's already bad enough
-    // that obsidian is Electron-based
-    containerEl.insertAdjacentHTML("beforeend", "<h1 id='webdav-sync-settings-header'>WebDAV Sync settings</h1>");
+    // Future me update: while scrolling through plugin addition requests to see how much of a pain in the ass this is
+    // going to be, https://github.com/obsidianmd/obsidian-releases/pull/5839#issuecomment-2978834437 says to use
+    // setName instead of setText, but this still just creates a div, not an <h1>.
+    // QuickAdd, another plugin that does have a proper header, uses createEl, which also appears to be forced in
+    // the review process.
+    containerEl.createEl("h1", {
+      text: "WebDAV sync settings",
+    });
     { 
-      containerEl.insertAdjacentHTML("beforeend", "<h2>Server connection settings</h2>");
+      containerEl.createEl("h2", {
+        text: "Server connection settings",
+      });
 
       new Setting(containerEl)
         .setName('WebDAV URL')
@@ -94,7 +101,9 @@ export class WebDAVSettingsTab extends PluginSettingTab {
         );
     }
     {
-      containerEl.insertAdjacentHTML("beforeend", "<h2>Sync settings</h2>");
+      containerEl.createEl("h2", {
+        text: "Sync settings"
+      });
       new Setting(containerEl)
         .setName("Full vault sync")
         .setDesc("Whether or not to sync the full vault")
@@ -135,36 +144,35 @@ export class WebDAVSettingsTab extends PluginSettingTab {
               await this.plugin.saveSettings()
             })
         )
-
-      const testButton = document.createElement("button");
-      testButton.innerText = "Test connection";
-      testButton.id = "webdav-settings-test-connection"
-      testButton.addEventListener("click", async (ev) => {
-        this.plugin.reloadClient();
-        if (this.plugin.client != null) {
-          const client = this.plugin.client.client;
-          if (this.plugin.settings.sync.root_folder.dest != "") {
-            try {
-              // I hate typescript so fucking much
-              let contents = client.getDirectoryContents(this.plugin.settings.sync.root_folder.dest) as any;
-              // TODO: tsserver whines about the .length because one of the two doesn't have length
-              // (the array has .length, the other appears to have .size()). Figure out if this will ever
-              // be returned
-              new Notice(
-                `Connection succeeded. Found folder with ${(await contents).length} direct files and folders.`
-              )
-            } catch (ex) {
-              console.error(ex);
-              new Notice("Connection failed");
+        .addButton(button => button
+          .setButtonText("Test connection")
+          .setCta()
+          .onClick(async (ev) => {
+            this.plugin.reloadClient();
+            if (this.plugin.client != null) {
+              const client = this.plugin.client.client;
+              if (this.plugin.settings.sync.root_folder.dest != "") {
+                try {
+                  // I hate typescript so fucking much
+                  let contents = client.getDirectoryContents(this.plugin.settings.sync.root_folder.dest) as any;
+                  // TODO: tsserver whines about the .length because one of the two doesn't have length
+                  // (the array has .length, the other appears to have .size()). Figure out if this will ever
+                  // be returned
+                  new Notice(
+                    `Connection succeeded. Found folder with ${(await contents).length} direct files and folders.`
+                  )
+                } catch (ex) {
+                  console.error(ex);
+                  new Notice("Connection failed");
+                }
+              } else {
+                new Notice(
+                  "Can't test connection without a vault folder"
+                );
+              }
             }
-          } else {
-            new Notice(
-              "Can't test connection without a vault folder"
-            );
-          }
-        }
-      });
-      containerEl.append(testButton);
+          }).buttonEl.id = "webdav-settings-test-connection"
+        )
 
       let newShare: string = "";
       let newVaultFolder: string = "";
@@ -205,13 +213,24 @@ export class WebDAVSettingsTab extends PluginSettingTab {
               this.display();
             })
         );
-      containerEl.insertAdjacentHTML("beforeend", "<div id=\"folder-mappings\"></div>");
+      containerEl.createDiv({
+        attr: {
+          id: "folder-mappings"
+        }
+      })
       this.regenerateFolderMappings();
     }
-    containerEl.insertAdjacentHTML("beforeend", `<h2>Meta</h2>
-    <p>Running into issues? Open an issue on <a href="https://github.com/LunarWatcher/obsidian-webdav-sync">GitHub</a>.</p>
-    <p>Trans rights are human rights 🏳️‍⚧️ 🏳️‍🌈</p>
-    `);
+    containerEl.createEl("h2", {
+      text: "Meta"
+    })
+    // Forced insertAdjacentHTML: createEl has no nested HTML support, I need a link, and I'm not doing that by hand
+    containerEl.insertAdjacentHTML(
+      "beforeend",
+      '<p>Running into issues? Open an issue on <a href="https://github.com/LunarWatcher/obsidian-webdav-sync">GitHub</a></p>'
+    );
+    containerEl.createEl("p", {
+      text: "Trans rights are human rights 🏳️‍⚧️ 🏳️‍🌈"
+    })
   }
 
   regenerateFolderMappings() {

@@ -8,7 +8,7 @@ that can describe obscure test failures in other tests. It's stuff I as a
 developer would check to debug anyway, so why not have it as explicit, separate
 tests?
 """
-from pytest import raises
+from pytest import fail, raises
 import requests
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
@@ -26,7 +26,14 @@ def test_buttons_visible_and_functional(obsidian: Chrome):
     open_settings(obsidian)
     click_settings_nav(obsidian)
 
-    assert obsidian.find_element(By.ID, "webdav-sync-settings-header")
+    headers = obsidian.find_elements(By.TAG_NAME, "h1")
+    for header in headers:
+        print("Header text: ", header.text)
+        if header.text == "WebDAV sync settings":
+            break
+    else:
+        fail("Failed to find main header")
+
 
 def test_copyparty_fixture(copyparty: str):
     """

@@ -93,6 +93,17 @@ python3 -m pytest
 ```
 For Linux users, at least X11 users, you can run `xvfb-run python3 -m pytest` to hide the GUI.
 
+#### Screenshots
+
+At strategic points during the tests, some tests take screenshots. These are output into `<git root>/integration-test/_screenshots/<test name>/<identifier>`.
+
+These are primarily taken to aid with debugging of test failures. 
+
+Note that the screenshots folder is never deleted, so if the code creating a given screenshot is removed, the screenshot files stay around. This is actually a feature, and in compatible image viewers, result in the opened images automatically being refreshed. XViewer is one such known example. 
+
+##### Taking screenshots
+
+
 #### Warnings for Windows users
 
 Because Windows is an operating system with a horrible relation to its filesystem, you can and will run into situations where tests fail on file deletions, or fail to fully delete files. If this affects you, delete the files manually and try again. The tests should try to automatically recover from this when detected, but may fail if the files end up being fully locked. Powertoys has a file unlocking tool that might help in this case.
