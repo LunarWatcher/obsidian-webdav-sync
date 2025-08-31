@@ -80,7 +80,7 @@ jobs:
         if: ${{ matrix.os == 'windows-2025' }}
         run: |
           .\obsidian_inst\*.exe /S
-          echo "OBSIDIAN_LOCATION=$env:LOCALAPPDATA/Programs/Obsidian/Obsidian.exe" >> $GITHUB_ENV
+          echo "OBSIDIAN_LOCATION=$env:LOCALAPPDATA/Programs/Obsidian/Obsidian.exe" >> $env:GITHUB_ENV
         shell: powershell
       - name: Python deps
         working-directory: integration-test/
