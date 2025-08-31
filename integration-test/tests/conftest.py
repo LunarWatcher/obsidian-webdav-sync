@@ -14,7 +14,11 @@ from tests.utils import execute
 
 @pytest.fixture
 def vault():
-    test_vault = os.path.join(os.getcwd(), "test_vault")
+    # The paths need to be replaced, because during string substitution, the \
+    # are interpreted literally
+    test_vault = os.path.join(os.getcwd(), "test_vault") \
+        .replace("\\", "/")
+
     if os.path.exists(test_vault):
         # Probably an internal fixture failure; clean up after the fact
         shutil.rmtree(test_vault)
@@ -59,6 +63,7 @@ def copyparty():
     yield BASE_URL
 
     try:
+        proc.kill()
         proc.terminate()
         proc.wait(1)
     finally:
@@ -195,7 +200,6 @@ def _get_driver() -> Chrome:
 
 def create_service():
     return Service(
-        # TODO: probably not portable, I assume windows has chromedriver.exe
         "../node_modules/.bin/chromedriver" if platform.system() != "Windows"
         else r"..\node_modules\.bin\chromedriver.cmd"
     )
