@@ -37,7 +37,7 @@ def test_copyparty_fixture(copyparty: str):
     :62169 (usually because of a conflict).
     """
     res = requests.get(
-    copyparty
+        copyparty
     )
 
     assert res.status_code == 200

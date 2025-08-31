@@ -67,7 +67,15 @@ def copyparty():
         proc.terminate()
         proc.wait(1)
     finally:
-        nuke_dirs()
+        try:
+            nuke_dirs()
+        except Exception as e:
+            print(e)
+            print("This will be ignored because you're likely on windows, "
+                  + "and windows is fucking trash at not locking files. "
+                  + "Have fun deleting it if the OS arbitrarily decided "
+                  + "that a now dead process still holds the file. "
+                  + "(have you considered using a real OS instead?)")
 
 def _install_plugin(vault_path: str, plugin_dist_path: str):
     if not os.path.exists(plugin_dist_path):
