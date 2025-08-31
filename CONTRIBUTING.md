@@ -18,9 +18,7 @@ MacOS users should probably assume that most things can and will break. If you'd
 
 #### Windows-specific issues
 
-Windows lacks support for most of the scripts used to support development. You're on your own with these, as no equivalents will be supported.
-
-You also will run into problems with the integration tests, as several of the paths are hard-coded to UNIX-compatible paths. These will eventually be fixed, and Windows on the CI is a priority, provided it's possible to install obsidian headlessly on Windows.
+Windows lacks support for most of the scripts used to support development. You're on your own with these, as no equivalents will be supported. They can still at least partly be run through git bash, though.
 
 ## Development setup
 
@@ -94,6 +92,10 @@ export OBSIDIAN_LOCATION=$(which obsidian)
 python3 -m pytest
 ```
 For Linux users, at least X11 users, you can run `xvfb-run python3 -m pytest` to hide the GUI.
+
+#### Warnings for Windows users
+
+Because Windows is an operating system with a horrible relation to its filesystem, you can and will run into situations where tests fail on file deletions, or fail to fully delete files. If this affects you, delete the files manually and try again.
 
 ## Making changes
 
