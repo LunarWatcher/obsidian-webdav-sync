@@ -81,7 +81,7 @@ jobs:
         run: |
           .\obsidian_inst\*.exe /S
           echo "OBSIDIAN_LOCATION=$env:LOCALAPPDATA\\Programs\\Obsidian\\Obsidian.exe" >> $env:GITHUB_ENV
-          ls $env:LOCALAPPDATA\programs\Obsidian
+          ls $env:LOCALAPPDATA\Programs\Obsidian
         shell: powershell
       - name: Python deps
         working-directory: integration-test/
