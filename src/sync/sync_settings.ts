@@ -22,6 +22,17 @@
 // "Yes please, I want react in my task bar", "yes please, make everything a browser,
 // I really hate having free RAM to do anything else" - deranged sentences made up by
 // Microsoft to justify investing in typescript.
+// -----------------------------------------------------------------------------------
+// Future me here: index signatures are meant to be used here, but fuck that shit. 
+// Object is so discouraged it has been disappeared from typescript's notation, but
+// getting the types in order is lots of work for no benefit, since the types aren't
+// enforced at runtime anyway[^1]. There's probably more fuckery that needs to be done
+// with the loadSettings function, but honestly, I don't care enough to do it.
+// Lots and lots of type error recovery needs to exist thanks to this fucking bullshit
+// anyway, so might as well use raw object types.
+//
+// [^1]: A message that is incredibly poorly conveyed in the official docs. Thanks,
+// Microsoft.
 export interface FolderDestination {
   dest: string;
 };

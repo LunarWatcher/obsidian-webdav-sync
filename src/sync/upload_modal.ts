@@ -54,7 +54,8 @@ export class UploadModal extends Modal {
     setIcon(up, "upload");
     setIcon(down, "download");
 
-    // TODO: This is nasty
+    // TODO: This is nasty, but it appears to be the only way for setIcon to not override
+    // the text.
     up.innerHTML += "<span>&nbsp;Upload</span>";
     down.innerHTML += "<span>&nbsp;Download</span>";
 
@@ -126,7 +127,7 @@ export class UploadModal extends Modal {
       
       if (!this.dryRun) {
         this.setLoading(ev.target);
-        const { actionedCount } = await runSync(
+        const { actionedCount, errorCount } = await runSync(
           SyncDir.DOWN,
           local,
           remote,
@@ -136,7 +137,7 @@ export class UploadModal extends Modal {
           this.resolveConflict
         )
 
-        new Notice(`Push complete. ${actionedCount} files were updated.`);
+        new Notice(`Push complete. ${actionedCount} files were updated (${errorCount} errors).`);
         this.close();
       } else {
         console.log("remote: ", remote);
@@ -163,7 +164,7 @@ export class UploadModal extends Modal {
 
       if (!this.dryRun) {
         this.setLoading(ev.target);
-        const { actionedCount } = await runSync(
+        const { actionedCount, errorCount } = await runSync(
           SyncDir.DOWN,
           remote,
           local,
@@ -172,7 +173,7 @@ export class UploadModal extends Modal {
           this.updateDownload.bind(this),
           this.resolveConflict
         )
-        new Notice(`Pull complete. ${actionedCount} files were updated.`);
+        new Notice(`Pull complete. ${actionedCount} files were updated (${errorCount} errors).`);
         this.close();
       } else {
         console.log("remote: ", remote);
@@ -189,7 +190,7 @@ export class UploadModal extends Modal {
     _destData: FileData
   ): Promise<string | null> {
     if (this.plugin.client == null) {
-      throw Error("This should never throw");
+      throw Error("This should never throw, but exists to make typescript shut up");
     }
     if (type == ActionType.ADD_LOCAL) {
       throw Error("Unexpected ADD_LOCAL; this should've been processed by now");
@@ -273,6 +274,15 @@ export class UploadModal extends Modal {
       );
       queue.push(...next.folders);
       for (const file of next.files) {
+        if (
+          this.plugin.settings.sync.ignore_workspace
+          && (
+            file.replace("\\", "/") == ".obsidian/workspace.json" 
+            || file.replace("\\", "/") == ".obsidian/workspace-mobile.json"
+          )
+        ) {
+          continue;
+        }
         const stat = await this.app.vault.adapter.stat(file);
         files.push({
           path: file,
@@ -322,6 +332,15 @@ export class UploadModal extends Modal {
         // TODO: this should mean that stub folders aren't deleted either. Separating them into a separate map
         // with special deletion logic is probably a good idea.
         if (file.type == "directory") {
+          continue;
+        }
+        if (
+          this.plugin.settings.sync.ignore_workspace
+          && (
+            file.filename.replace("\\", "/") == ".obsidian/workspace.json" 
+            || file.filename.replace("\\", "/") == ".obsidian/workspace-mobile.json"
+          )
+        ) {
           continue;
         }
 

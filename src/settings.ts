@@ -55,7 +55,6 @@ export class WebDAVSettingsTab extends PluginSettingTab {
           .setPlaceholder('https://dav.example.com')
           .setValue(this.plugin.settings.server_conf.url || "")
           .onChange(async (value) => {
-            console.log(value);
             this.plugin.settings.server_conf.url = value || null;
             await this.plugin.saveSettings();
           }));
@@ -81,6 +80,17 @@ export class WebDAVSettingsTab extends PluginSettingTab {
           })
           // Has to be last because this returns a void
           .inputEl.setAttribute("type", "password")
+        );
+      new Setting(containerEl)
+        .setName('Restart connection to WebDAV server')
+        .setDesc("You'll want to do this after changing WebDAV server settings")
+        .addButton(btn => btn
+          .setButtonText("Reload plugin")
+          .onClick(async () => {
+            if (await this.plugin.reloadClient()) {
+              new Notice("Connected!");
+            }
+          })
         );
     }
     {

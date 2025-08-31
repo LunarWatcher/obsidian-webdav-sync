@@ -40,7 +40,12 @@ export default class MyPlugin extends Plugin {
     await this.saveData(this.settings);
   }
 
-  async reloadClient() {
+  /**
+   * Reloads the underlying webdav client.
+   * This needs to be called at some point if changes are made to the client settings so
+   * the new settings take hold.
+   */
+  async reloadClient(): Promise<boolean> {
     // The reset is noop at startup
     this.client = null;
     if (!this.settings.server_conf.url) {
@@ -49,6 +54,7 @@ export default class MyPlugin extends Plugin {
         // The default duration is too short
         30000
       );
+      return false;
     } else {
       try {
         this.client = new Connection(
@@ -57,8 +63,9 @@ export default class MyPlugin extends Plugin {
       } catch (ex) {
         console.error(ex);
         new Notice(`Failed to connect to WebDAV server: ${ex.message} - have you run setup yet?`);
+        return false;
       }
     }
-
+    return true;
   }
 }

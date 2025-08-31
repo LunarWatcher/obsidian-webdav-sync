@@ -9,8 +9,9 @@ if [[ "${VAULT_LOCATION}" == "" ]]; then
 fi
 
 DEST_FOLDER="${VAULT_LOCATION}/.obsidian/plugins/obsidian-webdav-sync"
-mkdir -p ${DEST_FOLDER}
+mkdir -p "${DEST_FOLDER}/.obsidian/plugins"
+mkdir -p "${DEST_FOLDER}"
 
-ln -sf $(pwd)/main.js ${DEST_FOLDER}
-ln -sf $(pwd)/styles.css ${DEST_FOLDER}
-ln -sf $(pwd)/manifest.json ${DEST_FOLDER}
+ln -sf $(pwd)/main.js "${DEST_FOLDER}"
+ln -sf $(pwd)/styles.css "${DEST_FOLDER}"
+ln -sf $(pwd)/manifest.json "${DEST_FOLDER}"

@@ -4,6 +4,7 @@ export interface FileData {
 
 export interface SyncResult {
   actionedCount: number;
+  errorCount: number;
 };
 
 export enum ActionType {
@@ -133,6 +134,7 @@ export async function runSync(
   onConflict: (path: string, src: FileData, dest: FileData, direction: SyncDir) => Promise<ActionType>,
 ): Promise<SyncResult> {
   let actionedCount = 0;
+  let errorCount = 0;
   for (let [file, action] of actions) {
     let srcData = sourceFiles.get(file) as FileData;
     let destData = destFiles.get(file) as FileData;
@@ -166,6 +168,7 @@ export async function runSync(
         // Especially remotely. But I'm pretty sure there's move functions in the client,
         // so might be relatively easy
         console.log(ex);
+        errorCount += 1;
         if (ex instanceof Error) {
           onError(ex.message);
         } else {
@@ -176,5 +179,6 @@ export async function runSync(
   }
   return {
     actionedCount,
+    errorCount,
   }
 }
