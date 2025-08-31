@@ -81,6 +81,8 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
           winget install --id=Obsidian.Obsidian  -e
+          echo "OBSIDIAN_LOCATION=${LOCALAPPDATA}/Programs/Obsidian/Obsidian.exe >> $GITHUB_ENV"
+        shell: bash
       - name: Python deps
         working-directory: integration-test/
         run: |
