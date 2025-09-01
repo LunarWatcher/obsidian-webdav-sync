@@ -153,7 +153,7 @@ export async function runSync(
       && action != ActionType.REMOVE // Removing is obviously going to lack srcData
     ) {
       onError("Fatal: " + file + " lacks srcData");
-      console.error(sourceFiles);
+      console.error(file, action, srcData, destData, direction);
       return {
         actionedCount: -1,
         errorCount: errorCount + 1
