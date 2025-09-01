@@ -64,6 +64,11 @@ function dateRounder(a: number | null): number {
   return Math.floor(a / 1000);
 }
 
+function approx(a: number, b: number): boolean {
+  return a == b
+    || Math.abs(a - b) <= 1;
+}
+
 /**
  * Calculates the sync changes to do.
  *
@@ -103,7 +108,7 @@ export function calculateSyncActions(
         continue;
       }
 
-      if (dateRounder(remoteData.lastModified) == dateRounder(data.lastModified)) {
+      if (approx(dateRounder(remoteData.lastModified), dateRounder(data.lastModified))) {
         if (includeNoop) {
           out.set(file, ActionType.NOOP);
         }
