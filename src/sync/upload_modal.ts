@@ -229,7 +229,7 @@ export class UploadModal extends Modal {
           this.setError,
           this.updateDownload.bind(
             this,
-            this.plugin.settings.sync.root_folder,
+            this.plugin.settings.sync.root_folder.dest,
             null
           ),
           this.resolveConflict
@@ -406,7 +406,7 @@ export class UploadModal extends Modal {
         const stat = await this.app.vault.adapter.stat(file);
         files.push({
           path: file,
-          lastModified: stat?.mtime || stat?.ctime || null,
+          lastModified: stat?.mtime || null,
         });
       }
     }
@@ -502,7 +502,7 @@ export class UploadModal extends Modal {
           };
         }
         new Notice("WebDAV error: " + ex.message);
-      } 
+      }
       throw ex;
     }
   }
@@ -510,7 +510,7 @@ export class UploadModal extends Modal {
   prefixToStr(prefix: string | null) {
     if (prefix == null) {
       return "";
-    } else if (prefix.endsWith("/")) { // TODO: other way around?
+    } else if (prefix.endsWith("/")) {
       return prefix;
     }
     return prefix + "/";

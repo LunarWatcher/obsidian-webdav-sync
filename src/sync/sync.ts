@@ -146,6 +146,13 @@ export async function runSync(
         actionedCount: -1,
         errorCount: errorCount + 1
       };
+    } else if (typeof(file) != "string") {
+      onError("Fatal: expected string, found " + file);
+      console.error(sourceFiles);
+      return {
+        actionedCount: -1,
+        errorCount: errorCount + 1
+      };
     }
     // ADD_LOCAL needs to be first, so we don't have to redo value checks for action
     // TODO: this cannot be here, and needs to be refactored out. The conflict resolution
