@@ -25,7 +25,7 @@ export function actionToDescriptiveString(action: ActionType): string {
   case ActionType.REMOVE:
     return "Remove";
   case ActionType.ADD_LOCAL:
-    return "Conflict identified; ask user";
+    return "Conflict identified; ask user [not implemented, defaults to adding or updating]";
   case ActionType.NOOP:
     return "No changes made";
   }
@@ -64,6 +64,12 @@ function dateRounder(a: number | null): number {
   return Math.floor(a / 1000);
 }
 
+// TODO: this did not solve the underlying problem. For some reason, android 
+// always forces sync of some (but not all) .obsidian/ folders, in spite of the
+// timestamps appearing identical. 
+// I still suspect there's rounding issues at play, but it's not within 1 second,
+// and 1s is already too high for comfort
+// The probability this'll result in issues is extremely low.
 function approx(a: number, b: number): boolean {
   return a == b
     || Math.abs(a - b) <= 1;
@@ -95,12 +101,7 @@ export function calculateSyncActions(
       out.set(file, ActionType.ADD);
     } else {
       // Check the dates
-      let remoteData = dest.get(file);
-      if (remoteData == undefined) {
-        // This should never trigger, but tsserver is a whiny cunt if it isn't checked, sooo
-        throw Error("wtf typescript");
-      }
-
+      let remoteData = dest.get(file) as FileData;
       if (remoteData.lastModified == null || data.lastModified == null) {
         // If either of the dates are null, the underlying filesystem or remote webdav server doesn't support
         // it/has it disabled. We need to add just in case.

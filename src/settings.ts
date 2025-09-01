@@ -205,8 +205,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
                 return;
               }
 
-              // Typescript is a fucking worthless pile of shit. This is a load-bearing `any`
-              (this.plugin.settings.sync.subfolders as any)[newVaultFolder] = {
+              this.plugin.settings.sync.subfolders[newVaultFolder] = {
                 dest: newShare
               } as FolderDestination;
               await this.plugin.saveSettings()
@@ -240,24 +239,24 @@ export class WebDAVSettingsTab extends PluginSettingTab {
     // Fuck you javascript, why can I not `of` a dict?
     for (const path in this.plugin.settings.sync.subfolders) {
       // Typescript: are you fucking stupid?
-      const dest = (this.plugin.settings.sync.subfolders as any)[path] as FolderDestination;
+      const dest = this.plugin.settings.sync.subfolders[path] as FolderDestination;
 
       new Setting(container)
         .setName("WebDAV target folder for vault path: " + path)
         .addText(text => {
           text.setValue(dest.dest)
             .onChange(async (value) => {
-              const lastDest = (this.plugin.settings.sync.subfolders as any)[path] as FolderDestination | null;
+              const lastDest = this.plugin.settings.sync.subfolders[path] as FolderDestination | null;
               if (lastDest?.dest.startsWith("/")) {
                 lastDest.dest = value;
 
-                (this.plugin.settings.sync.subfolders as any)[path] = lastDest;
+                this.plugin.settings.sync.subfolders[path] = lastDest;
                 await this.plugin.saveSettings()
               }
             })
         })
         .addButton(button => button.setIcon("trash").setWarning().onClick(async () => {
-          delete (this.plugin.settings.sync.subfolders as any)[path];
+          delete this.plugin.settings.sync.subfolders[path];
           await this.plugin.saveSettings();
           this.display();
         }))

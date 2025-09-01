@@ -169,7 +169,7 @@ export class UploadModal extends Modal {
     } else {
       for (const vaultPath in this.plugin.settings.sync.subfolders) {
         // Typescript: are you fucking stupid?
-        const { dest } = (this.plugin.settings.sync.subfolders as any)[vaultPath] as FolderDestination;
+        const { dest } = this.plugin.settings.sync.subfolders[vaultPath] as FolderDestination;
         let local = await this.getVaultFiles(vaultPath);
         
         let remoteResult = await this.getRemoteFiles(dest);
@@ -244,7 +244,7 @@ export class UploadModal extends Modal {
     } else {
       for (const vaultPath in this.plugin.settings.sync.subfolders) {
         // Typescript: are you fucking stupid?
-        const { dest } = (this.plugin.settings.sync.subfolders as any)[vaultPath] as FolderDestination;
+        const { dest } = this.plugin.settings.sync.subfolders[vaultPath] as FolderDestination;
         let local = await this.getVaultFiles(vaultPath);
         
         let remoteResult = await this.getRemoteFiles(dest);
