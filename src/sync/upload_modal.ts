@@ -153,7 +153,8 @@ export class UploadModal extends Modal {
           this.setError,
           this.updateUpload.bind(
             this,
-            this.plugin.settings.sync.root_folder.dest
+            this.plugin.settings.sync.root_folder.dest,
+            null
           ),
           this.resolveConflict
         )
@@ -177,19 +178,20 @@ export class UploadModal extends Modal {
           return;
         }
         const remote = remoteResult.files as Files;
-        let actions = calculateSyncActions(remote, local);
+        let actions = calculateSyncActions(local, remote);
 
         if (!this.dryRun) {
           this.setLoading(ev.target);
           const { actionedCount, errorCount } = await runSync(
             SyncDir.UP,
-            remote,
             local,
+            remote,
             actions,
             this.setError,
             this.updateUpload.bind(
               this,
-              dest
+              dest,
+              vaultPath
             ),
             this.resolveConflict
           )
@@ -227,7 +229,8 @@ export class UploadModal extends Modal {
           this.setError,
           this.updateDownload.bind(
             this,
-            this.plugin.settings.sync.root_folder
+            this.plugin.settings.sync.root_folder,
+            null
           ),
           this.resolveConflict
         )
@@ -244,9 +247,7 @@ export class UploadModal extends Modal {
         const { dest } = (this.plugin.settings.sync.subfolders as any)[vaultPath] as FolderDestination;
         let local = await this.getVaultFiles(vaultPath);
         
-        let remoteResult = await this.getRemoteFiles(
-          dest
-        );
+        let remoteResult = await this.getRemoteFiles(dest);
         if (remoteResult.error) {
           this.setError(remoteResult.error);
           return;
@@ -267,7 +268,8 @@ export class UploadModal extends Modal {
             this.setError,
             this.updateDownload.bind(
               this,
-              dest
+              dest,
+              vaultPath,
             ),
             this.resolveConflict
           )
@@ -282,6 +284,7 @@ export class UploadModal extends Modal {
 
   async updateDownload(
     dest: string,
+    localPrefix: string | null,
     type: ActionType,
     file: string,
     srcData: FileData,
@@ -293,10 +296,12 @@ export class UploadModal extends Modal {
     if (type == ActionType.ADD_LOCAL) {
       throw Error("Unexpected ADD_LOCAL; this should've been processed by now");
     }
+    let localPath = this.prefixToStr(localPrefix) 
+      + file;
     switch (type) {
       case ActionType.ADD:
-        if (file.replace("\\", "/").contains("/")) {
-          const parentPath = file.replace("\\", "/")
+        if (localPath.replace("\\", "/").contains("/")) {
+          const parentPath = localPath.replace("\\", "/")
             .split("/")
             .slice(0, -1)
             .join("/");
@@ -310,7 +315,7 @@ export class UploadModal extends Modal {
           }
         }
         await this.app.vault.adapter.writeBinary(
-          normalizePath(file),
+          normalizePath(localPath),
           await this.plugin.client.client.getFileContents(
             this.resolvePath(
               dest,
@@ -325,7 +330,7 @@ export class UploadModal extends Modal {
         break;
       case ActionType.REMOVE:
         await this.app.vault.adapter.remove(
-          normalizePath(file)
+          normalizePath(localPath)
         );
         break;
     }
@@ -334,6 +339,7 @@ export class UploadModal extends Modal {
 
   async updateUpload(
     dest: string,
+    localPrefix: string | null,
     type: ActionType,
     file: string,
     srcData: FileData,
@@ -351,7 +357,10 @@ export class UploadModal extends Modal {
           dest
           + "/"
           + file,
-          await this.app.vault.adapter.readBinary(file), {
+          await this.app.vault.adapter.readBinary(
+            this.prefixToStr(localPrefix)
+              + file
+          ), {
             overwrite: true,
             headers: {
               "X-OC-MTime": Math.floor((srcData.lastModified || -1) / 1000).toString()
@@ -405,10 +414,21 @@ export class UploadModal extends Modal {
     const out = new Map<Path, FileData>();
 
     for (const file of files) {
+      let localFile = file.path.replace("\\", "/");
+      let compliantDestinationMap = localFile;
+      if (root != "/" && localFile.startsWith(root)) {
+        // This only removes the first match, and we know it's always present in the path
+        compliantDestinationMap = compliantDestinationMap.replace(
+          root + (
+            root.endsWith("/") ? "" : "/"
+          ), ""
+        )
+      }
       out.set(
-        file.path.replace("\\", "/"),
+        compliantDestinationMap,
         { 
-          lastModified: file.lastModified
+          lastModified: file.lastModified,
+          destination: localFile
         } as FileData
       )
     }
@@ -459,10 +479,12 @@ export class UploadModal extends Modal {
           continue;
         }
 
+        const sanitised = file.filename.replace(folder + (folder.endsWith("/") ? "" : "/"), "");
         out.set(
-          file.filename.replace(folder + (folder.endsWith("/") ? "" : "/"), ""),
+          sanitised,
           {
-            lastModified: Date.parse(file.lastmod)
+            lastModified: Date.parse(file.lastmod),
+            destination: sanitised,
           } as FileData
         )
       }
@@ -483,6 +505,15 @@ export class UploadModal extends Modal {
       } 
       throw ex;
     }
+  }
+
+  prefixToStr(prefix: string | null) {
+    if (prefix == null) {
+      return "";
+    } else if (prefix.endsWith("/")) { // TODO: other way around?
+      return prefix;
+    }
+    return prefix + "/";
   }
 
   onClose() {

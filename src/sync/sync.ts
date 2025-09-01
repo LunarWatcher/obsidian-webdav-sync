@@ -138,6 +138,15 @@ export async function runSync(
   for (let [file, action] of actions) {
     let srcData = sourceFiles.get(file) as FileData;
     let destData = destFiles.get(file) as FileData;
+
+    if (srcData == null) {
+      onError("Fatal: " + file + " lacks srcData");
+      console.error(sourceFiles);
+      return {
+        actionedCount: -1,
+        errorCount: errorCount + 1
+      };
+    }
     // ADD_LOCAL needs to be first, so we don't have to redo value checks for action
     // TODO: this cannot be here, and needs to be refactored out. The conflict resolution
     // needs to take place before anything else happens so it can be done in bulk with 
