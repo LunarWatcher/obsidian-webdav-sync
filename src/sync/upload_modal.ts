@@ -287,9 +287,9 @@ export class UploadModal extends Modal {
     localPrefix: string | null,
     type: ActionType,
     file: string,
-    srcData: FileData,
-    _destData: FileData
-  ): Promise<string | null> {
+    srcData: FileData | undefined,
+    _destData: FileData | undefined
+  ) {
     if (this.plugin.client == null) {
       throw Error("This should never throw, but exists to make typescript shut up");
     }
@@ -300,6 +300,7 @@ export class UploadModal extends Modal {
       + file;
     switch (type) {
       case ActionType.ADD:
+        if (srcData == null) { throw new Error("This should never throw"); }
         if (localPath.replace("\\", "/").contains("/")) {
           const parentPath = localPath.replace("\\", "/")
             .split("/")
@@ -311,7 +312,6 @@ export class UploadModal extends Modal {
                 parentPath
               )
             );
-
           }
         }
         await this.app.vault.adapter.writeBinary(
@@ -334,7 +334,6 @@ export class UploadModal extends Modal {
         );
         break;
     }
-    return null;
   }
 
   async updateUpload(
@@ -342,9 +341,9 @@ export class UploadModal extends Modal {
     localPrefix: string | null,
     type: ActionType,
     file: string,
-    srcData: FileData,
-    _destData: FileData
-  ): Promise<string | null> {
+    srcData: FileData | undefined,
+    _destData: FileData | undefined
+  ) {
     if (this.plugin.client == null) {
       throw Error("This should never throw");
     }
@@ -353,6 +352,7 @@ export class UploadModal extends Modal {
     }
     switch (type) {
       case ActionType.ADD:
+        if (srcData == undefined) { throw new Error("This should never throw"); }
         await this.plugin.client.client.putFileContents(
           dest
           + "/"
@@ -376,7 +376,6 @@ export class UploadModal extends Modal {
         );
         break;
     }
-    return null;
   }
 
   resolvePath(webdav: string, file: string) {

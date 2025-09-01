@@ -11,3 +11,4 @@ module.exports = {
     ...tsJestTransformCfg,
   },
 };
+// vim:sw=2

@@ -35,6 +35,20 @@ export type Path = string;
 export type Files = Map<Path, FileData>;
 export type Actions = Map<Path, ActionType>;
 
+export type OnUpdateCallback = (
+  type: ActionType,
+  path: string,
+  localData: FileData | undefined,
+  remoteData: FileData | undefined
+) => Promise<void>;
+
+export type OnConflictCallback = (
+  path: string,
+  src: FileData | undefined,
+  dest: FileData | undefined,
+  direction: SyncDir
+) => Promise<ActionType>;
+
 export enum SyncDir {
   UP,
   DOWN
@@ -125,21 +139,19 @@ export async function runSync(
   destFiles: Files,
   actions: Actions,
   onError: (message: string) => void,
-  onUpdate: (
-    type: ActionType,
-    path: string,
-    localData: FileData,
-    remoteData: FileData
-  ) => Promise<string | null>,
-  onConflict: (path: string, src: FileData, dest: FileData, direction: SyncDir) => Promise<ActionType>,
+  onUpdate: OnUpdateCallback,
+  onConflict: OnConflictCallback,
 ): Promise<SyncResult> {
   let actionedCount = 0;
   let errorCount = 0;
   for (let [file, action] of actions) {
-    let srcData = sourceFiles.get(file) as FileData;
-    let destData = destFiles.get(file) as FileData;
+    let srcData = sourceFiles.get(file);
+    let destData = destFiles.get(file);
 
-    if (srcData == null) {
+    if (
+      srcData == null
+      && action != ActionType.REMOVE // Removing is obviously going to lack srcData
+    ) {
       onError("Fatal: " + file + " lacks srcData");
       console.error(sourceFiles);
       return {
@@ -172,7 +184,7 @@ export async function runSync(
       continue; 
     } else {
       try {
-        onUpdate(
+        await onUpdate(
           action,
           file,
           srcData,
