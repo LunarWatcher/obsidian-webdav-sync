@@ -76,6 +76,7 @@ jobs:
         run: |
           sudo apt install -y ./obsidian_inst/*.deb
       - name: Install obsidian artefact (Windows)
+        timeout-minutes: 2
         if: ${{ matrix.os == 'windows-2025' }}
         run: |
           .\obsidian_inst\*.exe /S
