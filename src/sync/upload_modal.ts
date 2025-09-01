@@ -85,18 +85,21 @@ export class UploadModal extends Modal {
     // I'm not doing this with Obsidian's API. Give me a table API and I'll do that, but this is
     // 6 separate calls with tracking of nested objects, with planned expansions. This code is
     // already unreadable enough as it is with all the non-standard API calls.
-    this.contentEl.insertAdjacentHTML("beforeend", `<table id="dry-run-info">
-      <thead>
-        <tr>
-          <th>File</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="dry-run-data">
-      </tbody>
-    </table>`);
+    if (document.getElementById("dry-run-info") == null) {
+      this.contentEl.insertAdjacentHTML("beforeend", `<table id="dry-run-info">
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="dry-run-data">
+        </tbody>
+      </table>`);
+    }
     // The previous call is a void
     const tab = document.getElementById("dry-run-info") as HTMLTableElement;
+    tab.empty();
     const body = document.getElementById("dry-run-data") as HTMLTableSectionElement;
     body.empty();
 
