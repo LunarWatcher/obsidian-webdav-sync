@@ -9,7 +9,7 @@ This is a very simple sync plugin based on WebDAV. You need to bring your own se
 This sync plugins differs substantially from many of the other sync plugins, due to:
 
 * Sync is not automatic, so there's no need for a deletion-aware merge algorithm. Merging is relatively easy, but _deletion_ merge is not. In fact, there's no proper merge algorithm at all. The highest resolution you get is per-file selection in the evnet of conflict, as the assumption is a workflow that never ends up out of sync. This is also spoken like a developer, because I stay on top of my Git states the majority of the time.
-* [TODO] Support for partial vault sync, where specific folders can be imported. This primarily exists because I want to sync some folders between my private and work vaults, but without syncing everything (work notes stay at work, private notes stay at home).
+* Support for partial vault sync, where specific folders can be imported. This primarily exists because I want to sync some folders between my private and work vaults, but without syncing everything (work notes stay at work, private notes stay at home).
 * [TODO] An optional webhook can be run on push. The intent here is to allow for push-aware backup systems to do their thing only when it's needed. Versioning shouldn't need be a feature of the sync plugin itself when the specific needs for sync are diverse.
 
 ## Rationale
@@ -55,6 +55,8 @@ Although the plugin shouldn't cause any problems, I strongly suggest taking back
 ## Installation and setup
 
 Once this plugin is release-ready, you can grab the latest release from [GitHub](https://github.com/LunarWatcher/obsidian-webdav-sync/releases). Download it, and add the `obsidian-webdav-sync` folder to your vault's `.obsidian/plugins/` folder. The plugin is not yet available through the plugin store thing, so it'll need to be updated manually as well; this is done the same way.
+
+I have not yet decided whether I feel like uploading through Obsidian's built-in plugin manager; a chunk of the code is bad, partly out of pure spite for how absolutely infuriating it is to write TypeScript code, and Obsidian's plugin standards make no sense from a semantic POV. If you have a special interest in getting the plugin released, feel free to do so.
 
 ### Additional devices
 

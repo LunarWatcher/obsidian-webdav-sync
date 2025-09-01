@@ -3,6 +3,7 @@ import MyPlugin from "../main";
 import {canConnectWithSettings} from "settings";
 import {Actions, actionToDescriptiveString, ActionType, calculateSyncActions, FileData, Files, Path, runSync, SyncDir } from "./sync";
 import {FileStat} from "webdav";
+import {FolderDestination} from "./sync_settings";
 
 export interface RemoteFileResult {
   files: Files | null;
@@ -145,12 +146,15 @@ export class UploadModal extends Modal {
       if (!this.dryRun) {
         this.setLoading(ev.target);
         const { actionedCount, errorCount } = await runSync(
-          SyncDir.DOWN,
+          SyncDir.UP,
           local,
           remote,
           actions,
           this.setError,
-          this.updateUpload.bind(this),
+          this.updateUpload.bind(
+            this,
+            this.plugin.settings.sync.root_folder.dest
+          ),
           this.resolveConflict
         )
 
@@ -161,6 +165,40 @@ export class UploadModal extends Modal {
         console.log("local: ", local);
         this.showTaskGraph(actions, true);
       }
+    } else {
+      for (const vaultPath in this.plugin.settings.sync.subfolders) {
+        // Typescript: are you fucking stupid?
+        const { dest } = (this.plugin.settings.sync.subfolders as any)[vaultPath] as FolderDestination;
+        let local = await this.getVaultFiles(vaultPath);
+        
+        let remoteResult = await this.getRemoteFiles(dest);
+        if (remoteResult.error) {
+          this.setError(remoteResult.error);
+          return;
+        }
+        const remote = remoteResult.files as Files;
+        let actions = calculateSyncActions(remote, local);
+
+        if (!this.dryRun) {
+          this.setLoading(ev.target);
+          const { actionedCount, errorCount } = await runSync(
+            SyncDir.UP,
+            remote,
+            local,
+            actions,
+            this.setError,
+            this.updateUpload.bind(
+              this,
+              dest
+            ),
+            this.resolveConflict
+          )
+          new Notice(`Push complete. ${actionedCount} files were updated (${errorCount} errors).`);
+          this.close();
+        } else {
+          new Notice("IOU 1x dry run");
+        }
+      }
     }
   }
 
@@ -168,8 +206,8 @@ export class UploadModal extends Modal {
     if (this.plugin.client == null) {
       return;
     }
-    let local = await this.getVaultFiles();
     if (this.plugin.settings.sync.full_vault_sync) {
+      let local = await this.getVaultFiles();
       let remoteResult = await this.getRemoteFiles(this.plugin.settings.sync.root_folder.dest);
       if (remoteResult.error) {
         this.setError(remoteResult.error);
@@ -187,7 +225,10 @@ export class UploadModal extends Modal {
           local,
           actions,
           this.setError,
-          this.updateDownload.bind(this),
+          this.updateDownload.bind(
+            this,
+            this.plugin.settings.sync.root_folder
+          ),
           this.resolveConflict
         )
         new Notice(`Pull complete. ${actionedCount} files were updated (${errorCount} errors).`);
@@ -197,10 +238,50 @@ export class UploadModal extends Modal {
         console.log("local: ", local);
         this.showTaskGraph(actions, false);
       }
+    } else {
+      for (const vaultPath in this.plugin.settings.sync.subfolders) {
+        // Typescript: are you fucking stupid?
+        const { dest } = (this.plugin.settings.sync.subfolders as any)[vaultPath] as FolderDestination;
+        let local = await this.getVaultFiles(vaultPath);
+        
+        let remoteResult = await this.getRemoteFiles(
+          dest
+        );
+        if (remoteResult.error) {
+          this.setError(remoteResult.error);
+          return;
+        }
+        if (remoteResult.files == null) {
+          throw Error("Stfu typescript");
+        }
+        const remote = remoteResult.files as Files;
+        let actions = calculateSyncActions(remote, local);
+
+        if (!this.dryRun) {
+          this.setLoading(ev.target);
+          const { actionedCount, errorCount } = await runSync(
+            SyncDir.DOWN,
+            remote,
+            local,
+            actions,
+            this.setError,
+            this.updateDownload.bind(
+              this,
+              dest
+            ),
+            this.resolveConflict
+          )
+          new Notice(`Pull complete. ${actionedCount} files were updated (${errorCount} errors).`);
+          this.close();
+        } else {
+          new Notice("IOU 1x dry run");
+        }
+      }
     }
   }
 
   async updateDownload(
+    dest: string,
     type: ActionType,
     file: string,
     srcData: FileData,
@@ -214,11 +295,25 @@ export class UploadModal extends Modal {
     }
     switch (type) {
       case ActionType.ADD:
+        if (file.replace("\\", "/").contains("/")) {
+          const parentPath = file.replace("\\", "/")
+            .split("/")
+            .slice(0, -1)
+            .join("/");
+          if (!(await this.plugin.adapter().exists(parentPath))) {
+            await this.app.vault.adapter.mkdir(
+              normalizePath(
+                parentPath
+              )
+            );
+
+          }
+        }
         await this.app.vault.adapter.writeBinary(
           normalizePath(file),
           await this.plugin.client.client.getFileContents(
             this.resolvePath(
-              this.plugin.settings.sync.root_folder.dest,
+              dest,
               file
             ), {
               format: "binary"
@@ -238,6 +333,7 @@ export class UploadModal extends Modal {
   }
 
   async updateUpload(
+    dest: string,
     type: ActionType,
     file: string,
     srcData: FileData,
@@ -252,7 +348,7 @@ export class UploadModal extends Modal {
     switch (type) {
       case ActionType.ADD:
         await this.plugin.client.client.putFileContents(
-          this.plugin.settings.sync.root_folder.dest 
+          dest
           + "/"
           + file,
           await this.app.vault.adapter.readBinary(file), {
@@ -265,7 +361,7 @@ export class UploadModal extends Modal {
         break;
       case ActionType.REMOVE:
         await this.plugin.client.client.deleteFile(
-          this.plugin.settings.sync.root_folder.dest 
+          dest
           + "/"
           + file
         );
@@ -278,11 +374,15 @@ export class UploadModal extends Modal {
     return webdav + "/" + file
   }
 
-  async getVaultFiles(): Promise<Files> {
+  async getVaultFiles(root: string = "/"): Promise<Files> {
     //const files = this.app.vault.getFiles();
     const queue: any[] = [];
 
-    queue.push("/");
+    if (!(await this.plugin.adapter().exists(normalizePath(root)))) {
+      return new Map();
+    }
+
+    queue.push(root);
     const files: { path: string, lastModified: number | null }[] = [];
     while (queue.length > 0) {
       const elem = queue.pop() as string;
@@ -291,13 +391,7 @@ export class UploadModal extends Modal {
       );
       queue.push(...next.folders);
       for (const file of next.files) {
-        if (
-          this.plugin.settings.sync.ignore_workspace
-          && (
-            file.replace("\\", "/") == ".obsidian/workspace.json" 
-            || file.replace("\\", "/") == ".obsidian/workspace-mobile.json"
-          )
-        ) {
+        if (this.shouldIgnore(file)) {
           continue;
         }
         const stat = await this.app.vault.adapter.stat(file);
@@ -322,13 +416,23 @@ export class UploadModal extends Modal {
     return out;
   }
 
+  shouldIgnore(file: string) {
+    return this.plugin.settings.sync.ignore_workspace
+      && (
+        file.replace("\\", "/") == this.plugin.configDir() + "/workspace.json" 
+        || file.replace("\\", "/") == this.plugin.configDir() + "/workspace-mobile.json"
+      )
+  }
+
   async resolveConflict(file: string, src: FileData, dest: FileData, dir: SyncDir): Promise<ActionType> {
     // TODO: handle properly
     // TODO: this likely cannot be a separate function
     return ActionType.ADD;
   }
 
-  async getRemoteFiles(folder: string): Promise<RemoteFileResult> {
+  async getRemoteFiles(
+    folder: string,
+  ): Promise<RemoteFileResult> {
     if (this.plugin.client == null) {
       return {
         files: null,
@@ -351,13 +455,7 @@ export class UploadModal extends Modal {
         if (file.type == "directory") {
           continue;
         }
-        if (
-          this.plugin.settings.sync.ignore_workspace
-          && (
-            file.filename.replace("\\", "/") == ".obsidian/workspace.json" 
-            || file.filename.replace("\\", "/") == ".obsidian/workspace-mobile.json"
-          )
-        ) {
+        if (this.shouldIgnore(file.filename)) {
           continue;
         }
 
@@ -381,6 +479,7 @@ export class UploadModal extends Modal {
             error: "Failed to fetch from remote server. Has the server gone down?"
           };
         }
+        new Notice("WebDAV error: " + ex.message);
       } 
       throw ex;
     }

@@ -68,4 +68,12 @@ export default class MyPlugin extends Plugin {
     }
     return true;
   }
+
+  adapter() {
+    return this.app.vault.adapter;
+  }
+
+  configDir() {
+    return this.app.vault.configDir;
+  }
 }
