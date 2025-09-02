@@ -4,8 +4,10 @@ This is a very simple sync plugin based on WebDAV. You need to bring your own se
 
 Some major differences from other sync plugins:
 
-* Sync is not automatic, so there's no need for a proepr deletion-aware merge algorithm. Merging is relatively easy, but _deletion_ merge is not if you need to do a two-way merge. That said, there is no content-level merge algorithm; there's handling of file-level conflicts, but it's assumed you're able to track those yourself.
+* Sync is not automatic, so there's no need for a proper deletion-aware merge algorithm. Merging is relatively easy, but _deletion_ merge is not if you need to do a two-way merge. That said, there is no content-level merge algorithm; there's handling of file-level conflicts, but it's assumed you're able to track those yourself.
 * Support for partial vault sync, where specific folders can be imported. This primarily exists because I want to sync some folders between my private and work vaults, but without syncing everything (work notes stay at work, private notes stay at home).
+* [TODO] Built-in MTLS support on desktop
+    * Android appears to be blocked both by lacking support in the underlying HTTP client[^1], and by [obsidian not allowing user-supplied certificates](https://forum.obsidian.md/t/allow-user-supplied-root-certificates-weaken-security/26764), as this appears to include authentication certificates.
 * [TODO] An optional webhook can be run on push. The intent here is to allow for push-aware backup systems to do their thing only when it's needed. Versioning shouldn't need be a feature of the sync plugin itself when the specific needs for sync are diverse.
 
 ## Rationale
@@ -82,3 +84,5 @@ Other requirements:
 WebDAV sync is not thread-safe. If you run two pushes at once, you will end up with an inconsistent state.
 
 Due to the lack of content-level merge, ending up in a situation like this requires manual recovery. 
+
+[^1]: The `webdav` npm package appears to use node-fetch on desktop, and default to standard `fetch` on android. `node-fetch` supports hard-coded mTLS certificates, while the standard fetch client does not. Because it likely won't run in an android environment, this feature is desktop-only. For more technical information, see https://github.com/LunarWatcher/obsidian-webdav-sync/issues/4
