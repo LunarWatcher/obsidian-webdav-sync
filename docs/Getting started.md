@@ -25,7 +25,7 @@ Before you can do any syncing, go to the WebDAV sync settings. Here, you'll need
 * WebDAV password
 * One of:
     * A share for full vault sync
-    * A set of folder mappings for partial sync. See [Partial sync](./Partial sync.md)
+    * A set of folder mappings for partial sync. See [Partial sync](https://github.com/LunarWatcher/obsidian-webdav-sync/blob/master/docs/Partial%20sync.md)
 
 
 > [!warning] 
