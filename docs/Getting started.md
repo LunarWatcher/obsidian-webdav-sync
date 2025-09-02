@@ -28,7 +28,10 @@ Before you can do any syncing, go to the WebDAV sync settings. Here, you'll need
     * A set of folder mappings for partial sync. See [Partial sync](Partial sync.md)
 
 
-> [!warning] Trust your WebDAV provider.
+> [!warning] 
+>
+> **Trust your WebDAV provider.**
+> 
 > Due to a quirk of how sync works, your WebDAV password is also synced to the WebDAV share, as obsidian has no way to securely store credentials at the time of writing. In the future, explicit ignore rules will be added that allows this file to be ignored. 
 > 
 > In the meanwhile, this means that you need to trust your WebDAV provider. If you use a sketchy cloud provider where data isn't encrypted, for example, they may be able to grab your account password. Encrypted sync is not a planned feature, as the default assumption is that you own your data, and therefore don't need to encrypt it.
@@ -37,7 +40,7 @@ Before you can do any syncing, go to the WebDAV sync settings. Here, you'll need
 
 The first push is relatively straight-forward. In the ribbon, a sync button is added by default. When clicked, you'll get a modal asking whether you want to push or pull. 
 
-> [!error]
+> [!caution]
 >
 > It's **vitally important** that you ***do not*** press "Download" at this point. If you do not have a backup, and you did not initialise your vault in the cloud manually, your vault is gone. No security measures have been implemented yet to prevent this, so common sense is required. User error can and will fuck you up at this point.
 
@@ -45,7 +48,7 @@ In this menu, you'll also find a "dry run" toggle. As the toggle explains, it re
 
 Once you click "upload", your entire vault will be synced to the remote WebDAV share. Once completed, you can verify that it's completed by trying a second upload. If it's complete, you'll get a message saying no changes were made.
 
-> [!info]
+> [!note]
 >
 > This only works reliably if your WebDAV server supports the `X-OC-MTime` header. Without it, if you use dry run, you'll see that all the files you just uploaded count as modified in the remote.
 
