@@ -69,30 +69,16 @@ Due to how obsidian works, CORS is in play. CORS is just as much of a pain in th
 
 Other requirements:
 
-* It must be possible to index the DAV share infinitely, as no manual recursion logic is implemented on the client side.
+* It must be possible to fully and recursively index the DAV folder, as no manual recursion logic is implemented on the client side.
 
-#### Copyparty setup
+#### Setup of known WebDAV servers
 
-If you're using copyparty, note that your user needs access to dotfiles (the `.` permission) if you're doing full vault sync. Without it, the `.obsidian` folder is omitted. It's also strongly suggested that you don't keep the `hist` cache inside the folder, as it can and almost certainly will cause issues with copyparty.
-```conf
-[global]
-    hist: ~/.cache/copyparty
-    # For reasons described at the top of the DAV server section
-    # This may or may not be the only way to achieve the goal, but it's easy and I don't care
-    # If you do, you're welcome to change this to whatever allows app://obsidian.md and apparently
-    # many other things instead.
-    allow-csrf
-    dav-inf
-
-    # Enables full webdav writes - for copyparty, this means redundant files aren't 
-    # made on PUT that require deleting. 
-    # Omitting this means the actual files will always be out of sync.
-    daw
-```
+* [Copyparty](docs/webdav-servers/Copyparty.md)
 
 ## Things to note
 
 ### Race conditions
 
-WebDAV sync is not thread-safe. If you run two pushes at once, you will end up with an inconsistent state. There _is_ error recovery for dealing with various conflicts
+WebDAV sync is not thread-safe. If you run two pushes at once, you will end up with an inconsistent state.
 
+Due to the lack of content-level merge, ending up in a situation like this requires manual recovery. 

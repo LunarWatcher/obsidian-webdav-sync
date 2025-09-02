@@ -106,7 +106,10 @@ export class WebDAVSettingsTab extends PluginSettingTab {
       });
       new Setting(containerEl)
         .setName("Full vault sync")
-        .setDesc("Whether or not to sync the full vault")
+        .setDesc(
+          "Whether or not to sync the full vault. This option is mutually exclusive with partial vault sync, and "
+          + "must be disabled for folder mappings to take effect."
+        )
         .addToggle(toggle =>
             toggle
               .setValue(this.plugin.settings.sync.full_vault_sync)
