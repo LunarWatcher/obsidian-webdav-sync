@@ -97,9 +97,6 @@ export class UploadModal extends Modal {
         </tbody>
       </table>`);
     }
-    // The previous call is a void
-    const tab = document.getElementById("dry-run-info") as HTMLTableElement;
-    tab.empty();
     const body = document.getElementById("dry-run-data") as HTMLTableSectionElement;
     body.empty();
 

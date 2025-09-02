@@ -30,6 +30,7 @@ export class Connection {
       username: server_config.username,
       password: server_config.password,
       authType: AuthType.Auto,
+      withCredentials: true,
     })
   }
 }
