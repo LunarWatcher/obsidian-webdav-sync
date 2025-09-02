@@ -4,7 +4,7 @@
     "version": "0.0.1",
     "minAppVersion": "1.9.10",
     "description": "Simple manually-controlled WebDAV sync plugin",
-    "author": "LunarWatcher",
+    "author": "Olivia",
     "authorUrl": "https://lunarwatcher.github.io",
     "isDesktopOnly": false
 }

@@ -1,14 +1,10 @@
 # Obsidian WebDAV sync
 
-> [!warning]
->
-> The plugin is nowhere near production-ready. You should not download it yet; it can and will act in unexpected ways, break hard, and potentially take your vault with it.
+This is a very simple sync plugin based on WebDAV. You need to bring your own server to use this plugin. Theoretically, all WebDAV-compatible servers are supported, though there are some requirements for the general behaviour of the server. This is described in a later section.
 
-This is a very simple sync plugin based on WebDAV. You need to bring your own server to use this plugin.
+Some major differences from other sync plugins:
 
-This sync plugins differs substantially from many of the other sync plugins, due to:
-
-* Sync is not automatic, so there's no need for a deletion-aware merge algorithm. Merging is relatively easy, but _deletion_ merge is not. In fact, there's no proper merge algorithm at all. The highest resolution you get is per-file selection in the evnet of conflict, as the assumption is a workflow that never ends up out of sync. This is also spoken like a developer, because I stay on top of my Git states the majority of the time.
+* Sync is not automatic, so there's no need for a proepr deletion-aware merge algorithm. Merging is relatively easy, but _deletion_ merge is not if you need to do a two-way merge. That said, there is no content-level merge algorithm; there's handling of file-level conflicts, but it's assumed you're able to track those yourself.
 * Support for partial vault sync, where specific folders can be imported. This primarily exists because I want to sync some folders between my private and work vaults, but without syncing everything (work notes stay at work, private notes stay at home).
 * [TODO] An optional webhook can be run on push. The intent here is to allow for push-aware backup systems to do their thing only when it's needed. Versioning shouldn't need be a feature of the sync plugin itself when the specific needs for sync are diverse.
 
@@ -92,7 +88,6 @@ If you're using copyparty, note that your user needs access to dotfiles (the `.`
     # made on PUT that require deleting. 
     # Omitting this means the actual files will always be out of sync.
     daw
-
 ```
 
 ## Things to note
