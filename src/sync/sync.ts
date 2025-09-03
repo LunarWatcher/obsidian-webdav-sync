@@ -83,7 +83,8 @@ function approx(a: number, b: number): boolean {
 export function calculateSyncActions(
   src: Files,
   dest: Files,
-  includeNoop: boolean = false
+  includeNoop: boolean = false,
+  deleteIsNoop: boolean = false
 ): Actions {
   const out: Actions = new Map<string, ActionType>();
 
@@ -91,7 +92,17 @@ export function calculateSyncActions(
     // Deletions are determined by finding files available in the remote that aren't available locally. These are deleted
     // in the destination.
     if (!src.has(file)) {
-      out.set(file, ActionType.REMOVE);
+      if (deleteIsNoop && includeNoop) {
+        out.set(
+          file,
+          ActionType.NOOP
+        );
+      } else if (!deleteIsNoop){
+        out.set(
+          file,
+          ActionType.REMOVE
+        );
+      }
     }
   }
 

@@ -245,4 +245,19 @@ describe("Files missing locally should be removed", () => {
     expect(testData.remove.length).toBe(1);
     expect(testData.conflict.length).toBe(0);
   });
+  test("except when deleteIsNoop, then it should be NOOP", () =>  {
+    const actions = calculateSyncActions(src, dest, true, true);
+    expect(actions).toStrictEqual(new Map([
+      ["Index.md", ActionType.ADD],
+      ["test/Hi.md", ActionType.ADD],
+      [".obsidian/plugins/obsidian-webdav-sync/index.js", ActionType.NOOP],
+    ]));
+  });
+  test("except when deleteIsNoop, then it should be NOOP, and omitted when not including noop", () =>  {
+    const actions = calculateSyncActions(src, dest, false, true);
+    expect(actions).toStrictEqual(new Map([
+      ["Index.md", ActionType.ADD],
+      ["test/Hi.md", ActionType.ADD],
+    ]));
+  });
 });

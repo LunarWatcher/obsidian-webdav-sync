@@ -18,6 +18,7 @@ export interface RemoteFileResult {
 export class UploadModal extends Modal {
   plugin: MyPlugin;
   dryRun: boolean;
+  deleteIsNoop: boolean;
   dryRunInfoContainer: HTMLDivElement;
 
   constructor(app: App, plugin: MyPlugin) {
@@ -27,6 +28,10 @@ export class UploadModal extends Modal {
 
   onOpen() {
     const { contentEl } = this;
+
+    this.dryRun = false;
+    this.deleteIsNoop = false;
+
     contentEl.empty();
     contentEl.createEl("h1", {
       text: "WebDAV sync controls"
@@ -44,11 +49,23 @@ export class UploadModal extends Modal {
     new Setting(contentEl)
       .setName("Dry run")
       .setDesc("If set, the plugin will only tell you what it would've done, but not actually do it. "
-              + "Meaning tell you which files it would change, but not actually do the changes. Useful "
-              + "for debugging, or just making sure you trust the plugin")
+        + "Meaning tell you which files it would change, but not actually do the changes. Useful "
+        + "for debugging, or just making sure you trust the plugin"
+      )
       .addToggle(toggle => 
-        toggle.setValue(false)
-      .onChange(value => { this.dryRun = value })
+        toggle
+          .setValue(this.dryRun)
+          .onChange(value => { this.dryRun = value })
+      )
+    new Setting(contentEl)
+      .setName("Don't delete anything")
+      .setDesc("If set, files that would've been deleted are not actually deleted. This should mainly be set if you failed "
+        + "to download before making changes, and don't wish to discard the changes you made. "
+      )
+      .addToggle(toggle => 
+        toggle
+          .setValue(this.deleteIsNoop)
+          .onChange(value => { this.deleteIsNoop = value })
       )
 
     const btnWrapper = contentEl.createDiv({
@@ -159,7 +176,12 @@ export class UploadModal extends Modal {
       }
 
       const remote = remoteResult.files as Files;
-      let actions = calculateSyncActions(local, remote);
+      let actions = calculateSyncActions(
+        local,
+        remote,
+        false,
+        this.deleteIsNoop
+      );
       
       if (!this.dryRun) {
         this.setLoading(ev.target);
@@ -199,7 +221,12 @@ export class UploadModal extends Modal {
           return;
         }
         const remote = remoteResult.files as Files;
-        let actions = calculateSyncActions(local, remote);
+        let actions = calculateSyncActions(
+          local,
+          remote,
+          false,
+          this.deleteIsNoop
+        );
 
         if (!this.dryRun) {
           this.setLoading(ev.target);
@@ -242,7 +269,12 @@ export class UploadModal extends Modal {
       }
 
       const remote = remoteResult.files as Files;
-      let actions = calculateSyncActions(remote, local);
+      let actions = calculateSyncActions(
+        remote,
+        local,
+        false,
+        this.deleteIsNoop
+      );
 
       if (!this.dryRun) {
         this.setLoading(ev.target);
@@ -284,7 +316,12 @@ export class UploadModal extends Modal {
           throw Error("Stfu typescript");
         }
         const remote = remoteResult.files as Files;
-        let actions = calculateSyncActions(remote, local);
+        let actions = calculateSyncActions(
+          remote,
+          local,
+          false,
+          this.deleteIsNoop
+        );
 
         if (!this.dryRun) {
           this.setLoading(ev.target);
