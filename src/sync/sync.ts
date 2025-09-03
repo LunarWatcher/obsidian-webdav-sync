@@ -34,6 +34,14 @@ export function actionToDescriptiveString(action: ActionType): string {
 export type Path = string;
 export type Files = Map<Path, FileData>;
 export type Actions = Map<Path, ActionType>;
+export interface Folder {
+  realPath: string;
+  commonPath: string;
+}
+export interface Content {
+  files: Files;
+  folderPaths: Folder[];
+}
 
 export type OnUpdateCallback = (
   type: ActionType,

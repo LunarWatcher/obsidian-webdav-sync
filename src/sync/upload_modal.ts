@@ -1,7 +1,7 @@
 import {App, Modal, normalizePath, Notice, setIcon, Setting} from "obsidian";
 import MyPlugin from "../main";
 import {canConnectWithSettings} from "settings";
-import {Actions, actionToDescriptiveString, ActionType, calculateSyncActions, FileData, Files, Path, runSync, SyncDir } from "./sync";
+import {Actions, actionToDescriptiveString, ActionType, calculateSyncActions, Content, FileData, Files, Folder, Path, runSync, SyncDir } from "./sync";
 import {FileStat} from "webdav";
 import {FolderDestination} from "./sync_settings";
 
@@ -11,7 +11,7 @@ interface DryRunInfo {
 }
 
 export interface RemoteFileResult {
-  files: Files | null;
+  content: Content | null;
   error: string | null;
 };
 
@@ -168,6 +168,8 @@ export class UploadModal extends Modal {
     }
     this.checkClearDryRun();
     let local = await this.getVaultFiles();
+    // TODO: There must be a way to merge both branches of the if statement. There's a _lot_ of duplicated code
+    // Also applies to upload()
     if (this.plugin.settings.sync.full_vault_sync) {
       let remoteResult = await this.getRemoteFiles(this.plugin.settings.sync.root_folder.dest);
       if (remoteResult.error) {
@@ -175,10 +177,10 @@ export class UploadModal extends Modal {
         return;
       }
 
-      const remote = remoteResult.files as Files;
+      const remote = remoteResult.content as Content;
       let actions = calculateSyncActions(
-        local,
-        remote,
+        local.files,
+        remote.files,
         false,
         this.deleteIsNoop
       );
@@ -187,8 +189,8 @@ export class UploadModal extends Modal {
         this.setLoading(ev.target);
         const { actionedCount, errorCount } = await runSync(
           SyncDir.UP,
-          local,
-          remote,
+          local.files,
+          remote.files,
           actions,
           this.setError,
           this.updateUpload.bind(
@@ -220,10 +222,10 @@ export class UploadModal extends Modal {
           this.setError(remoteResult.error);
           return;
         }
-        const remote = remoteResult.files as Files;
+        const remote = remoteResult.content as Content;
         let actions = calculateSyncActions(
-          local,
-          remote,
+          local.files,
+          remote.files,
           false,
           this.deleteIsNoop
         );
@@ -232,8 +234,8 @@ export class UploadModal extends Modal {
           this.setLoading(ev.target);
           const { actionedCount, errorCount } = await runSync(
             SyncDir.UP,
-            local,
-            remote,
+            local.files,
+            remote.files,
             actions,
             this.setError,
             this.updateUpload.bind(
@@ -268,10 +270,10 @@ export class UploadModal extends Modal {
         return;
       }
 
-      const remote = remoteResult.files as Files;
+      const remote = remoteResult.content as Content;
       let actions = calculateSyncActions(
-        remote,
-        local,
+        remote.files,
+        local.files,
         false,
         this.deleteIsNoop
       );
@@ -280,8 +282,8 @@ export class UploadModal extends Modal {
         this.setLoading(ev.target);
         const { actionedCount, errorCount } = await runSync(
           SyncDir.DOWN,
-          remote,
-          local,
+          remote.files,
+          local.files,
           actions,
           this.setError,
           this.updateDownload.bind(
@@ -312,13 +314,11 @@ export class UploadModal extends Modal {
           this.setError(remoteResult.error);
           return;
         }
-        if (remoteResult.files == null) {
-          throw Error("Stfu typescript");
-        }
-        const remote = remoteResult.files as Files;
+
+        const remote = remoteResult.content as Content;
         let actions = calculateSyncActions(
-          remote,
-          local,
+          remote.files,
+          local.files,
           false,
           this.deleteIsNoop
         );
@@ -327,8 +327,8 @@ export class UploadModal extends Modal {
           this.setLoading(ev.target);
           const { actionedCount, errorCount } = await runSync(
             SyncDir.DOWN,
-            remote,
-            local,
+            remote.files,
+            local.files,
             actions,
             this.setError,
             this.updateDownload.bind(
@@ -450,13 +450,18 @@ export class UploadModal extends Modal {
     return webdav + "/" + file
   }
 
-  async getVaultFiles(root: string = "/"): Promise<Files> {
+  async getVaultFiles(root: string = "/"): Promise<Content> {
     //const files = this.app.vault.getFiles();
     const queue: any[] = [];
 
     if (!(await this.plugin.adapter().exists(normalizePath(root)))) {
-      return new Map();
+      return {
+        files: new Map(),
+        folderPaths: []
+      }
     }
+
+    const outFolders = [] as Folder[];
 
     queue.push(root);
     const files: { path: string, lastModified: number | null }[] = [];
@@ -465,6 +470,22 @@ export class UploadModal extends Modal {
       const next = await this.app.vault.adapter.list(
         normalizePath(elem)
       );
+      // Don't push the root folder (deletion of the root folder is an irrelevant edge-case, because a deleted root folder 
+      // means the entire vault or an entire shared subfolder has been deleted, and we can't delete root-level folders
+      // in the webdav share. The plugin will also likely be gone at this point, at which point everything is UB anyway)
+      if (elem != root) {
+        if (root == "/") {
+          outFolders.push({
+            realPath: elem,
+            commonPath: elem
+          } as Folder);
+        } else {
+          outFolders.push({
+            realPath: elem,
+            commonPath: this.stripPrefix(elem, root)
+          } as Folder);
+        }
+      }
       queue.push(...next.folders);
       for (const file of next.files) {
         if (this.shouldIgnore(file)) {
@@ -485,11 +506,10 @@ export class UploadModal extends Modal {
       let compliantDestinationMap = localFile;
       if (root != "/" && localFile.startsWith(root)) {
         // This only removes the first match, and we know it's always present in the path
-        compliantDestinationMap = compliantDestinationMap.replace(
-          root + (
-            root.endsWith("/") ? "" : "/"
-          ), ""
-        )
+        compliantDestinationMap = this.stripPrefix(
+          compliantDestinationMap,
+          root
+        );
       }
       out.set(
         compliantDestinationMap,
@@ -500,7 +520,18 @@ export class UploadModal extends Modal {
       )
     }
 
-    return out;
+    return {
+      files: out,
+      folderPaths: outFolders
+    }
+  }
+
+  stripPrefix(path: string, root: string) {
+    return path.replace(
+      root + (
+        root.endsWith("/") ? "" : "/"
+      ), ""
+    )
   }
 
   shouldIgnore(file: string) {
@@ -522,7 +553,7 @@ export class UploadModal extends Modal {
   ): Promise<RemoteFileResult> {
     if (this.plugin.client == null) {
       return {
-        files: null,
+        content: null,
         error: "No connection established"
       };
     }
@@ -532,6 +563,7 @@ export class UploadModal extends Modal {
           deep: true,
         }
       ) as FileStat[];
+      const folders = [] as Folder[];
       const out = new Map();
 
       for (const file of files) {
@@ -540,6 +572,10 @@ export class UploadModal extends Modal {
         // TODO: this should mean that stub folders aren't deleted either. Separating them into a separate map
         // with special deletion logic is probably a good idea.
         if (file.type == "directory") {
+          folders.push({
+            realPath: file.filename,
+            commonPath: file.filename
+          })
           continue;
         }
         if (this.shouldIgnore(file.filename)) {
@@ -557,14 +593,17 @@ export class UploadModal extends Modal {
       }
 
       return {
-        files: out,
+        content: {
+          files: out,
+          folderPaths: folders,
+        },
         error: null
       };
     } catch (ex) {
       if (ex instanceof Error) {
         if (ex.message.contains("Failed to fetch")) {
           return {
-            files: null,
+            content: null,
             error: "Failed to fetch from remote server. Has the server gone down?"
           };
         }
