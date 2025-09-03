@@ -49,6 +49,9 @@ def test_copyparty_fixture(copyparty: Copyparty):
     )
 
     assert res.status_code == 200
+    # "howdy stranger" is the default non-authed text for copyparty
+    # Could theoretically test more, but then an entire webdriver would be
+    # needed, and I don't have one readily available
     assert "howdy stranger" in res.text
 
 def test_find_setting(obsidian):
