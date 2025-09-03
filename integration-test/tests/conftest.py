@@ -13,6 +13,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
 from tests.constants import SCREENSHOT_DIR
+from tests.copyparty import Copyparty
 from tests.utils import close_notices, execute
 
 @pytest.fixture
@@ -39,7 +40,6 @@ def vault():
 def obsidian(vault: str):
     driver = _get_driver()
     _load_vault(driver, vault)
-    close_notices(driver)
     yield driver
 
     driver.quit()
@@ -89,7 +89,10 @@ def copyparty():
     assert proc.poll() is None, \
         "Failed to start copyparty"
 
-    yield BASE_URL
+    yield Copyparty(
+        BASE_URL,
+        DATA_DIR
+    )
 
     try:
         proc.kill()
@@ -191,7 +194,17 @@ def _load_vault(driver: Chrome, vault_path: str):
                 break
         else:
             raise RuntimeError("Failed to locate trust button")
+        execute(
+            driver,
+            """
+            app.disableCssTransition();
 
+            0
+            """
+        )
+        close_notices(driver)
+        driver.find_element(By.CLASS_NAME, "modal-close-button") \
+            .click()
         return
     # No exception means the window wasn't closed. When obsidian boots, it
     # closes the launcher and opens obsidian proper. Under the hood, these are

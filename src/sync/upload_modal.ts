@@ -34,7 +34,10 @@ export class UploadModal extends Modal {
 
     contentEl.empty();
     contentEl.createEl("h1", {
-      text: "WebDAV sync controls"
+      text: "WebDAV sync controls",
+      attr: {
+        id: "webdav-sync-modal-header"
+      }
     });
     
     if (!canConnectWithSettings(this.plugin.settings)) {

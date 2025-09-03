@@ -1,3 +1,4 @@
+from time import sleep
 from typing import Literal
 import pytest
 from selenium.webdriver import ActionChains, Chrome, Keys
@@ -134,6 +135,7 @@ def inject_settings(driver: Chrome, settings_object = None):
         """
         app.plugins.plugins["obsidian-webdav-sync"].settings = JSON.parse('{0}');
         app.plugins.plugins["obsidian-webdav-sync"].saveSettings();
+        app.plugins.plugins["obsidian-webdav-sync"].reloadClient();
         0
         """.format(json.dumps(settings_object))
     )
@@ -148,3 +150,34 @@ def close_notices(driver: Chrome):
         NOTICE_CLASS
     ):
         elem.click()
+
+def get_notice_message(
+    driver: Chrome
+):
+    try:
+        notice_container = driver.find_element(
+            By.CLASS_NAME, "notice-container"
+        )
+        msg = notice_container.find_element(
+            By.CLASS_NAME,
+            "notice-message"
+        ).text
+        return msg
+    except:
+        return None
+
+def get_ribbon_button(driver: Chrome):
+    return driver.find_element(
+        By.ID,
+        "webdav-ribbon-btn"
+    )
+def assert_sync_modal_shown(obsidian: Chrome, screenshotter = None):
+    try:
+        obsidian.find_element(
+            By.ID,
+            "webdav-sync-modal-header"
+        )
+    except:
+        if screenshotter is not None:
+            screenshotter("Fail-OpenModal")
+        pytest.fail("Failed to find #webdav-sync-modal-header")

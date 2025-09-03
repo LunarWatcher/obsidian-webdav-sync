@@ -4,7 +4,7 @@
 
 ### Use of generative AI is banned
 
-Generative AI uses training data [based on plagiarism and piracy](https://web.archive.org/web/20250000000000*/https://www.theatlantic.com/technology/archive/2025/03/libgen-meta-openai/682093/), has [significant environmental costs associated with it](https://doi.org/10.21428/e4baedd9.9070dfe7), and [generates fundamentally insecure code](https://doi.org/10.1007/s10664-024-10590-1). GenAI is not ethically built, ethical to use, nor safe to use for programming applications. When caught, you will be permanently banned from contributing to the project, and any prior contributions will be checked and potentially reverted.
+Generative AI uses training data [based on plagiarism and piracy](https://web.archive.org/web/20250000000000*/https://www.theatlantic.com/technology/archive/2025/03/libgen-meta-openai/682093/), has [significant environmental costs associated with it](https://doi.org/10.21428/e4baedd9.9070dfe7), and [generates fundamentally insecure code](https://doi.org/10.1007/s10664-024-10590-1). GenAI is not ethically built, ethical to use, nor safe to use for programming applications. When caught, you will be permanently banned from contributing to the project, and any prior contributions will be checked and potentially reverted. Any and all contributions you've made cannot be trusted if AI slop machines were involved.
 
 ### PR and commit meta
 
@@ -19,6 +19,12 @@ MacOS users should probably assume that most things can and will break. If you'd
 #### Windows-specific issues
 
 Windows lacks support for most of the scripts used to support development. You're on your own with these, as no equivalents will be supported. They can still at least partly be run through git bash, though.
+
+### Testing guidelines
+
+As far as reasonably possible, as much code as possible should be tested. 100% coverage is not the goal here (nor is 100% cover realistically achievable), but covering the major, critical parts of the plugin means it's easier to be sure stuff doesn't violently break when making changes.
+
+Testing is grossly underappreciated in far too many places in the software development sector. While this plugin isn't exactly load-bearing infrastructure, every single test failure is one less problem for end-users to report.
 
 ## Development setup
 
@@ -50,6 +56,8 @@ There's also `./scripts/bundle.sh`, which creates a folder in the repo containin
 ### Testing
 
 Some functionality is tested via jest. Running these tests can be done with `npm run test`. They're also run automatically in the CI when a PR is made.
+
+When writing code, anything that can be  tested standalone without any obsidian APIs being involved can go in this file. Obsidian's runtime is unfortunately fully private and proprietary, so those cannot be accessed in unit tests without writing an entire mock suite first, and fuck that.
 
 ### Integration testing
 
@@ -103,6 +111,15 @@ Note that the screenshots folder is never deleted, so if the code creating a giv
 
 ##### Taking screenshots
 
+```python
+def test_whatever(obsidian: Chrome, screenshotter):
+    do_whatever()
+    # Note that an extension is not needed, and is added automatically
+    # when the screenshot is taken
+    screenshotter("Some identifier for the file - doesn't have to be globally unique, only unique for the test")
+```
+
+There's no specific rule for when a screenshot is needed. Don't take too many, and if any end up missing, they can be added as needed. If you're unsure, don't take any screenshots altogether.
 
 #### Warnings for Windows users
 
