@@ -5,6 +5,11 @@ import {Actions, actionToDescriptiveString, ActionType, calculateSyncActions, Fi
 import {FileStat} from "webdav";
 import {FolderDestination} from "./sync_settings";
 
+interface DryRunInfo {
+  direction: SyncDir;
+  subfolder: string | null;
+}
+
 export interface RemoteFileResult {
   files: Files | null;
   error: string | null;
@@ -13,6 +18,7 @@ export interface RemoteFileResult {
 export class UploadModal extends Modal {
   plugin: MyPlugin;
   dryRun: boolean;
+  dryRunInfoContainer: HTMLDivElement;
 
   constructor(app: App, plugin: MyPlugin) {
     super(app);
@@ -74,48 +80,53 @@ export class UploadModal extends Modal {
     // the text. Can't find an API for icon + text buttons
     up.innerHTML += "<span>&nbsp;Upload</span>";
     down.innerHTML += "<span>&nbsp;Download</span>";
+
+    this.dryRunInfoContainer = this.contentEl.createEl("div", {
+      attr: {
+        id: "dry-run-info-container"
+      }
+    });
   }
 
-  showTaskGraph(actions: Actions, upload: boolean) {
+  showTaskGraph(actions: Actions, info: DryRunInfo) {
     if (actions.size == 0) {
       new Notice("No changes would be made", 15000);
       return;
     }
-
-    // I'm not doing this with Obsidian's API. Give me a table API and I'll do that, but this is
-    // 6 separate calls with tracking of nested objects, with planned expansions. This code is
-    // already unreadable enough as it is with all the non-standard API calls.
-    if (document.getElementById("dry-run-info") == null) {
-      this.contentEl.insertAdjacentHTML("beforeend", `<table id="dry-run-info">
-        <thead>
-          <tr>
-            <th>File</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="dry-run-data">
-        </tbody>
-      </table>`);
+    if (this.dryRunInfoContainer.children.length == 0) {
+      this.dryRunInfoContainer.createEl("p", {
+        text: (info.direction == SyncDir.DOWN ? "Downloading from" : "Uploading to") + " WebDAV server"
+      });
     }
-    const body = document.getElementById("dry-run-data") as HTMLTableSectionElement;
-    body.empty();
+    if (info.subfolder != null) {
+      this.dryRunInfoContainer.createEl("h2", {
+        text: "Folder sync: " + info.subfolder
+      });
+    } else {
+      this.dryRunInfoContainer.createEl("p", {
+        text: "Operating on full vault"
+      });
+    }
+    // I hate this so fucking much, but the function being dynamic means this is forced
+    const table = this.dryRunInfoContainer.createEl("table");
+    const thead = table.createEl("thead");
+    const theadTr = thead.createEl("tr");
+    theadTr.createEl("th", {
+      text: "File"
+    });
+    theadTr.createEl("th", {
+      text: "Action"
+    });
+    const body = table.createEl("tbody");
 
     for (let [file, action] of actions) {
-      // HTMLTableRowElement: *exists*
-      // Typescript: I HAVE LITERALLY NEVER HEARD ABOUT THIS IN MY LIFE BEFORE WTF COULD YOU POSSIBLY MEEEAAANNNNN
-      const elem = document.createElement("tr");
-      const fromElem = document.createElement("td");
-      const actionElem = document.createElement("td");
-
-      fromElem.innerText = file;
-      actionElem.innerText = actionToDescriptiveString(action);
-
-      elem.append(
-        fromElem,
-        actionElem
-      )
-
-      body.insertAdjacentElement("beforeend", elem);
+      const row = body.createEl("tr");
+      row.createEl("td", {
+        text: file
+      });
+      row.createEl("td", {
+        text: actionToDescriptiveString(action)
+      });
     }
   }
 
@@ -128,10 +139,17 @@ export class UploadModal extends Modal {
     new Notice(err);
   }
 
+  checkClearDryRun() {
+    if (this.dryRun) {
+      this.dryRunInfoContainer.empty();
+    }
+  }
+
   async upload(ev: any) {
     if (this.plugin.client == null) {
       return;
     }
+    this.checkClearDryRun();
     let local = await this.getVaultFiles();
     if (this.plugin.settings.sync.full_vault_sync) {
       let remoteResult = await this.getRemoteFiles(this.plugin.settings.sync.root_folder.dest);
@@ -164,7 +182,10 @@ export class UploadModal extends Modal {
       } else {
         console.log("remote: ", remote);
         console.log("local: ", local);
-        this.showTaskGraph(actions, true);
+        this.showTaskGraph(actions, {
+          direction: SyncDir.UP,
+          subfolder: null
+        });
       }
     } else {
       for (const vaultPath in this.plugin.settings.sync.subfolders) {
@@ -198,7 +219,10 @@ export class UploadModal extends Modal {
           new Notice(`Push complete. ${actionedCount} files were updated (${errorCount} errors).`);
           this.close();
         } else {
-          new Notice("IOU 1x dry run");
+          this.showTaskGraph(actions, {
+            direction: SyncDir.UP,
+            subfolder: vaultPath
+          });
         }
       }
     }
@@ -208,6 +232,7 @@ export class UploadModal extends Modal {
     if (this.plugin.client == null) {
       return;
     }
+    this.checkClearDryRun();
     if (this.plugin.settings.sync.full_vault_sync) {
       let local = await this.getVaultFiles();
       let remoteResult = await this.getRemoteFiles(this.plugin.settings.sync.root_folder.dest);
@@ -239,7 +264,10 @@ export class UploadModal extends Modal {
       } else {
         console.log("remote: ", remote);
         console.log("local: ", local);
-        this.showTaskGraph(actions, false);
+        this.showTaskGraph(actions, {
+          direction: SyncDir.DOWN,
+          subfolder: null
+        });
       }
     } else {
       for (const vaultPath in this.plugin.settings.sync.subfolders) {
@@ -276,7 +304,10 @@ export class UploadModal extends Modal {
           new Notice(`Pull complete. ${actionedCount} files were updated (${errorCount} errors).`);
           this.close();
         } else {
-          new Notice("IOU 1x dry run");
+          this.showTaskGraph(actions, {
+            direction: SyncDir.DOWN,
+            subfolder: vaultPath
+          });
         }
       }
     }
