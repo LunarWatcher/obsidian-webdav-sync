@@ -13,6 +13,7 @@ import requests
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 
+from tests.copyparty import Copyparty
 from tests.utils import click_settings_nav, default_settings, execute, find_setting, get_settings_data, inject_settings, open_settings
 
 def test_buttons_visible_and_functional(obsidian: Chrome):
@@ -35,7 +36,7 @@ def test_buttons_visible_and_functional(obsidian: Chrome):
         fail("Failed to find main header")
 
 
-def test_copyparty_fixture(copyparty: str):
+def test_copyparty_fixture(copyparty: Copyparty):
     """
     Canary: copyparty doesn't work as intended. Immediate failures should be
     caught, but this ensures copyparty is indeed reachable where it's supposed
@@ -44,7 +45,7 @@ def test_copyparty_fixture(copyparty: str):
     :62169 (usually because of a conflict).
     """
     res = requests.get(
-        copyparty
+        copyparty.baseUrl
     )
 
     assert res.status_code == 200
