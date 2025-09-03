@@ -400,6 +400,10 @@ export class UploadModal extends Modal {
         );
         break;
       case ActionType.REMOVE:
+        if (this.deleteIsNoop) {
+          new Notice("WebDAV bug: violation of no delete identified. Please open a bug report");
+          return
+        }
         await this.app.vault.adapter.remove(
           normalizePath(localPath)
         );
@@ -440,6 +444,10 @@ export class UploadModal extends Modal {
         );
         break;
       case ActionType.REMOVE:
+        if (this.deleteIsNoop) {
+          new Notice("WebDAV bug: violation of no delete identified. Please open a bug report");
+          return
+        }
         await this.plugin.client.client.deleteFile(
           dest
           + "/"
