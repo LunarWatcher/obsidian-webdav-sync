@@ -192,8 +192,8 @@ export class UploadModal extends Modal {
         this.setLoading(ev.target);
         const { actionedCount, errorCount } = await runSync(
           SyncDir.UP,
-          local.files,
-          remote.files,
+          local,
+          remote,
           actions,
           this.setError,
           this.updateUpload.bind(
@@ -201,7 +201,8 @@ export class UploadModal extends Modal {
             this.plugin.settings.sync.root_folder.dest,
             null
           ),
-          this.resolveConflict
+          this.resolveConflict,
+          this.deleteIsNoop,
         )
 
         new Notice(`Push complete. ${actionedCount} files were updated (${errorCount} errors).`);
@@ -237,8 +238,8 @@ export class UploadModal extends Modal {
           this.setLoading(ev.target);
           const { actionedCount, errorCount } = await runSync(
             SyncDir.UP,
-            local.files,
-            remote.files,
+            local,
+            remote,
             actions,
             this.setError,
             this.updateUpload.bind(
@@ -246,7 +247,8 @@ export class UploadModal extends Modal {
               dest,
               vaultPath
             ),
-            this.resolveConflict
+            this.resolveConflict,
+            this.deleteIsNoop
           )
           new Notice(`Push complete. ${actionedCount} files were updated (${errorCount} errors).`);
           this.close();
@@ -285,8 +287,8 @@ export class UploadModal extends Modal {
         this.setLoading(ev.target);
         const { actionedCount, errorCount } = await runSync(
           SyncDir.DOWN,
-          remote.files,
-          local.files,
+          remote,
+          local,
           actions,
           this.setError,
           this.updateDownload.bind(
@@ -294,7 +296,8 @@ export class UploadModal extends Modal {
             this.plugin.settings.sync.root_folder.dest,
             null
           ),
-          this.resolveConflict
+          this.resolveConflict,
+          this.deleteIsNoop,
         )
         new Notice(`Pull complete. ${actionedCount} files were updated (${errorCount} errors).`);
         this.close();
@@ -330,8 +333,8 @@ export class UploadModal extends Modal {
           this.setLoading(ev.target);
           const { actionedCount, errorCount } = await runSync(
             SyncDir.DOWN,
-            remote.files,
-            local.files,
+            remote,
+            local,
             actions,
             this.setError,
             this.updateDownload.bind(
@@ -339,7 +342,8 @@ export class UploadModal extends Modal {
               dest,
               vaultPath,
             ),
-            this.resolveConflict
+            this.resolveConflict,
+            this.deleteIsNoop,
           )
           new Notice(`Pull complete. ${actionedCount} files were updated (${errorCount} errors).`);
           this.close();
@@ -401,7 +405,7 @@ export class UploadModal extends Modal {
         break;
       case ActionType.REMOVE:
         if (this.deleteIsNoop) {
-          new Notice("WebDAV bug: violation of no delete identified. Please open a bug report");
+          new Notice("WebDAV bug: violation of no delete identified. Please open a bug report. Path: " + file);
           return
         }
         await this.app.vault.adapter.remove(
@@ -445,7 +449,9 @@ export class UploadModal extends Modal {
         break;
       case ActionType.REMOVE:
         if (this.deleteIsNoop) {
-          new Notice("WebDAV bug: violation of no delete identified. Please open a bug report");
+          new Notice(
+            "WebDAV bug: violation of no delete identified. Please open a bug report. Path: " + file
+          );
           return
         }
         await this.plugin.client.client.deleteFile(
@@ -469,7 +475,7 @@ export class UploadModal extends Modal {
       return {
         files: new Map(),
         folderPaths: []
-      }
+      } as Content
     }
 
     const outFolders = [] as Folder[];

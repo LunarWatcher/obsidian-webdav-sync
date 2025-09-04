@@ -1,0 +1,1 @@
+This subfolder exists so the folder deletion tests can check if other folders are accidentally deleted or not. This cannot be checked against subfolder due to it being immediately recreated by copyparty.

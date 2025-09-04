@@ -8,6 +8,7 @@ that can describe obscure test failures in other tests. It's stuff I as a
 developer would check to debug anyway, so why not have it as explicit, separate
 tests?
 """
+import os
 from pytest import fail, raises
 import requests
 from selenium.webdriver import Chrome
@@ -34,7 +35,6 @@ def test_buttons_visible_and_functional(obsidian: Chrome):
             break
     else:
         fail("Failed to find main header")
-
 
 def test_copyparty_fixture(copyparty: Copyparty):
     """
@@ -110,3 +110,20 @@ def test_settings_sideloading(obsidian: Chrome):
     obj = default_settings()
     inject_settings(obsidian)
     assert get_settings_data(obsidian) == obj
+
+def test_obsidian_vault_path(obsidian: Chrome):
+    path = obsidian.execute_script(
+        "return app.vault.adapter.basePath"
+    )
+    assert path is not None
+    assert isinstance(path, str), path
+
+    assert path.replace("\\", "/") \
+        .endswith("integration-test/test_vault"), path
+    assert os.path.exists(
+        os.path.join(
+            path,
+            ".obsidian"
+        )
+    ), "Vault was likely added as a subfolder"
+

@@ -1,4 +1,4 @@
-import { ActionType, calculateSyncActions, FileData, OnUpdateCallback, runSync, SyncDir } from "../src/sync/sync"
+import { ActionType, calculateSyncActions, Content, FileData, Files, findDeletedFolders, Folder, OnUpdateCallback, runSync, SyncDir } from "../src/sync/sync"
 
 interface TestSyncStatus {
   upload: string[];
@@ -13,10 +13,24 @@ function lazyTestData(): TestSyncStatus {
   };
 }
 
+/**
+ * Creates a Folder where the paths are the same. In real sync scenarios, this happens in full vault sync
+ */
+function lazyFolder(path: string): Folder {
+  return {
+    realPath: path,
+    commonPath: path
+  } as Folder;
+}
+
 function failHardOnError(err: string) {
   throw new Error(err);
 }
 
+/**
+ * Dummy implementation of onUpdate. This implementation contains assertions that only work on files.
+ * For mixed file and folder deletion tests, use laxOnUpdate.
+ */
 async function onUpdate(
   testData: TestSyncStatus,
   extras: OnUpdateCallback | null,
@@ -43,6 +57,28 @@ async function onUpdate(
     );
   }
 }
+async function laxOnUpdate(
+  testData: TestSyncStatus,
+  extras: OnUpdateCallback | null,
+  type: ActionType,
+  path: string,
+  localData: FileData | undefined,
+  remoteData: FileData | undefined
+) {
+  if (type == ActionType.ADD) {
+    testData.upload.push(path);
+  } else if (type == ActionType.REMOVE){
+    testData.remove.push(path);
+  }
+  if (extras != null) {
+    await extras(
+      type,
+      path,
+      localData,
+      remoteData
+    );
+  }
+}
 
 async function addOnConflict(
   _path: string,
@@ -51,6 +87,13 @@ async function addOnConflict(
   _direction: SyncDir
 ): Promise<ActionType> {
   return ActionType.ADD;
+}
+
+function nofolders(files: Files): Content {
+  return {
+    files: files,
+    folderPaths: []
+  } as Content
 }
 
 describe("Sync with no files remotely means all are added", () => {
@@ -73,8 +116,8 @@ describe("Sync with no files remotely means all are added", () => {
     const testData = lazyTestData();
     await runSync(
       SyncDir.UP,
-      src,
-      dest,
+      nofolders(src),
+      nofolders(dest),
       actions,
       failHardOnError,
       onUpdate.bind(this, testData, async (
@@ -88,6 +131,7 @@ describe("Sync with no files remotely means all are added", () => {
         }
       }),
       addOnConflict,
+      false
     );
 
     expect(testData.upload.length).toBe(3);
@@ -118,12 +162,13 @@ describe("Sync with one file matching in the remote means only two files are add
     const testData = lazyTestData();
     await runSync(
       SyncDir.UP,
-      src,
-      dest,
+      nofolders(src),
+      nofolders(dest),
       actions,
       failHardOnError,
       onUpdate.bind(this, testData, null),
       addOnConflict,
+      false
     );
 
     expect(testData.upload.length).toBe(2);
@@ -154,8 +199,8 @@ describe("One outdated file in the remote means all three files are added", () =
     const testData = lazyTestData();
     await runSync(
       SyncDir.UP,
-      src,
-      dest,
+      nofolders(src),
+      nofolders(dest),
       actions,
       failHardOnError,
       onUpdate.bind(this, testData, async (
@@ -173,6 +218,7 @@ describe("One outdated file in the remote means all three files are added", () =
         }
       }),
       addOnConflict,
+      false
     );
 
     expect(testData.upload.length).toBe(3);
@@ -220,8 +266,8 @@ describe("Files missing locally should be removed", () => {
     const testData = lazyTestData();
     await runSync(
       SyncDir.UP,
-      src,
-      dest,
+      nofolders(src),
+      nofolders(dest),
       actions,
       failHardOnError,
       onUpdate.bind(this, testData, async (
@@ -239,6 +285,7 @@ describe("Files missing locally should be removed", () => {
         }
       }),
       addOnConflict,
+      false
     );
 
     expect(testData.upload.length).toBe(2);
@@ -261,3 +308,69 @@ describe("Files missing locally should be removed", () => {
     ]));
   });
 });
+
+describe("Folders", () => {
+  const src: Content = {
+    files: new Map([
+      ["Index.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
+      ["test/Index.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
+      ["test/subfolder/Index.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
+    ]),
+    folderPaths: [
+      lazyFolder("test"),
+      lazyFolder("test/subfolder"),
+    ]
+  };
+  const dest: Content = {
+    files: new Map([
+      ["Index.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
+      ["test/Index.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
+      ["test/subfolder/Index.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
+      ["test/topfolder/Index.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
+    ]),
+    folderPaths: [
+      lazyFolder("test"),
+      lazyFolder("test/subfolder"),
+      lazyFolder("test/topfolder"),
+    ]
+  };
+  test("Should have the correct deletion actions computed", () => {
+    const toDelete = findDeletedFolders(src.folderPaths, dest.folderPaths);
+    expect(toDelete.length).toBe(1);
+  });
+  test("Should only have one reported deleted folder when deleting", async () => {
+    const actions = calculateSyncActions(src.files, dest.files);
+    const testData = lazyTestData();
+    let selfReported = await runSync(
+      SyncDir.UP,
+      src,
+      dest,
+      actions,
+      failHardOnError,
+      laxOnUpdate.bind(this, testData, async (
+        type: ActionType,
+        path: string,
+        _localData: FileData | undefined,
+        remoteData: FileData | undefined
+      ) => {
+        if (type == ActionType.ADD) {
+          if (!path.startsWith(".obsidian")) {
+            expect(remoteData).toBeUndefined();
+          } else {
+            expect(remoteData).not.toBeUndefined();
+          }
+        }
+      }),
+      addOnConflict,
+      false
+    );
+
+    expect(selfReported.actionedCount).toBe(1);
+    expect(selfReported.actionedFolders).toBe(1);
+    expect(selfReported.errorCount).toBe(0);
+
+    expect(testData.upload.length).toBe(0);
+    expect(testData.remove.length).toBe(2);
+    expect(testData.conflict.length).toBe(0);
+  });
+})

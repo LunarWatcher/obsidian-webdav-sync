@@ -109,6 +109,34 @@ def copyparty():
                   + "that a now dead process still holds the file. "
                   + "(have you considered using a real OS instead?)")
 
+@pytest.fixture
+def preloaded_vault(vault: str, copyparty: Copyparty):
+    """
+    Used to preload the standard vault into copyparty's share. Useful to test
+    specific push/pull quirks without needing to actually push first.
+
+    Returns null, as all the actual info is provided by the vault and copyparty
+    fixtures. Tests using this fixture that need to know where the vault and
+    copyparty share are must explicitly use the vault and copyparty fixtures
+    alongside this one:
+    ```python3
+    def test_trans_rights_are_human_rights(
+        vault,
+        copyparty,
+        preloaded_vault
+    ):
+        assert 1 == 1
+    ```
+    """
+    # Copytree appears to make its own tree (fucking nice), and copyparty seems
+    # to create the root folders as well on boot, hence why dirs_exist_ok is
+    # needed.
+    shutil.copytree(
+        vault,
+        copyparty.root_vault_path,
+        dirs_exist_ok=True
+    )
+
 def _install_plugin(vault_path: str, plugin_dist_path: str):
     if not os.path.exists(plugin_dist_path):
         raise RuntimeError(

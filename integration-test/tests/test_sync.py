@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 from pytest import fail, raises
 import pytest
 from selenium.webdriver import Chrome
@@ -9,7 +10,7 @@ import filecmp
 
 from tests.constants import DOWNLOAD_BUTTON_ID, UPLOAD_BUTTON_ID
 from tests.copyparty import Copyparty
-from tests.utils import assert_sync_modal_shown, click_settings_nav, get_notice_message, get_ribbon_button, inject_settings, open_settings
+from tests.utils import assert_sync_modal_shown, autodownload, autoupload, click_settings_nav, get_notice_message, get_ribbon_button, inject_settings, open_settings
 from time import sleep
 
 
@@ -40,26 +41,7 @@ def test_push_pull(
     screenshotter
 ):
     inject_settings(obsidian)
-
-    try:
-        ribbon = get_ribbon_button(obsidian)
-        ribbon.click()
-    except Exception as e:
-        screenshotter("Fail-unk")
-        raise e
-
-    assert_sync_modal_shown(obsidian, screenshotter)
-    screenshotter("Dialog opened")
-
-    obsidian.find_element(
-        By.ID,
-        UPLOAD_BUTTON_ID
-    ).click()
-    sleep(0.3)
-    screenshotter("After upload clicked")
-
-    with raises(pytest.fail.Exception):
-        assert_sync_modal_shown(obsidian)
+    autoupload(obsidian, screenshotter)
 
     comp = filecmp.dircmp(
         vault,
@@ -119,11 +101,7 @@ def test_push_pull(
     # material is copied from an archived vault that has an mtime that will
     # always far exceed 1 second
     sleep(5)
-    ribbon.click()
-    obsidian.find_element(
-        By.ID,
-        DOWNLOAD_BUTTON_ID
-    ).click()
+    autodownload(obsidian, screenshotter)
     sleep(1)
 
     assert os.path.exists(readmePath)
@@ -133,3 +111,88 @@ def test_push_pull(
         - os.stat(
             os.path.join(copyparty.root_vault_path, "README.md")
         ).st_mtime) < 1
+
+def test_obsidian_folder_logic(
+    obsidian: Chrome,
+    vault: str
+):
+    # TODO: this test is proof enough that Map()s need to be dropped. They're
+    # absolutely horrid to work with, and do not serialise properly
+    data = obsidian.execute_async_script("""
+    let plugin = app.plugins.plugins["obsidian-webdav-sync"];
+    let fileInterface = plugin._getModal();
+    let content = await fileInterface.getVaultFiles();
+    arguments[arguments.length - 1](JSON.stringify({
+        files: Object.fromEntries(content.files),
+        folderPaths: content.folderPaths
+    }))
+    """)
+    assert data is not None
+    j = json.loads(data)
+    assert isinstance(j, dict), data
+
+    # 3 folders + .obsidian + .obsidian/plugins + .obsidian/plugins/<plugin id>
+    assert len(j["folderPaths"]) == 6, data
+    # 4: markdown files
+    # 8: 4x default .obsidian files, 3x plugin files, 1x .gitinclude
+    assert len(j["files"]) == 4 + 8, data
+
+def test_directory_removal_on_push(
+    obsidian: Chrome,
+    vault: str,
+    copyparty: Copyparty,
+    screenshotter,
+    preloaded_vault: None
+):
+    inject_settings(obsidian)
+
+    assert os.path.exists(
+        os.path.join(
+            copyparty.root_vault_path,
+            "private_subfolder",
+            "mrrp meow.md"
+        )
+    )
+    assert os.path.exists(
+        copyparty.private_subfolder
+    )
+
+    shutil.rmtree(
+        os.path.join(
+            vault,
+            "private_subfolder"
+        )
+    )
+    autoupload(obsidian, screenshotter)
+    notice = get_notice_message(obsidian)
+    assert notice is not None
+    assert "files were updated (0 errors)" in notice, notice
+
+    assert not os.path.exists(
+        os.path.join(
+            copyparty.root_vault_path,
+            "private_subfolder",
+            "mrrp meow.md"
+        )
+    ), "File deletion is borked"
+    assert not os.path.exists(
+        os.path.join(
+            copyparty.root_vault_path,
+            "private_subfolder"
+        )
+    ), "Folder deletion is borked"
+    assert os.path.exists(
+        os.path.join(
+            copyparty.root_vault_path,
+            "canary"
+        )
+    ), "Folder deletion deleted too much"
+    assert os.path.exists(
+        os.path.join(
+            copyparty.root_vault_path,
+            "canary",
+            "awooken.md"
+        )
+    ), "Folder deletion deleted too much"
+
+

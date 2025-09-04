@@ -14,3 +14,10 @@ class Copyparty:
     @property
     def subfolder_path(self):
         return os.path.join(self.dataDir, "vault/subfolder")
+
+    @property
+    def private_subfolder(self):
+        return os.path.join(
+            self.dataDir,
+            "vault/private_subfolder"
+        )

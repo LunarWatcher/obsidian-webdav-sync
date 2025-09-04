@@ -4,6 +4,7 @@ export interface FileData {
 
 export interface SyncResult {
   actionedCount: number;
+  actionedFolders: number;
   errorCount: number;
 };
 
@@ -25,7 +26,7 @@ export function actionToDescriptiveString(action: ActionType): string {
   case ActionType.REMOVE:
     return "Remove";
   case ActionType.ADD_LOCAL:
-    return "Conflict identified; ask user [not implemented, defaults to adding or updating]";
+    return "Conflict identified; ask user [not implemented, falls back to adding or updating instead]";
   case ActionType.NOOP:
     return "No changes made";
   }
@@ -146,6 +147,36 @@ export function calculateSyncActions(
 }
 
 /**
+ * Calculates folder actions. These are done separately from files really just for readability purposes.
+ * Unlike file s ync, folder operations only have one action; remove. 
+ * Folders are never added nor conflict checked, as this functionality is derived from sync. If a folder
+ * appeared in the remote with no content on a push, we don't care because it has no content. 
+ * If it _has_ content, that is (will be) caught by ADD_LOCAL in _file_ sync.
+ *
+ * Folders are automatically created by both WebDAV and obsidian's adapter API, so no explicit folder
+ * actions ever need to be taken except for deleting stale folders
+ */
+export function findDeletedFolders(
+  src: Folder[],
+  dest: Folder[]
+): Folder[] {
+  let deleted = [];
+  // TODO: this is nasty. There has to be a better way
+  // (Maybe do a Set() instead?)
+  for (let destFolder of dest) {
+    // We only care about the commonPath, because it's the same path in both.
+    // realPath varies between the two, so it'll fail to match subfolder sync if that's used.
+    if (!src.some(srcFolder =>
+      destFolder.commonPath == srcFolder.commonPath
+    )) {
+      deleted.push(destFolder);
+    }
+  }
+
+  return deleted;
+}
+
+/**
  * General template for the sync system, since it's the same shit in both places with some minor differences
  *
  * @param direction   The sync direction; used for some actions that require knowing whether the source is local
@@ -160,18 +191,19 @@ export function calculateSyncActions(
  */
 export async function runSync(
   direction: SyncDir,
-  sourceFiles: Files,
-  destFiles: Files,
+  source: Content,
+  dest: Content,
   actions: Actions,
   onError: (message: string) => void,
   onUpdate: OnUpdateCallback,
   onConflict: OnConflictCallback,
+  deleteIsNoop: boolean
 ): Promise<SyncResult> {
   let actionedCount = 0;
   let errorCount = 0;
   for (let [file, action] of actions) {
-    let srcData = sourceFiles.get(file);
-    let destData = destFiles.get(file);
+    let srcData = source.files.get(file);
+    let destData = dest.files.get(file);
 
     if (
       srcData == null
@@ -181,13 +213,15 @@ export async function runSync(
       console.error(file, action, srcData, destData, direction);
       return {
         actionedCount: -1,
+        actionedFolders: -1,
         errorCount: errorCount + 1
       };
     } else if (typeof(file) != "string") {
       onError("Fatal: expected string, found " + file);
-      console.error(sourceFiles);
+      console.error(source);
       return {
         actionedCount: -1,
+        actionedFolders: -1,
         errorCount: errorCount + 1
       };
     }
@@ -230,8 +264,41 @@ export async function runSync(
       }
     }
   }
+
+  let actionedFolders = 0;
+  if (!deleteIsNoop) {
+    const foldersToDelete = findDeletedFolders(
+      source.folderPaths,
+      dest.folderPaths
+    );
+
+    for (const folder of foldersToDelete) {
+      try {
+        await onUpdate(
+          ActionType.REMOVE,
+          folder.realPath,
+          undefined,
+          undefined
+        );
+        actionedFolders += 1;
+      } catch (ex) {
+        // TODO: would be nice if this could be done atomically, but that feels involved.
+        // Especially remotely. But I'm pretty sure there's move functions in the client,
+        // so might be relatively easy
+        console.log(ex);
+        errorCount += 1;
+        if (ex instanceof Error) {
+          onError(ex.message);
+        } else {
+          onError("An unknown error occurred");
+        }
+      }
+    }
+  }
+
   return {
     actionedCount,
+    actionedFolders,
     errorCount,
   }
 }

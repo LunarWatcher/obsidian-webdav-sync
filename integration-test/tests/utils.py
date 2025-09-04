@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 import json
 
-from tests.constants import NOTICE_CLASS
+from tests.constants import DOWNLOAD_BUTTON_ID, NOTICE_CLASS, UPLOAD_BUTTON_ID
 
 def execute(driver: Chrome, script: str):
     return driver.execute_cdp_cmd(
@@ -181,3 +181,45 @@ def assert_sync_modal_shown(obsidian: Chrome, screenshotter = None):
         if screenshotter is not None:
             screenshotter("Fail-OpenModal")
         pytest.fail("Failed to find #webdav-sync-modal-header")
+
+def autoupload(obsidian: Chrome, screenshotter, idx = 0):
+    try:
+        ribbon = get_ribbon_button(obsidian)
+        ribbon.click()
+    except Exception as e:
+        screenshotter("Fail-unk")
+        raise e
+
+    assert_sync_modal_shown(obsidian, screenshotter)
+    screenshotter(f"Dialog opened {idx}")
+
+    obsidian.find_element(
+        By.ID,
+        UPLOAD_BUTTON_ID
+    ).click()
+    sleep(0.3)
+    screenshotter(f"After upload clicked {idx}")
+
+    with pytest.raises(pytest.fail.Exception):
+        assert_sync_modal_shown(obsidian)
+
+def autodownload(obsidian: Chrome, screenshotter, idx = 0):
+    try:
+        ribbon = get_ribbon_button(obsidian)
+        ribbon.click()
+    except Exception as e:
+        screenshotter("Fail-unk")
+        raise e
+
+    assert_sync_modal_shown(obsidian, screenshotter)
+    screenshotter("Dialog opened {idx}")
+
+    obsidian.find_element(
+        By.ID,
+        DOWNLOAD_BUTTON_ID
+    ).click()
+    sleep(0.3)
+    screenshotter("After download clicked {idx}")
+
+    with pytest.raises(pytest.fail.Exception):
+        assert_sync_modal_shown(obsidian)

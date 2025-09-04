@@ -32,6 +32,18 @@ export default class MyPlugin extends Plugin {
 
   }
 
+  /**
+   * Utility function used by some of the integration tests.
+   * Should never be used anywhere else in code
+   * (This is also really a symptom of the modal having far too much business logic,
+   * but I'll fix that later. in either case, I think we'll need something like this
+   * for name wrangling purposes. UploadModal is not defined in the global namespace
+   * in debug mode, so release mode will certainly be worse)
+   */
+  _getModal() {
+    return new UploadModal(this.app, this);
+  }
+
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
   }
