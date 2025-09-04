@@ -190,7 +190,7 @@ export class UploadModal extends Modal {
       
       if (!this.dryRun) {
         this.setLoading(ev.target);
-        const { actionedCount, errorCount } = await runSync(
+        const { actionedCount, actionedFolders, errorCount } = await runSync(
           SyncDir.UP,
           local,
           remote,
@@ -205,7 +205,7 @@ export class UploadModal extends Modal {
           this.deleteIsNoop,
         )
 
-        new Notice(`Push complete. ${actionedCount} files were updated (${errorCount} errors).`);
+        new Notice(`Push complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
         this.close();
       } else {
         console.log("remote: ", remote);
@@ -236,7 +236,7 @@ export class UploadModal extends Modal {
 
         if (!this.dryRun) {
           this.setLoading(ev.target);
-          const { actionedCount, errorCount } = await runSync(
+          const { actionedCount, actionedFolders, errorCount } = await runSync(
             SyncDir.UP,
             local,
             remote,
@@ -250,7 +250,7 @@ export class UploadModal extends Modal {
             this.resolveConflict,
             this.deleteIsNoop
           )
-          new Notice(`Push complete. ${actionedCount} files were updated (${errorCount} errors).`);
+          new Notice(`Push complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
           this.close();
         } else {
           this.showTaskGraph(actions, {
@@ -285,7 +285,7 @@ export class UploadModal extends Modal {
 
       if (!this.dryRun) {
         this.setLoading(ev.target);
-        const { actionedCount, errorCount } = await runSync(
+        const { actionedCount, actionedFolders, errorCount } = await runSync(
           SyncDir.DOWN,
           remote,
           local,
@@ -299,7 +299,7 @@ export class UploadModal extends Modal {
           this.resolveConflict,
           this.deleteIsNoop,
         )
-        new Notice(`Pull complete. ${actionedCount} files were updated (${errorCount} errors).`);
+        new Notice(`Pull complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
         this.close();
       } else {
         console.log("remote: ", remote);
@@ -331,7 +331,7 @@ export class UploadModal extends Modal {
 
         if (!this.dryRun) {
           this.setLoading(ev.target);
-          const { actionedCount, errorCount } = await runSync(
+          const { actionedCount, actionedFolders, errorCount } = await runSync(
             SyncDir.DOWN,
             remote,
             local,
@@ -345,7 +345,7 @@ export class UploadModal extends Modal {
             this.resolveConflict,
             this.deleteIsNoop,
           )
-          new Notice(`Pull complete. ${actionedCount} files were updated (${errorCount} errors).`);
+          new Notice(`Pull complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
           this.close();
         } else {
           this.showTaskGraph(actions, {
@@ -590,8 +590,8 @@ export class UploadModal extends Modal {
         // with special deletion logic is probably a good idea.
         if (file.type == "directory") {
           folders.push({
-            realPath: file.filename,
-            commonPath: file.filename
+            realPath: file.filename.replace(folder + "/", ""),
+            commonPath: file.filename.replace(folder + "/", "")
           })
           continue;
         }

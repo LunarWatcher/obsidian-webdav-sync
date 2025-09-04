@@ -173,6 +173,19 @@ export function findDeletedFolders(
     }
   }
 
+  // Required for nested deletions to be correct
+  // Basically, we want the return list to be 
+  //     ["a/b/c", "a/b", "a"]
+  // Since the inverse or a random order causes problems both if recursive folder deletion is available, and if it isn't
+  //
+  // Given ["a", "a/b", "a/b/c"]:
+  // * If it is available: "a" is deleted, the remaining two fail.
+  //   However, since the tree is deleted, no additional tries are required, but it does cause misleading error messages
+  // * If it isn't available: "a" cannot be deleted and generates an error. Same for a/b, but a/b/c is deleted.
+  //   The next run, the list is only ["a", "a/b"], so "a" fails, "a/b" succeeds.
+  //   In this case, three runs total are required for the folder hierarchy to be deleted.
+  deleted.sort((a, b) => b.commonPath.length - a.commonPath.length);
+
   return deleted;
 }
 
@@ -276,7 +289,7 @@ export async function runSync(
       try {
         await onUpdate(
           ActionType.REMOVE,
-          folder.realPath,
+          folder.commonPath,
           undefined,
           undefined
         );
@@ -288,7 +301,7 @@ export async function runSync(
         console.log(ex);
         errorCount += 1;
         if (ex instanceof Error) {
-          onError(ex.message);
+          onError(ex.message + " --- path: " + folder);
         } else {
           onError("An unknown error occurred");
         }

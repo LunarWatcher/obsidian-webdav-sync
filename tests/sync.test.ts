@@ -374,3 +374,22 @@ describe("Folders", () => {
     expect(testData.conflict.length).toBe(0);
   });
 })
+
+test("Nested folders should not cause deletion exceptions", () => {
+
+  const src = [
+    lazyFolder("test"),
+  ];
+  const dest = [
+    lazyFolder("test"),
+    lazyFolder("test/subfolder"),
+    lazyFolder("test/subfolder/subsubfolder"),
+    lazyFolder("test/subfolder/subsubfolder/subsubsubfolder"),
+  ];
+  const toDelete = findDeletedFolders(src, dest);
+  expect(toDelete).toStrictEqual([
+    lazyFolder("test/subfolder/subsubfolder/subsubsubfolder"),
+    lazyFolder("test/subfolder/subsubfolder"),
+    lazyFolder("test/subfolder"),
+  ])
+})
