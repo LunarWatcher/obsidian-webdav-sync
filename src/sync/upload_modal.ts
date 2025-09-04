@@ -408,9 +408,17 @@ export class UploadModal extends Modal {
           new Notice("WebDAV bug: violation of no delete identified. Please open a bug report. Path: " + file);
           return
         }
-        await this.app.vault.adapter.remove(
-          normalizePath(localPath)
+        const ref = this.app.vault.getAbstractFileByPath(localPath);
+        if (!ref) {
+          return
+        }
+
+        this.app.vault.delete(
+          ref
         );
+        //await this.app.vault.adapter.remove(
+          //normalizePath(localPath)
+        //);
         break;
     }
   }
