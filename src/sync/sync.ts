@@ -285,6 +285,10 @@ export async function runSync(
       dest.folderPaths
     );
 
+    console.log(source.folderPaths);
+    console.log(dest.folderPaths);
+    console.log(foldersToDelete);
+
     for (const folder of foldersToDelete) {
       try {
         await onUpdate(
@@ -293,6 +297,7 @@ export async function runSync(
           undefined,
           undefined
         );
+        console.log(folder.commonPath);
         actionedFolders += 1;
       } catch (ex) {
         // TODO: would be nice if this could be done atomically, but that feels involved.
