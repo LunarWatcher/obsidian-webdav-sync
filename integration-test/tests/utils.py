@@ -151,20 +151,23 @@ def close_notices(driver: Chrome):
     ):
         elem.click()
 
-def get_notice_message(
+def get_notice_messages(
     driver: Chrome
-):
-    try:
-        notice_container = driver.find_element(
-            By.CLASS_NAME, "notice-container"
-        )
-        msg = notice_container.find_element(
-            By.CLASS_NAME,
-            "notice-message"
-        ).text
-        return msg
-    except:
-        return None
+) -> list[str]:
+    return driver.execute_script("""
+    let containers = document.getElementsByClassName("notice-container");
+    if (containers.length == 0) {
+        return [];
+    }
+    let container = containers[0];
+    let notices = container.getElementsByClassName("notice-message");
+    let out = [];
+    for (const notice of notices) {
+        out.push(notice.textContent);
+    }
+    
+    return out;
+    """)
 
 def get_ribbon_button(driver: Chrome):
     return driver.find_element(

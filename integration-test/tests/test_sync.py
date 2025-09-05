@@ -10,7 +10,7 @@ import filecmp
 
 from tests.constants import DOWNLOAD_BUTTON_ID, UPLOAD_BUTTON_ID
 from tests.copyparty import Copyparty
-from tests.utils import assert_sync_modal_shown, autodownload, autoupload, click_settings_nav, get_notice_message, get_ribbon_button, inject_settings, open_settings
+from tests.utils import assert_sync_modal_shown, autodownload, autoupload, click_settings_nav, get_notice_messages, get_ribbon_button, inject_settings, open_settings
 from time import sleep
 
 
@@ -28,11 +28,12 @@ def test_server_connection(obsidian: Chrome, copyparty, screenshotter):
     elem.click()
     screenshotter("After button click")
 
-    notice_content = get_notice_message(
+    notices = get_notice_messages(
         obsidian
     )
-    assert notice_content is not None
-    assert "Connection succeeded. Found folder with " in notice_content, notice_content
+    assert len(notices) == 1
+    assert "Connection succeeded. Found folder with " in notices[0], \
+        notices[0]
 
 def test_push_pull(
     obsidian: Chrome,
@@ -164,9 +165,9 @@ def test_directory_removal_on_push(
         )
     )
     autoupload(obsidian, screenshotter)
-    notice = get_notice_message(obsidian)
-    assert notice is not None
-    assert "1 stale folders were removed (0 errors)" in notice, notice
+    notices = get_notice_messages(obsidian)
+    assert len(notices) == 1, notices
+    assert "1 stale folders were removed (0 errors)" in notices[0], notices[0]
 
     assert not os.path.exists(
         os.path.join(
@@ -190,6 +191,61 @@ def test_directory_removal_on_push(
     assert os.path.exists(
         os.path.join(
             copyparty.root_vault_path,
+            "canary",
+            "awooken.md"
+        )
+    ), "Folder deletion deleted too much"
+
+
+def test_directory_removal_on_pull(
+    obsidian: Chrome,
+    vault: str,
+    copyparty: Copyparty,
+    screenshotter,
+    preloaded_vault: None
+):
+    inject_settings(obsidian)
+
+    assert os.path.exists(
+        os.path.join(
+            copyparty.private_subfolder,
+            "mrrp meow.md"
+        )
+    )
+    assert os.path.exists(
+        copyparty.private_subfolder
+    )
+
+    shutil.rmtree(
+        copyparty.private_subfolder
+    )
+    autodownload(obsidian, screenshotter)
+    notices = get_notice_messages(obsidian)
+    assert len(notices) == 1, notices
+    assert "1 stale folders were removed (0 errors)" in notices[0], notices[0]
+
+    assert not os.path.exists(
+        os.path.join(
+            vault,
+            "private_subfolder",
+            "mrrp meow.md"
+        )
+    ), "File deletion is borked"
+    assert not os.path.exists(
+        os.path.join(
+            vault,
+            "private_subfolder"
+        )
+    ), "Folder deletion is borked"
+    assert os.path.exists(
+        os.path.join(
+            vault,
+            "canary"
+        )
+    ), "Folder deletion deleted too much"
+    assert os.path.exists(
+        os.path.join(
+            vault,
             "canary",
             "awooken.md"
         )
