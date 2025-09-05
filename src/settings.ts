@@ -30,31 +30,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
     const {containerEl} = this;
 
     containerEl.empty();
-    // TODO: Obsidian's documentation claims
-    //    new Setting(containerEl).setText("Whatever").setHeading()
-    // should work. Weirdly, `setText` does not seem to exist. Using `addText` does not work; this just sets the value.
-    // Using `setName` does not work either. The method doesn't exist here either:
-    //    https://docs.obsidian.md/Reference/TypeScript+API/Setting#Methods
-    //
-    // Granted, obsidian's API documentation is absolute horseshit. It's incredibly disappointing that it's this bad
-    // when the editor itself being customisable is, y'know, one of their big things:tm:.
-    // The setHeading() function is not helpful either. The documentation just says it returns `this`, and nothing else.
-    // It would be nice if this was an option rather than having to presumably parse an HTML string in JS before 
-    // inserting it.
-    //
-    // Future me update: while scrolling through plugin addition requests to see how much of a pain in the ass this is
-    // going to be, https://github.com/obsidianmd/obsidian-releases/pull/5839#issuecomment-2978834437 says to use
-    // setName instead of setText, but this still just creates a div, not an <h1>.
-    // QuickAdd, another plugin that does have a proper header, uses createEl, which also appears to be forced in
-    // the review process.
-    containerEl.createEl("h1", {
-      text: "WebDAV sync settings",
-    });
     { 
-      containerEl.createEl("h2", {
-        text: "Server connection settings",
-      });
-
       new Setting(containerEl)
         .setName('WebDAV URL')
         .setDesc('URL to your WebDAV share')
@@ -95,15 +71,18 @@ export class WebDAVSettingsTab extends PluginSettingTab {
           .setButtonText("Reload plugin")
           .onClick(async () => {
             if (await this.plugin.reloadClient()) {
-              new Notice("Connected!");
+              // TODO: This is supposed to check that the client is connected, but that's not correct.
+              // The client doesn't actually establish a connection, so there's no way to verify that it is
+              // connected without a webdav share to test against
+              new Notice("Reloaded");
             }
           })
         );
     }
     {
-      containerEl.createEl("h2", {
-        text: "Sync settings"
-      });
+      // .setHeading() seems to work now, but it's just another div rather than a proper <h2>
+      // Much worse for accessibility, but this is forced by obsidian's plugin guidelines, so it's on them
+      new Setting(containerEl).setName("Sync").setHeading();
       new Setting(containerEl)
         .setName("Full vault sync")
         .setDesc(
@@ -222,14 +201,14 @@ export class WebDAVSettingsTab extends PluginSettingTab {
       })
       this.regenerateFolderMappings();
     }
-    containerEl.createEl("h2", {
-      text: "Meta"
-    })
-    // Forced insertAdjacentHTML: createEl has no nested HTML support, I need a link, and I'm not doing that by hand
-    containerEl.insertAdjacentHTML(
-      "beforeend",
-      '<p>Running into issues? Open an issue on <a href="https://github.com/LunarWatcher/obsidian-webdav-sync">GitHub</a></p>'
-    );
+    new Setting(containerEl).setName("Meta").setHeading();
+
+    containerEl.createEl("p", {
+      text: "Running into issues? Open an issue on "
+    }).createEl("a", {
+      text: "GitHub.",
+      href: "https://github.com/LunarWatcher/obsidian-webdav-sync"
+    });
     containerEl.createEl("p", {
       text: "Trans rights are human rights 🏳️‍⚧️ 🏳️‍🌈"
     })

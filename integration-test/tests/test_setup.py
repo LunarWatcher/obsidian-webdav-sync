@@ -28,13 +28,11 @@ def test_buttons_visible_and_functional(obsidian: Chrome):
     open_settings(obsidian)
     click_settings_nav(obsidian)
 
-    headers = obsidian.find_elements(By.TAG_NAME, "h1")
-    for header in headers:
-        print("Header text: ", header.text)
-        if header.text == "WebDAV sync settings":
-            break
-    else:
-        fail("Failed to find main header")
+    test_button = obsidian.find_element(
+        By.ID,
+        "webdav-settings-test-connection"
+    )
+    assert test_button.text == "Test connection"
 
 def test_copyparty_fixture(copyparty: Copyparty):
     """
