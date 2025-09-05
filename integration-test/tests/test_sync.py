@@ -166,7 +166,7 @@ def test_directory_removal_on_push(
     autoupload(obsidian, screenshotter)
     notice = get_notice_message(obsidian)
     assert notice is not None
-    assert "1 stale folders were updated (0 errors)" in notice, notice
+    assert "1 stale folders were removed (0 errors)" in notice, notice
 
     assert not os.path.exists(
         os.path.join(
