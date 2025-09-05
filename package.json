@@ -1,7 +1,7 @@
 {
     "name": "webdav-sync",
     "version": "0.0.2",
-    "description": "Simple manually-controlled WebDAV sync plugin",
+    "description": "Simple, manually-controlled WebDAV sync plugin",
     "main": "main.js",
     "scripts": {
         "dev": "node esbuild.config.mjs",
