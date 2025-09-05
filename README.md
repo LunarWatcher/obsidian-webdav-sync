@@ -77,7 +77,7 @@ Other requirements:
 
 ### First use
 
-See [docs/Getting started.md](docs/Getting started.md)
+See [Getting started.md](docs/Getting started.md)
 
 ## Things to note
 
