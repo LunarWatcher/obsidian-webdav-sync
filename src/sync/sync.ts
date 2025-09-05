@@ -35,6 +35,8 @@ export function actionToDescriptiveString(action: ActionType): string {
 export type Path = string;
 export type Files = Map<Path, FileData>;
 export type Actions = Map<Path, ActionType>;
+export type OnErrorHandler = (message: string) => void;
+
 export interface Folder {
   realPath: string;
   commonPath: string;
@@ -207,7 +209,7 @@ export async function runSync(
   source: Content,
   dest: Content,
   actions: Actions,
-  onError: (message: string) => void,
+  onError: OnErrorHandler,
   onUpdate: OnUpdateCallback,
   onConflict: OnConflictCallback,
   deleteIsNoop: boolean
@@ -284,10 +286,6 @@ export async function runSync(
       source.folderPaths,
       dest.folderPaths
     );
-
-    console.log(source.folderPaths);
-    console.log(dest.folderPaths);
-    console.log(foldersToDelete);
 
     for (const folder of foldersToDelete) {
       try {

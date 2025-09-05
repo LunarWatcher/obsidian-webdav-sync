@@ -2,8 +2,9 @@ import {Notice, Plugin} from 'obsidian';
 import {DEFAULT_SETTINGS, settings_t, WebDAVSettingsTab} from 'settings';
 import {Connection} from './fs/webdav';
 import {UploadModal} from './sync/upload_modal';
+import {FileProvider} from 'sync/files';
 
-export default class MyPlugin extends Plugin {
+export default class WebDAVSyncPlugin extends Plugin {
   settings: settings_t;
   client: Connection | null;
 
@@ -13,12 +14,32 @@ export default class MyPlugin extends Plugin {
     await this.reloadClient();
 
     this.addSettingTab(new WebDAVSettingsTab(this.app, this));
-
+    this.addCommand({
+      id: "webdav-command-upload",
+      name: "Upload to WebDAV",
+      icon: "upload",
+      callback: this.uploadAction.bind(false)
+    });
+    this.addCommand({
+      id: "webdav-command-download",
+      name: "Download from WebDAV",
+      icon: "download",
+      callback: this.downloadAction.bind(false)
+    });
   }
 
   onunload() {
 
   }
+
+  async uploadAction(dryRun: boolean) {
+
+  }
+
+  async downloadAction(dryRun: boolean) {
+
+  }
+
 
   async initRibbon() {
     const ribbonIconEl = this.addRibbonIcon('cloud', 'Open WebDAV sync panel', (evt: MouseEvent) => {
@@ -40,8 +61,10 @@ export default class MyPlugin extends Plugin {
    * for name wrangling purposes. UploadModal is not defined in the global namespace
    * in debug mode, so release mode will certainly be worse)
    */
-  _getModal() {
-    return new UploadModal(this.app, this);
+  _getFileInterface() {
+    return new FileProvider(
+      this
+    )
   }
 
   async loadSettings() {

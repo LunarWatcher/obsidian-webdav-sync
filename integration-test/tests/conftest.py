@@ -47,7 +47,9 @@ def obsidian(vault: str):
 @pytest.fixture
 def screenshotter(obsidian: Chrome, request: pytest.FixtureRequest):
     prefix = request.node.name
+    index = 0
     def _screenshot(obsidian: Chrome, prefix: str, identifier: str):
+        nonlocal index
         path = os.path.join(
             os.getcwd(),
             SCREENSHOT_DIR,
@@ -62,9 +64,10 @@ def screenshotter(obsidian: Chrome, request: pytest.FixtureRequest):
         obsidian.get_screenshot_as_file(
             os.path.join(
                 path,
-                identifier + ".png"
+                str(index) + identifier + ".png"
             )
         )
+        index += 1
 
     yield partial(_screenshot, obsidian, prefix)
 

@@ -1,5 +1,5 @@
 import {DAVServerConfig, DEFAULT_DAV_CONFIG} from "./fs/webdav";
-import MyPlugin from "./main";
+import WebDAVSyncPlugin from "./main";
 import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 import { DEFAULT_SYNC_SETTINGS, FolderDestination, SyncSettings } from "./sync/sync_settings";
 
@@ -19,9 +19,9 @@ export function canConnectWithSettings(settings: settings_t): boolean {
 }
 
 export class WebDAVSettingsTab extends PluginSettingTab {
-  plugin: MyPlugin;
+  plugin: WebDAVSyncPlugin;
 
-  constructor(app: App, plugin: MyPlugin) {
+  constructor(app: App, plugin: WebDAVSyncPlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }

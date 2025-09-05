@@ -121,7 +121,7 @@ def test_obsidian_folder_logic(
     # absolutely horrid to work with, and do not serialise properly
     data = obsidian.execute_async_script("""
     let plugin = app.plugins.plugins["obsidian-webdav-sync"];
-    let fileInterface = plugin._getModal();
+    let fileInterface = plugin._getFileInterface();
     let content = await fileInterface.getVaultFiles();
     arguments[arguments.length - 1](JSON.stringify({
         files: Object.fromEntries(content.files),

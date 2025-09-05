@@ -120,5 +120,4 @@ def test_folder_maps_stored_correctly(obsidian: Chrome):
     # Not sure if this is necessary, but it'll at least avoid more obscure test
     # failures if the fields are changed
     assert webdav_inp.get_attribute("placeholder") == "/webdav/share/path"
-
-
+    # TODO: finish test

@@ -215,14 +215,14 @@ def autodownload(obsidian: Chrome, screenshotter, idx = 0):
         raise e
 
     assert_sync_modal_shown(obsidian, screenshotter)
-    screenshotter("Dialog opened {idx}")
+    screenshotter(f"Dialog opened {idx}")
 
     obsidian.find_element(
         By.ID,
         DOWNLOAD_BUTTON_ID
     ).click()
     sleep(0.3)
-    screenshotter("After download clicked {idx}")
+    screenshotter(f"After download clicked {idx}")
 
     with pytest.raises(pytest.fail.Exception):
         assert_sync_modal_shown(obsidian)
