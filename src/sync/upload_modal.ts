@@ -363,7 +363,7 @@ export class UploadModal extends Modal {
     type: ActionType,
     file: string,
     srcData: FileData | undefined,
-    _destData: FileData | undefined
+    destData: FileData | undefined
   ) {
     if (this.plugin.client == null) {
       throw Error("This should never throw, but exists to make typescript shut up");
@@ -409,7 +409,7 @@ export class UploadModal extends Modal {
           return
         }
 
-        if (dest == undefined) {
+        if (destData == undefined) {
           await this.app.vault.adapter.rmdir(
             normalizePath(localPath),
             false
