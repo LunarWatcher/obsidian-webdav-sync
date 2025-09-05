@@ -38,7 +38,7 @@ Before you can do any syncing, go to the WebDAV sync settings. Here, you'll need
 
 ## Your first sync
 
-The first push is relatively straight-forward. In the ribbon, a sync button is added by default. When clicked, you'll get a modal asking whether you want to push or pull. 
+The first push is relatively straight-forward. In the ribbon, a sync button is added by default. When clicked, you'll get a modal asking whether you want to push or pull. **You should use this for your first sync**, even if you don't want to keep the button around. It gives you access to more options than the commands do, so you can see more clearly what's going to happen before you do it.
 
 > [!caution]
 >
@@ -52,5 +52,21 @@ Once you click "upload", your entire vault will be synced to the remote WebDAV s
 >
 > This only works reliably if your WebDAV server supports the `X-OC-MTime` header. Without it, if you use dry run, you'll see that all the files you just uploaded count as modified in the remote.
 
+## Adding devices
 
+One major downside with this plugin is that adding extra devices requires having at least partial vault access. Though it's possible to create a new vault, I strongly suggest you copy over your entire vault as a first sync. Once the plugin is set up, this includes everything you need to sync. 
 
+> [!note]
+>
+> Passwords are stored in plain text in `.obsidian/plugins/webdav-sync/data.json`, as that's how Obsidian does things. Remove this file before copying if you want to set up the plugin from scratch for whatever reason.
+
+## Day-to-day syncing
+
+There's both a ribbon entry and currently two actions that can be used to actually do the syncing. There will be more actions in the future that cover everything you'd do with the ribbon entry, but this plugin is still in an early development phase. 
+
+The sync modal (opened through the ribbon) offers all the available per-sync options. At the time of writing, these include:
+
+* **Dry run**: does everything a normal sync would do, but disables the actual push or pull step, and shows all the actions that would've been taken. Useful for debugging, or checking if you forgot to sync :)
+* **Don't delete anything**: disables deletion. Mainly useful if you forget to push, and made changes that you need to pull. Setting this preserves those files so you can push, but can also result in files you intentionally deleted being restored on a push. Like I said, deletion-aware sync is hard, and this plugin does not bother with it.
+
+Aside the modal, raw upload and download actions exist, accessible via Ctrl-P (search "WebDAV:" to see all the available actions). Unless otherwise specified, the actions use all default settings, which amy be undesirable. If you need more control, use the modal.
