@@ -47,7 +47,7 @@ vim .env.dev
 
 `.env.dev` is sourced as a bash script, and uses bash syntax.
 
-There's also `./scripts/bundle.sh`, which creates a folder in the repo containing the sources, under `dist/`. You can then copy `dist/obsidian-webdav-sync` to `.obsidian/plugins/obsidian-webdav-sync` manually.
+There's also `./scripts/bundle.sh`, which creates a folder in the repo containing the sources, under `dist/`. You can then copy `dist/webdav-sync` to `.obsidian/plugins/webdav-sync` manually.
 
 > [!warning]
 >
@@ -82,7 +82,7 @@ npm run build
 npm run dev
 # Both work
 
-# Create dist/obsidian-webdav-sync and move the stuff into it
+# Create dist/webdav-sync and move the stuff into it
 # This is where the tests look for the plugin for copying into
 # the test vault
 ./scripts/bundle.sh

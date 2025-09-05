@@ -100,7 +100,7 @@ describe("Sync with no files remotely means all are added", () => {
   let src = new Map([
     ["Index.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
     ["test/Hi.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
-    [".obsidian/plugins/obsidian-webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
+    [".obsidian/plugins/webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
   ]);
   const dest = new Map();
   const actions = calculateSyncActions(src, dest);
@@ -109,7 +109,7 @@ describe("Sync with no files remotely means all are added", () => {
     expect(actions).toStrictEqual(new Map([
       ["Index.md", ActionType.ADD],
       ["test/Hi.md", ActionType.ADD],
-      [".obsidian/plugins/obsidian-webdav-sync/index.js", ActionType.ADD],
+      [".obsidian/plugins/webdav-sync/index.js", ActionType.ADD],
     ]));
   });
   test("The sync actions handled correctly", async () => {
@@ -144,10 +144,10 @@ describe("Sync with one file matching in the remote means only two files are add
   let src = new Map([
     ["Index.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
     ["test/Hi.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
-    [".obsidian/plugins/obsidian-webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
+    [".obsidian/plugins/webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
   ]);
   const dest = new Map([
-    [".obsidian/plugins/obsidian-webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
+    [".obsidian/plugins/webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
   ]);
   const actions = calculateSyncActions(src, dest, true);
 
@@ -155,7 +155,7 @@ describe("Sync with one file matching in the remote means only two files are add
     expect(actions).toStrictEqual(new Map([
       ["Index.md", ActionType.ADD],
       ["test/Hi.md", ActionType.ADD],
-      [".obsidian/plugins/obsidian-webdav-sync/index.js", ActionType.NOOP],
+      [".obsidian/plugins/webdav-sync/index.js", ActionType.NOOP],
     ]));
   });
   test("The sync actions handled correctly", async () => {
@@ -181,10 +181,10 @@ describe("One outdated file in the remote means all three files are added", () =
   let src = new Map([
     ["Index.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
     ["test/Hi.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
-    [".obsidian/plugins/obsidian-webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
+    [".obsidian/plugins/webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
   ]);
   const dest = new Map([
-    [".obsidian/plugins/obsidian-webdav-sync/index.js", { lastModified: Date.parse("2025-05-21T00:00:00Z") } as FileData],
+    [".obsidian/plugins/webdav-sync/index.js", { lastModified: Date.parse("2025-05-21T00:00:00Z") } as FileData],
   ]);
   const actions = calculateSyncActions(src, dest, true);
 
@@ -192,7 +192,7 @@ describe("One outdated file in the remote means all three files are added", () =
     expect(actions).toStrictEqual(new Map([
       ["Index.md", ActionType.ADD],
       ["test/Hi.md", ActionType.ADD],
-      [".obsidian/plugins/obsidian-webdav-sync/index.js", ActionType.ADD],
+      [".obsidian/plugins/webdav-sync/index.js", ActionType.ADD],
     ]));
   });
   test("The sync actions handled correctly", async () => {
@@ -231,17 +231,17 @@ test("One outdated file locally should be detected", () => {
   let src = new Map([
     ["Index.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
     ["test/Hi.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
-    [".obsidian/plugins/obsidian-webdav-sync/index.js", { lastModified: Date.parse("2025-05-21T00:00:00Z") } as FileData],
+    [".obsidian/plugins/webdav-sync/index.js", { lastModified: Date.parse("2025-05-21T00:00:00Z") } as FileData],
   ]);
   const dest = new Map([
-    [".obsidian/plugins/obsidian-webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
+    [".obsidian/plugins/webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
   ]);
   const actions = calculateSyncActions(src, dest, true);
 
   expect(actions).toStrictEqual(new Map([
     ["Index.md", ActionType.ADD],
     ["test/Hi.md", ActionType.ADD],
-    [".obsidian/plugins/obsidian-webdav-sync/index.js", ActionType.ADD_LOCAL],
+    [".obsidian/plugins/webdav-sync/index.js", ActionType.ADD_LOCAL],
   ]))
 });
 
@@ -251,7 +251,7 @@ describe("Files missing locally should be removed", () => {
     ["test/Hi.md", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
   ]);
   const dest = new Map([
-    [".obsidian/plugins/obsidian-webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
+    [".obsidian/plugins/webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
   ]);
   const actions = calculateSyncActions(src, dest);
 
@@ -259,7 +259,7 @@ describe("Files missing locally should be removed", () => {
     expect(actions).toStrictEqual(new Map([
       ["Index.md", ActionType.ADD],
       ["test/Hi.md", ActionType.ADD],
-      [".obsidian/plugins/obsidian-webdav-sync/index.js", ActionType.REMOVE],
+      [".obsidian/plugins/webdav-sync/index.js", ActionType.REMOVE],
     ]));
   });
   test("The sync actions handled correctly", async () => {
@@ -297,7 +297,7 @@ describe("Files missing locally should be removed", () => {
     expect(actions).toStrictEqual(new Map([
       ["Index.md", ActionType.ADD],
       ["test/Hi.md", ActionType.ADD],
-      [".obsidian/plugins/obsidian-webdav-sync/index.js", ActionType.NOOP],
+      [".obsidian/plugins/webdav-sync/index.js", ActionType.NOOP],
     ]));
   });
   test("except when deleteIsNoop, then it should be NOOP, and omitted when not including noop", () =>  {

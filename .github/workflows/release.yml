@@ -18,7 +18,7 @@ jobs:
         run: npm run build
       - name: Assemble artefacts
         run: |
-          OUTPUT=obsidian-webdav-sync
+          OUTPUT=webdav-sync
           mkdir $OUTPUT
           cp styles.css $OUTPUT
           cp main.js $OUTPUT
@@ -27,14 +27,14 @@ jobs:
 
       - name: Compress folder
         run: |
-          zip -r obsidian-webdav-sync.zip obsidian-webdav-sync/*
+          zip -r webdav-sync.zip webdav-sync/*
       # For manual downloads
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: obsidian-webdav-sync.zip
-          asset_name: obsidian-webdav-sync.zip
+          file: webdav-sync.zip
+          asset_name: webdav-sync.zip
           tag: ${{ github.ref }}
           overwrite: true
       # For obsidian's package index
@@ -42,7 +42,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: obsidian-webdav-sync/*
+          file: webdav-sync/*
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true

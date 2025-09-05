@@ -1,5 +1,5 @@
 {
-    "id": "obsidian-webdav-sync",
+    "id": "webdav-sync",
     "name": "WebDAV sync",
     "version": "0.0.2",
     "minAppVersion": "1.9.10",

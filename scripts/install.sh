@@ -8,7 +8,7 @@ if [[ "${VAULT_LOCATION}" == "" ]]; then
     exit -1
 fi
 
-DEST_FOLDER="${VAULT_LOCATION}/.obsidian/plugins/obsidian-webdav-sync"
+DEST_FOLDER="${VAULT_LOCATION}/.obsidian/plugins/webdav-sync"
 mkdir -p ${DEST_FOLDER}
 
 cp main.js ${DEST_FOLDER}

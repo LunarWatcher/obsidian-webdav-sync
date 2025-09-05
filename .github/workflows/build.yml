@@ -20,7 +20,7 @@ jobs:
         run: npm run test
       - name: Assemble artefacts
         run: |
-          OUTPUT=obsidian-webdav-sync
+          OUTPUT=webdav-sync
           mkdir $OUTPUT
           cp styles.css $OUTPUT
           cp main.js $OUTPUT
@@ -28,8 +28,8 @@ jobs:
           ls $OUTPUT
       - uses: actions/upload-artifact@v4
         with:
-          name: obsidian-webdav-sync
-          path: obsidian-webdav-sync
+          name: webdav-sync
+          path: webdav-sync
           if-no-files-found: error
   integration:
     needs: artefacts
@@ -53,14 +53,14 @@ jobs:
           npm i --include=dev
       - uses: actions/download-artifact@v5
         with:
-          name: obsidian-webdav-sync
-          path: obsidian-webdav-sync
+          name: webdav-sync
+          path: webdav-sync
       - uses: actions/download-artifact@v5
         with:
-          name: obsidian-webdav-sync
-          path: dist/obsidian-webdav-sync
+          name: webdav-sync
+          path: dist/webdav-sync
       - name: Show artefact tree
-        run: ls dist/obsidian-webdav-sync
+        run: ls dist/webdav-sync
 
       - name: Yoink Obsidian artefact
         uses: robinraju/release-downloader@v1

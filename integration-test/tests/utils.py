@@ -90,7 +90,7 @@ def get_settings_data(driver: Chrome):
     return json.loads(execute(
         driver,
         """
-        JSON.stringify(app.plugins.plugins["obsidian-webdav-sync"].settings)
+        JSON.stringify(app.plugins.plugins["webdav-sync"].settings)
         """
     )["result"]["value"])
 
@@ -133,9 +133,9 @@ def inject_settings(driver: Chrome, settings_object = None):
     out = execute(
         driver,
         """
-        app.plugins.plugins["obsidian-webdav-sync"].settings = JSON.parse('{0}');
-        app.plugins.plugins["obsidian-webdav-sync"].saveSettings();
-        app.plugins.plugins["obsidian-webdav-sync"].reloadClient();
+        app.plugins.plugins["webdav-sync"].settings = JSON.parse('{0}');
+        app.plugins.plugins["webdav-sync"].saveSettings();
+        app.plugins.plugins["webdav-sync"].reloadClient();
         0
         """.format(json.dumps(settings_object))
     )
