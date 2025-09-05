@@ -52,7 +52,7 @@ Although the plugin shouldn't cause any problems, I strongly suggest taking back
 
 Once this plugin is release-ready, you can grab the latest release from [GitHub](https://github.com/LunarWatcher/obsidian-webdav-sync/releases). Download it, and add the `obsidian-webdav-sync` folder to your vault's `.obsidian/plugins/` folder. The plugin is not yet available through the plugin store thing, so it'll need to be updated manually as well; this is done the same way.
 
-I have not yet decided whether I feel like uploading through Obsidian's built-in plugin manager; a chunk of the code is bad, partly out of pure spite for how absolutely infuriating it is to write TypeScript code, and Obsidian's plugin standards make no sense from a semantic POV. If you have a special interest in getting the plugin released, feel free to do so.
+An upload to Obsidian's plugin registry is pending.
 
 ### Additional devices
 
@@ -74,6 +74,10 @@ Other requirements:
 #### Setup of known WebDAV servers
 
 * [Copyparty](docs/webdav-servers/Copyparty.md)
+
+### First use
+
+See [docs/Getting started.md](docs/Getting started.md)
 
 ## Things to note
 
