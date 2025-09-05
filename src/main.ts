@@ -3,6 +3,8 @@ import {DEFAULT_SETTINGS, settings_t, WebDAVSettingsTab} from 'settings';
 import {Connection} from './fs/webdav';
 import {UploadModal} from './sync/upload_modal';
 import {FileProvider} from 'sync/files';
+import {SyncImpl} from 'sync/sync_impl';
+import {onActionError, showActionTaskGraph} from 'integration/actions';
 
 export default class WebDAVSyncPlugin extends Plugin {
   settings: settings_t;
@@ -18,13 +20,19 @@ export default class WebDAVSyncPlugin extends Plugin {
       id: "webdav-command-upload",
       name: "Upload to WebDAV",
       icon: "upload",
-      callback: this.uploadAction.bind(false)
+      callback: this.uploadAction.bind(
+        this,
+        false
+      )
     });
     this.addCommand({
       id: "webdav-command-download",
       name: "Download from WebDAV",
       icon: "download",
-      callback: this.downloadAction.bind(false)
+      callback: this.downloadAction.bind(
+        this,
+        false
+      )
     });
   }
 
@@ -33,13 +41,26 @@ export default class WebDAVSyncPlugin extends Plugin {
   }
 
   async uploadAction(dryRun: boolean) {
-
+    new SyncImpl(
+      this,
+      onActionError,
+      showActionTaskGraph,
+      () => {},
+      dryRun,
+      false
+    ).upload(null);
   }
 
   async downloadAction(dryRun: boolean) {
-
+    new SyncImpl(
+      this,
+      onActionError,
+      showActionTaskGraph,
+      () => {},
+      dryRun,
+      false
+    ).download(null);
   }
-
 
   async initRibbon() {
     const ribbonIconEl = this.addRibbonIcon('cloud', 'Open WebDAV sync panel', (evt: MouseEvent) => {

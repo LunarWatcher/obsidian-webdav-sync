@@ -1,4 +1,6 @@
 copyparty-cache/
+/test_vault/
+/copyparty/
 _screenshots
 
 # Byte-compiled / optimized / DLL files

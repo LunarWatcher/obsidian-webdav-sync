@@ -43,6 +43,9 @@ def test_push_pull(
 ):
     inject_settings(obsidian)
     autoupload(obsidian, screenshotter)
+    notices = get_notice_messages(obsidian)
+    assert len(notices) == 1, notices
+    assert "Push complete" in notices[0]
 
     comp = filecmp.dircmp(
         vault,
@@ -104,6 +107,9 @@ def test_push_pull(
     sleep(5)
     autodownload(obsidian, screenshotter)
     sleep(1)
+    notices = get_notice_messages(obsidian)
+    assert len(notices) == 1, notices
+    assert "Pull complete" in notices[0]
 
     assert os.path.exists(readmePath)
 
