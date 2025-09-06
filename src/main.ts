@@ -17,7 +17,7 @@ export default class WebDAVSyncPlugin extends Plugin {
 
     this.addSettingTab(new WebDAVSettingsTab(this.app, this));
     this.addCommand({
-      id: "webdav-command-upload",
+      id: "webdav-upload",
       name: "Upload to WebDAV",
       icon: "upload",
       callback: this.uploadAction.bind(
@@ -26,7 +26,7 @@ export default class WebDAVSyncPlugin extends Plugin {
       )
     });
     this.addCommand({
-      id: "webdav-command-download",
+      id: "webdav-download",
       name: "Download from WebDAV",
       icon: "download",
       callback: this.downloadAction.bind(
