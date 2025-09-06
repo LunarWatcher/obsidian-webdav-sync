@@ -2,6 +2,7 @@ import {DAVServerConfig, DEFAULT_DAV_CONFIG} from "./fs/webdav";
 import WebDAVSyncPlugin from "./main";
 import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 import { DEFAULT_SYNC_SETTINGS, FolderDestination, SyncSettings } from "./sync/sync_settings";
+import {FileStat} from "webdav";
 
 export interface settings_t {
   server_conf: DAVServerConfig;
@@ -135,13 +136,9 @@ export class WebDAVSettingsTab extends PluginSettingTab {
               const client = this.plugin.client.client;
               if (this.plugin.settings.sync.root_folder.dest != "") {
                 try {
-                  // I hate typescript so fucking much
-                  let contents = client.getDirectoryContents(this.plugin.settings.sync.root_folder.dest) as any;
-                  // TODO: tsserver whines about the .length because one of the two doesn't have length
-                  // (the array has .length, the other appears to have .size()). Figure out if this will ever
-                  // be returned
+                  let contents = (await client.getDirectoryContents(this.plugin.settings.sync.root_folder.dest)) as FileStat[];
                   new Notice(
-                    `Connection succeeded. Found folder with ${(await contents).length} direct files and folders.`
+                    `Connection succeeded. Found folder with ${contents.length} direct files and folders.`
                   )
                 } catch (ex) {
                   console.error(ex);
