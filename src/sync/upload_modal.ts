@@ -95,10 +95,12 @@ export class UploadModal extends Modal {
     setIcon(up, "upload");
     setIcon(down, "download");
 
-    // TODO: This is nasty, but it appears to be the only way for setIcon to not override
-    // the text. Can't find an API for icon + text buttons
-    up.innerHTML += "<span>&nbsp;Upload</span>";
-    down.innerHTML += "<span>&nbsp;Download</span>";
+    up.createSpan({
+      text: "\u00A0Upload"
+    });
+    down.createSpan({
+      text: "\u00A0Download"
+    });
 
     this.dryRunInfoContainer = this.contentEl.createEl("div", {
       attr: {
