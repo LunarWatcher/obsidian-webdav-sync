@@ -107,6 +107,10 @@ def copyparty():
         proc.kill()
         proc.terminate()
         proc.wait(1 if platform.system() != "Windows" else 10)
+        if platform.system() == "Windows":
+            os.system(
+                "Taskkill /PID %d /F" % proc.pid
+            )
     finally:
         try:
             nuke_dirs()
