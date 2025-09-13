@@ -11,6 +11,7 @@ from selenium.common.exceptions import NoSuchWindowException
 from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
 
 from tests.constants import SCREENSHOT_DIR
 from tests.copyparty import Copyparty
@@ -223,8 +224,12 @@ def _load_vault(driver: Chrome, vault_path: str):
     except NoSuchWindowException:
         assert len(driver.window_handles) == 1
         driver.switch_to.window(driver.window_handles[0])
-        # loading plugins inexplicably takes multiple seconds on windows. Not sure why
-        delay_for_windows_bullshit()
+        # loading plugins inexplicably takes multiple seconds on windows. Not sure why, so this wait needs to be here
+        WebDriverWait(
+            driver,
+            timeout=10,
+        ).until(lambda wd : wd.find_element(By.CLASS_NAME, "workspace-ribbon"))
+
         for btn in driver.find_elements(By.TAG_NAME, "button"):
             if (btn.text == "Trust author and enable plugins"):
                 btn.click()
