@@ -2,11 +2,18 @@ import os
 import platform
 import shutil
 from time import sleep
+import pytest
 from selenium.webdriver import Chrome
 from tests.copyparty import Copyparty
 from tests.utils import autodownload, autoupload, close_notices, close_sync_modal, get_notice_messages, inject_settings
 
-
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="Because this test deletes the .obsidian folder, including the plugin, windows cannot run the test. The "
+        "second the plugin is gone, obsidian on Windows ceases to know how the plugin works, because reasons. "
+        "The general functionality is tested by test_push_content_wipe_blocked instead, which checks the same thing "
+        "minus deleting the .obsidian folder."
+)
 def test_push_wipe_blocked(
     obsidian: Chrome,
     vault,
