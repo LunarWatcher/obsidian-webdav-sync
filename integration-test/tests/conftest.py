@@ -14,7 +14,7 @@ from selenium.webdriver.common.by import By
 
 from tests.constants import SCREENSHOT_DIR
 from tests.copyparty import Copyparty
-from tests.utils import close_notices, execute
+from tests.utils import close_notices, delay_for_windows_bullshit, execute
 
 @pytest.fixture
 def vault():
@@ -89,6 +89,7 @@ def copyparty():
         ["copyparty", "-c", "./copyparty.conf"]
     )
     sleep(2)
+    delay_for_windows_bullshit()
     assert proc.poll() is None, \
         "Failed to start copyparty"
 
@@ -100,7 +101,7 @@ def copyparty():
     try:
         proc.kill()
         proc.terminate()
-        proc.wait(1)
+        proc.wait(1 if platform.system() != "Windows" else 10)
     finally:
         try:
             nuke_dirs()

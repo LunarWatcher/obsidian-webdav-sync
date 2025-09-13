@@ -5,6 +5,7 @@ from selenium.webdriver import ActionChains, Chrome, Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 import json
+import platform
 
 from tests.constants import DOWNLOAD_BUTTON_ID, NOTICE_CLASS, UPLOAD_BUTTON_ID
 
@@ -237,3 +238,15 @@ def autodownload(obsidian: Chrome, screenshotter, expect_error: bool = False):
     else:
         with pytest.raises(pytest.fail.Exception):
             assert_sync_modal_shown(obsidian)
+
+def delay_for_windows_bullshit():
+    """
+    The tests on Windows struggle _massively_ with timing actions, ESPECIALLY in the teardown and setup of copyparty.
+    I'm not sure if 10 seconds is enough, but this alone is at least 10 seconds extra per test, and there's like 13
+    tests at the time of this being implemented, so that's a free 2 extra minutes to run tests because windows is a
+    worthless pile of bug-ridden shit.
+
+    Fuck you windows. With a cactus.
+    """
+    if platform.system() == "Windows":
+        sleep(10)
