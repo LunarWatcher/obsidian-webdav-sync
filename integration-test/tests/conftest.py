@@ -223,7 +223,8 @@ def _load_vault(driver: Chrome, vault_path: str):
     except NoSuchWindowException:
         assert len(driver.window_handles) == 1
         driver.switch_to.window(driver.window_handles[0])
-
+        # loading plugins inexplicably takes multiple seconds on windows. Not sure why
+        delay_for_windows_bullshit()
         for btn in driver.find_elements(By.TAG_NAME, "button"):
             if (btn.text == "Trust author and enable plugins"):
                 btn.click()
