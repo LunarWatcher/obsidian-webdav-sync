@@ -23,6 +23,7 @@ def test_push_wipe_blocked(
     os.makedirs(vault)
 
     autoupload(obsidian, screenshotter, True)
+    sleep(1)
     notices = get_notice_messages(obsidian)
     assert len(notices) == 1
     assert "Action blocked" in notices[0], notices[0]
@@ -56,6 +57,7 @@ def test_pull_wipe_blocked(
     )
 
     autodownload(obsidian, screenshotter, True)
+    sleep(1)
     notices = get_notice_messages(obsidian)
     assert len(notices) == 1
     assert "Action blocked" in notices[0], notices[0]
