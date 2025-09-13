@@ -1,10 +1,10 @@
 from functools import partial
 import os
-from pathlib import Path
 import shutil
 import subprocess
 from time import sleep
 import platform
+import random
 
 import pytest
 from selenium.common.exceptions import NoSuchWindowException
@@ -44,29 +44,33 @@ def obsidian(vault: str):
 
     driver.quit()
 
+def screenshot_impl(obsidian: Chrome, prefix: str, identifier: str, index: int):
+    path = os.path.join(
+        os.getcwd(),
+        SCREENSHOT_DIR,
+        prefix,
+    )
+    if not os.path.exists(path):
+        os.makedirs(
+            path,
+            exist_ok=True
+        )
+
+    obsidian.get_screenshot_as_file(
+        os.path.join(
+            path,
+            str(index) + identifier + ".png"
+        )
+    )
+
+
 @pytest.fixture
 def screenshotter(obsidian: Chrome, request: pytest.FixtureRequest):
     prefix = request.node.name
     index = 0
     def _screenshot(obsidian: Chrome, prefix: str, identifier: str):
         nonlocal index
-        path = os.path.join(
-            os.getcwd(),
-            SCREENSHOT_DIR,
-            prefix,
-        )
-        if not os.path.exists(path):
-            os.makedirs(
-                path,
-                exist_ok=True
-            )
-
-        obsidian.get_screenshot_as_file(
-            os.path.join(
-                path,
-                str(index) + identifier + ".png"
-            )
-        )
+        screenshot_impl(obsidian, prefix, identifier, index)
         index += 1
 
     yield partial(_screenshot, obsidian, prefix)
@@ -225,6 +229,10 @@ def _load_vault(driver: Chrome, vault_path: str):
                 btn.click()
                 break
         else:
+            screenshot_impl(
+                driver,
+                "bootstrap", "trust-btn", random.randint(-20000, 20000)
+            )
             raise RuntimeError("Failed to locate trust button")
         execute(
             driver,

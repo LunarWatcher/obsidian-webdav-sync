@@ -20,6 +20,8 @@ MacOS users should probably assume that most things can and will break. If you'd
 
 Windows lacks support for most of the scripts used to support development. You're on your own with these, as no equivalents will be supported. They can still at least partly be run through git bash, though.
 
+Additionally, the integration tests will take at least `10 * ${test_count}` seconds longer to complete than on Linux, due to special delays that need to be in place for windows not to quietly fail. This is caused by weird Popen startup shit that does not make sense from my perspective as a user of a real operating system. Linux mostly does not have equivalent delays, and if it does, those are mostly 1-2 seconds to deal with race conditions, and are actually present everywhere.
+
 ### Testing guidelines
 
 As far as reasonably possible, as much code as possible should be tested. 100% coverage is not the goal here (nor is 100% cover realistically achievable), but covering the major, critical parts of the plugin means it's easier to be sure stuff doesn't violently break when making changes.
