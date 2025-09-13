@@ -1,5 +1,5 @@
 import {FileStat} from "webdav";
-import {RemoteFileResult} from "./upload_modal";
+import {RemoteFileResult} from "./sync_modal";
 import {Content, FileData, Folder, Path} from "./sync";
 import {normalizePath, Notice} from "obsidian";
 import WebDAVSyncPlugin from "main";

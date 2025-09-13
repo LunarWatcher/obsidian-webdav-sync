@@ -1,0 +1,26 @@
+" Note: This file has been set up to be manually sourceable as well.
+" With embear/vim-localvimrc, it's sourced after  the filetype is set,
+" so the autogroups are _technically_ redundant, but left in for 
+" compatibility with manual use.
+fun! LoadMarkdown()
+    setlocal tw=0
+endfun
+fun! LoadTypescript()
+    setlocal tw=120
+    setlocal sw=2
+    " See CONTRIBUTING.md#Comment-standard
+    set ft=typescript.doxygen
+endfun
+fun! LoadPython()
+    setlocal tw=120
+    setlocal sw=4
+    " See CONTRIBUTING.md#Comment-standard
+    set ft=python.doxygen
+endfun
+
+augroup WebDAVSync
+    au!
+    autocmd FileType markdown call LoadMarkdown()
+    autocmd FileType typescript call LoadTypescript()
+    autocmd FileType python call LoadPython()
+augroup END

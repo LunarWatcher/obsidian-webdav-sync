@@ -1,16 +1,14 @@
 import json
 import os
 import shutil
-from pytest import fail, raises
-import pytest
+from pytest import fail
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 # The amount of arbitrary shit just part of Python's stdlib is amazing
 import filecmp
 
-from tests.constants import DOWNLOAD_BUTTON_ID, UPLOAD_BUTTON_ID
 from tests.copyparty import Copyparty
-from tests.utils import assert_sync_modal_shown, autodownload, autoupload, click_settings_nav, get_notice_messages, get_ribbon_button, inject_settings, open_settings
+from tests.utils import autodownload, autoupload, click_settings_nav, get_notice_messages, get_ribbon_button, inject_settings, open_settings
 from time import sleep
 
 

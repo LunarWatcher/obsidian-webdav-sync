@@ -185,7 +185,7 @@ def assert_sync_modal_shown(obsidian: Chrome, screenshotter = None):
             screenshotter("Fail-OpenModal")
         pytest.fail("Failed to find #webdav-sync-modal-header")
 
-def autoupload(obsidian: Chrome, screenshotter, idx = 0):
+def autoupload(obsidian: Chrome, screenshotter, expect_error: bool = False):
     try:
         ribbon = get_ribbon_button(obsidian)
         ribbon.click()
@@ -194,19 +194,27 @@ def autoupload(obsidian: Chrome, screenshotter, idx = 0):
         raise e
 
     assert_sync_modal_shown(obsidian, screenshotter)
-    screenshotter(f"Dialog opened {idx}")
+    screenshotter(f"Dialog opened")
 
     obsidian.find_element(
         By.ID,
         UPLOAD_BUTTON_ID
     ).click()
     sleep(0.3)
-    screenshotter(f"After upload clicked {idx}")
+    screenshotter(f"After upload clicked")
 
-    with pytest.raises(pytest.fail.Exception):
+    if expect_error:
         assert_sync_modal_shown(obsidian)
+    else:
+        with pytest.raises(pytest.fail.Exception):
+            assert_sync_modal_shown(obsidian)
 
-def autodownload(obsidian: Chrome, screenshotter, idx = 0):
+def close_sync_modal(obsidian: Chrome):
+    assert_sync_modal_shown(obsidian)
+    # Note: if this starts failing, the class has likely changed. The class is not controlled by the plugin
+    obsidian.find_element(By.CLASS_NAME, "modal-close-button").click()
+
+def autodownload(obsidian: Chrome, screenshotter, expect_error: bool = False):
     try:
         ribbon = get_ribbon_button(obsidian)
         ribbon.click()
@@ -215,14 +223,17 @@ def autodownload(obsidian: Chrome, screenshotter, idx = 0):
         raise e
 
     assert_sync_modal_shown(obsidian, screenshotter)
-    screenshotter(f"Dialog opened {idx}")
+    screenshotter(f"Dialog opened")
 
     obsidian.find_element(
         By.ID,
         DOWNLOAD_BUTTON_ID
     ).click()
     sleep(0.3)
-    screenshotter(f"After download clicked {idx}")
+    screenshotter(f"After download clicked")
 
-    with pytest.raises(pytest.fail.Exception):
+    if expect_error:
         assert_sync_modal_shown(obsidian)
+    else:
+        with pytest.raises(pytest.fail.Exception):
+            assert_sync_modal_shown(obsidian)

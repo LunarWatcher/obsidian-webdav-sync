@@ -1,10 +1,10 @@
 import {Notice, Plugin} from 'obsidian';
 import {DEFAULT_SETTINGS, settings_t, WebDAVSettingsTab} from 'settings';
 import {Connection} from './fs/webdav';
-import {UploadModal} from './sync/upload_modal';
 import {FileProvider} from 'sync/files';
 import {SyncImpl} from 'sync/sync_impl';
 import {onActionError, showActionTaskGraph} from 'integration/actions';
+import {SyncModal} from 'sync/sync_modal';
 
 export default class WebDAVSyncPlugin extends Plugin {
   settings: settings_t;
@@ -68,7 +68,7 @@ export default class WebDAVSyncPlugin extends Plugin {
         new Notice("You don't appear to have set up the plugin. Go to settings before continuing.");
         return;
       }
-      new UploadModal(this.app, this).open();
+      new SyncModal(this.app, this).open();
     });
     ribbonIconEl.id = "webdav-ribbon-btn"
 
@@ -76,11 +76,7 @@ export default class WebDAVSyncPlugin extends Plugin {
 
   /**
    * Utility function used by some of the integration tests.
-   * Should never be used anywhere else in code
-   * (This is also really a symptom of the modal having far too much business logic,
-   * but I'll fix that later. in either case, I think we'll need something like this
-   * for name wrangling purposes. UploadModal is not defined in the global namespace
-   * in debug mode, so release mode will certainly be worse)
+   * Should never be used anywhere else in code, and ANY type changes to this method must result in unit test changes.
    */
   _getFileInterface() {
     return new FileProvider(

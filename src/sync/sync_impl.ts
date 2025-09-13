@@ -1,5 +1,13 @@
 import {normalizePath, Notice} from "obsidian";
-import {Actions, ActionType, calculateSyncActions, Content, FileData, OnErrorHandler, Path, runSync, SyncDir} from "./sync";
+import {
+  Actions, ActionType,
+  calculateSyncActions,
+  Content,
+  FileData,
+  OnErrorHandler,
+  runSync,
+  SyncDir
+} from "./sync";
 import {FolderDestination} from "./sync_settings";
 import WebDAVSyncPlugin from "main";
 import {FileProvider} from "./files";
@@ -14,11 +22,35 @@ export type TaskGraphHandler = (actions: Actions, info: DryRunInfo) => void;
 export type OnCompleteHandler = (dryRun: boolean) => void;
 export class SyncImpl {
   plugin: WebDAVSyncPlugin;
+
+  /**
+   * Whether or not to only report what would've happened rather than actually making the changes. Defaults to false for
+   * obvious reasons
+   */
   dryRun: boolean;
+
+  /**
+   * Whether or not to block any form of deletion. Defaults to false.
+   */
   deleteIsNoop: boolean;
-  dryRunInfoContainer: HTMLDivElement;
+
+  /**
+   * Whether or not to block vault wipes. Defaults to true
+   */
+  blockWipes: boolean;
+
+  /**
+   * Invoked on error (shock). Note that at this time, onError can be invoked multiple times, as calls to onError do not
+   * default to assuming the error is fatal. This behaviour will likely be changed at Some Point:tm:.
+   */
   onError: OnErrorHandler;
   onComplete: OnCompleteHandler;
+
+  /**
+   * Callback when the task graph is calculated. This is only invoked in dry run, and should be used to display dry run
+   * information to the user. How dry run is handled is left to the user of this class, as the dry run handling method
+   * varies between the modal and command activation methods.
+   */
   showTaskGraph: TaskGraphHandler;
   fileProvider: FileProvider;
 
@@ -35,13 +67,15 @@ export class SyncImpl {
     showTaskGraph: TaskGraphHandler,
     onComplete: OnCompleteHandler,
     dryRun: boolean = false,
-    deleteIsNoop: boolean = false
+    deleteIsNoop: boolean = false,
+    blockWipes: boolean = true,
   ) {
     this.plugin = plugin;
     this.onError = onError;
     this.showTaskGraph = showTaskGraph;
     this.onComplete = onComplete;
     this.dryRun = dryRun;
+    this.blockWipes = blockWipes;
     this.deleteIsNoop = deleteIsNoop;
 
     this.fileProvider = new FileProvider(
@@ -49,7 +83,7 @@ export class SyncImpl {
     )
   }
 
-  async upload(ev: any) {
+  async upload(_ev: any) {
     if (this.plugin.client == null) {
       return;
     }
@@ -64,19 +98,26 @@ export class SyncImpl {
       }
 
       const remote = remoteResult.content as Content;
-      let actions = calculateSyncActions(
+      let actionResult = calculateSyncActions(
         local.files,
         remote.files,
+        this.plugin.configDir(),
         false,
-        this.deleteIsNoop
+        this.deleteIsNoop,
+        this.blockWipes,
       );
+
+      if (actionResult.error != null) {
+        this.onError(actionResult.error)
+        return
+      }
       
       if (!this.dryRun) {
         const { actionedCount, actionedFolders, errorCount } = await runSync(
           SyncDir.UP,
           local,
           remote,
-          actions,
+          actionResult.actions,
           this.onError,
           this.updateUpload.bind(
             this,
@@ -92,7 +133,7 @@ export class SyncImpl {
       } else {
         console.log("remote: ", remote);
         console.log("local: ", local);
-        this.showTaskGraph(actions, {
+        this.showTaskGraph(actionResult.actions, {
           direction: SyncDir.UP,
           subfolder: null
         });
@@ -108,19 +149,26 @@ export class SyncImpl {
           return;
         }
         const remote = remoteResult.content as Content;
-        let actions = calculateSyncActions(
+        let actionResult = calculateSyncActions(
           local.files,
           remote.files,
+          this.plugin.configDir(),
           false,
-          this.deleteIsNoop
+          this.deleteIsNoop,
+          this.blockWipes,
         );
+
+        if (actionResult.error != null) {
+          this.onError(actionResult.error)
+          return
+        }
 
         if (!this.dryRun) {
           const { actionedCount, actionedFolders, errorCount } = await runSync(
             SyncDir.UP,
             local,
             remote,
-            actions,
+            actionResult.actions,
             this.onError,
             this.updateUpload.bind(
               this,
@@ -133,7 +181,7 @@ export class SyncImpl {
           new Notice(`Push complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
           this.onComplete(this.dryRun);
         } else {
-          this.showTaskGraph(actions, {
+          this.showTaskGraph(actionResult.actions, {
             direction: SyncDir.UP,
             subfolder: vaultPath
           });
@@ -142,7 +190,7 @@ export class SyncImpl {
     }
   }
 
-  async download(ev: any) {
+  async download(_ev: any) {
     if (this.plugin.client == null) {
       return;
     }
@@ -155,19 +203,26 @@ export class SyncImpl {
       }
 
       const remote = remoteResult.content as Content;
-      let actions = calculateSyncActions(
+      let actionResult = calculateSyncActions(
         remote.files,
         local.files,
+        this.plugin.configDir(),
         false,
-        this.deleteIsNoop
+        this.deleteIsNoop,
+        this.blockWipes,
       );
+
+      if (actionResult.error != null) {
+        this.onError(actionResult.error)
+        return
+      }
 
       if (!this.dryRun) {
         const { actionedCount, actionedFolders, errorCount } = await runSync(
           SyncDir.DOWN,
           remote,
           local,
-          actions,
+          actionResult.actions,
           this.onError,
           this.updateDownload.bind(
             this,
@@ -182,7 +237,7 @@ export class SyncImpl {
       } else {
         console.log("remote: ", remote);
         console.log("local: ", local);
-        this.showTaskGraph(actions, {
+        this.showTaskGraph(actionResult.actions, {
           direction: SyncDir.DOWN,
           subfolder: null
         });
@@ -200,19 +255,26 @@ export class SyncImpl {
         }
 
         const remote = remoteResult.content as Content;
-        let actions = calculateSyncActions(
+        let actionResult = calculateSyncActions(
           remote.files,
           local.files,
+          this.plugin.configDir(),
           false,
-          this.deleteIsNoop
+          this.deleteIsNoop,
+          this.blockWipes,
         );
+
+        if (actionResult.error != null) {
+          this.onError(actionResult.error)
+          return
+        }
 
         if (!this.dryRun) {
           const { actionedCount, actionedFolders, errorCount } = await runSync(
             SyncDir.DOWN,
             remote,
             local,
-            actions,
+            actionResult.actions,
             this.onError,
             this.updateDownload.bind(
               this,
@@ -225,7 +287,7 @@ export class SyncImpl {
           new Notice(`Pull complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
           this.onComplete(this.dryRun);
         } else {
-          this.showTaskGraph(actions, {
+          this.showTaskGraph(actionResult.actions, {
             direction: SyncDir.DOWN,
             subfolder: vaultPath
           });

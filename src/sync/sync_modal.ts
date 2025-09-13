@@ -1,7 +1,7 @@
-import {App, Modal, normalizePath, Notice, setIcon, Setting} from "obsidian";
+import {App, Modal, Notice, setIcon, Setting} from "obsidian";
 import WebDAVSyncPlugin from "../main";
 import {canConnectWithSettings} from "settings";
-import {Actions, actionToDescriptiveString, ActionType, calculateSyncActions, Content, FileData, Files, Folder, Path, runSync, SyncDir } from "./sync";
+import {Actions, actionToDescriptiveString, Content, SyncDir } from "./sync";
 import {DryRunInfo, SyncImpl} from "./sync_impl";
 
 export interface RemoteFileResult {
@@ -9,7 +9,7 @@ export interface RemoteFileResult {
   error: string | null;
 };
 
-export class UploadModal extends Modal {
+export class SyncModal extends Modal {
   plugin: WebDAVSyncPlugin;
   dryRunInfoContainer: HTMLDivElement;
   syncImpl: SyncImpl;
@@ -68,6 +68,18 @@ export class UploadModal extends Modal {
         toggle
           .setValue(this.syncImpl.deleteIsNoop)
           .onChange(value => { this.syncImpl.deleteIsNoop = value })
+      )
+    new Setting(contentEl)
+      .setName("Block vault wipes")
+      .setDesc(
+        "Whether or not to prevent pushes or pulls that would wipe the entire vault, or everything outside the "
+        + ".obsidian folder. This should be left as true unless you really want to do something likely very dumb, "
+        + "in which case, you're on your own."
+      )
+      .addToggle(toggle => 
+        toggle
+          .setValue(this.syncImpl.blockWipes)
+          .onChange(value => { this.syncImpl.blockWipes = value })
       )
 
     const btnWrapper = contentEl.createDiv({

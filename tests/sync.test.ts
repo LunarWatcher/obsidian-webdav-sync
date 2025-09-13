@@ -1,4 +1,4 @@
-import { ActionType, calculateSyncActions, Content, FileData, Files, findDeletedFolders, Folder, OnUpdateCallback, runSync, SyncDir } from "../src/sync/sync"
+import { Actions, ActionType, calculateSyncActions, Content, FileData, Files, findDeletedFolders, Folder, OnUpdateCallback, runSync, SyncDir } from "../src/sync/sync"
 
 interface TestSyncStatus {
   upload: string[];
@@ -103,7 +103,9 @@ describe("Sync with no files remotely means all are added", () => {
     [".obsidian/plugins/webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
   ]);
   const dest = new Map();
-  const actions = calculateSyncActions(src, dest);
+  const actionResult = calculateSyncActions(src, dest, ".obsidian");
+  expect(actionResult.error).toBeNull();
+  const actions = actionResult.actions as Actions;
 
   test("The actions are correctly computed", () =>  {
     expect(actions).toStrictEqual(new Map([
@@ -149,7 +151,9 @@ describe("Sync with one file matching in the remote means only two files are add
   const dest = new Map([
     [".obsidian/plugins/webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
   ]);
-  const actions = calculateSyncActions(src, dest, true);
+  const actionResult = calculateSyncActions(src, dest, ".obsidian", true);
+  expect(actionResult.error).toBeNull();
+  const actions = actionResult.actions as Actions;
 
   test("The actions are correctly computed", () =>  {
     expect(actions).toStrictEqual(new Map([
@@ -186,7 +190,9 @@ describe("One outdated file in the remote means all three files are added", () =
   const dest = new Map([
     [".obsidian/plugins/webdav-sync/index.js", { lastModified: Date.parse("2025-05-21T00:00:00Z") } as FileData],
   ]);
-  const actions = calculateSyncActions(src, dest, true);
+  const actionResult = calculateSyncActions(src, dest, ".obsidian", true);
+  expect(actionResult.error).toBeNull();
+  const actions = actionResult.actions as Actions;
 
   test("The actions are correctly computed", () =>  {
     expect(actions).toStrictEqual(new Map([
@@ -236,7 +242,9 @@ test("One outdated file locally should be detected", () => {
   const dest = new Map([
     [".obsidian/plugins/webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
   ]);
-  const actions = calculateSyncActions(src, dest, true);
+  const actionResult = calculateSyncActions(src, dest, ".obsidian", true);
+  expect(actionResult.error).toBeNull();
+  const actions = actionResult.actions as Actions;
 
   expect(actions).toStrictEqual(new Map([
     ["Index.md", ActionType.ADD],
@@ -253,7 +261,9 @@ describe("Files missing locally should be removed", () => {
   const dest = new Map([
     [".obsidian/plugins/webdav-sync/index.js", { lastModified: Date.parse("2025-06-21T00:00:00Z") } as FileData],
   ]);
-  const actions = calculateSyncActions(src, dest);
+  const actionResult = calculateSyncActions(src, dest, ".obsidian");
+  expect(actionResult.error).toBeNull();
+  const actions = actionResult.actions as Actions;
 
   test("The actions are correctly computed", () =>  {
     expect(actions).toStrictEqual(new Map([
@@ -293,7 +303,10 @@ describe("Files missing locally should be removed", () => {
     expect(testData.conflict.length).toBe(0);
   });
   test("except when deleteIsNoop, then it should be NOOP", () =>  {
-    const actions = calculateSyncActions(src, dest, true, true);
+    const actionResult = calculateSyncActions(src, dest, ".obsidian", true, true);
+    expect(actionResult.error).toBeNull();
+    const actions = actionResult.actions as Actions;
+
     expect(actions).toStrictEqual(new Map([
       ["Index.md", ActionType.ADD],
       ["test/Hi.md", ActionType.ADD],
@@ -301,7 +314,10 @@ describe("Files missing locally should be removed", () => {
     ]));
   });
   test("except when deleteIsNoop, then it should be NOOP, and omitted when not including noop", () =>  {
-    const actions = calculateSyncActions(src, dest, false, true);
+    const actionResult = calculateSyncActions(src, dest, ".obsidian", false, true);
+    expect(actionResult.error).toBeNull();
+    const actions = actionResult.actions as Actions;
+
     expect(actions).toStrictEqual(new Map([
       ["Index.md", ActionType.ADD],
       ["test/Hi.md", ActionType.ADD],
@@ -339,7 +355,10 @@ describe("Folders", () => {
     expect(toDelete.length).toBe(1);
   });
   test("Should only have one reported deleted folder when deleting", async () => {
-    const actions = calculateSyncActions(src.files, dest.files);
+    const actionResult = calculateSyncActions(src.files, dest.files, ".obsidian");
+    expect(actionResult.error).toBeNull();
+    const actions = actionResult.actions as Actions;
+
     const testData = lazyTestData();
     let selfReported = await runSync(
       SyncDir.UP,

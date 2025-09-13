@@ -37,6 +37,14 @@ export type Files = Map<Path, FileData>;
 export type Actions = Map<Path, ActionType>;
 export type OnErrorHandler = (message: string) => void;
 
+export type ActionResult = {
+  actions: Actions;
+  error: null;
+} | {
+  actions: null;
+  error: string;
+}
+
 export interface Folder {
   realPath: string;
   commonPath: string;
@@ -86,17 +94,37 @@ function approx(a: number, b: number): boolean {
     || Math.abs(a - b) <= 1;
 }
 
+export function resolveActions(dest: Files, actions: Actions, configDir: string = ".obsidian"): Set<string> {
+  let out = new Set<string>();
+  // prepopulate the array with the destination vault
+  for (let [fn, _] of dest.entries()) {
+    out.add(fn);
+  }
+
+  for (let [fn, action] of actions.entries()) {
+    if (action == ActionType.ADD || action == ActionType.ADD_LOCAL) {
+      out.add(fn)
+    } else if (action == ActionType.REMOVE) {
+      out.delete(fn);
+    }
+  }
+
+  return out;
+}
+
 /**
  * Calculates the sync changes to do.
  *
- * The function is pseudo-bidirectional, and attempts to do a merge
+ * The function is pseudo-bidirectional, and attempts to do a file-level merge [not implemented]
  */
 export function calculateSyncActions(
   src: Files,
   dest: Files,
+  obsidianConfDir: string,
   includeNoop: boolean = false,
-  deleteIsNoop: boolean = false
-): Actions {
+  deleteIsNoop: boolean = false,
+  blockWipes: boolean = true,
+): ActionResult {
   const out: Actions = new Map<string, ActionType>();
 
   for (let [file, _] of dest) {
@@ -145,7 +173,48 @@ export function calculateSyncActions(
     }
   }
 
-  return out;
+  if (blockWipes) {
+    // Trivial scenario: source reports 0 files found. Ignore
+    if (src.size == 0) {
+      return {
+        actions: null,
+        error: "WebDAV sync: Action blocked: detected full vault wipe"
+      }
+    }
+
+    let resolvedFiles = resolveActions(dest, out, obsidianConfDir);
+    // The more likely scenario is the actions resolving to everything being removed due to a bug in the action
+    // calculation system.
+    if (resolvedFiles.size == 0) {
+      return {
+        actions: null,
+        error: "WebDAV sync: Action blocked: detected full vault wipe. This is likely a bug; please open an issue on GitHub"
+      }
+    }
+
+    let hasNonObsidianFiles = Array.from(resolvedFiles).some(fn => {
+      return !fn.startsWith(obsidianConfDir);
+    });
+
+    // Used to check if we need to care. If a vault, for whatever reason, only contains content in the .obsidian folder,
+    // we don't need to care about hasNonObsidianFiles = false. It's a very weird edge-case borderline not worth caring
+    // about, but I'm doing it anyway.
+    let destHasNonObsidianFiles = Array.from(dest.entries()).some(entry => {
+      return !entry[0].startsWith(obsidianConfDir)
+    });
+
+    if (!hasNonObsidianFiles && destHasNonObsidianFiles) {
+      return {
+        actions: null,
+        error: "WebDAV sync: Action blocked: identified vault content wipe (.obsidian untouched)"
+      }
+    }
+  }
+
+  return {
+    actions: out,
+    error: null
+  };
 }
 
 /**
@@ -192,16 +261,16 @@ export function findDeletedFolders(
 }
 
 /**
- * General template for the sync system, since it's the same shit in both places with some minor differences
+ * General template for the sync system, since it's the same shit in both places with some minor differences.
  *
- * @param direction   The sync direction; used for some actions that require knowing whether the source is local
+ * \param direction   The sync direction; used for some actions that require knowing whether the source is local
  *                    or not
- * @param sourceFiles The files in the source directory. Does not have to be local
- * @param destFiles   The files in the destination directory. Does not have to be remote.
- * @param onError     invoked on error. What did you expect?
- * @param onUpdate    Called when an update is made; used to perform the specific action on the source or dest files
+ * \param sourceFiles The files in the source directory. Does not have to be local
+ * \param destFiles   The files in the destination directory. Does not have to be remote.
+ * \param onError     invoked on error. What did you expect?
+ * \param onUpdate    Called when an update is made; used to perform the specific action on the source or dest files
  *                    with the corresponding adapter
- * @param onConflict  Called when a conflict happens. In production, this just shows a dialog to the user. In unit tests,
+ * \param onConflict  Called when a conflict happens. In production, this just shows a dialog to the user. In unit tests,
  *                    it's a noop or an otherwise fixed result.
  */
 export async function runSync(
@@ -269,12 +338,13 @@ export async function runSync(
         // TODO: would be nice if this could be done atomically, but that feels involved.
         // Especially remotely. But I'm pretty sure there's move functions in the client,
         // so might be relatively easy
-        console.log(ex);
+        console.error(ex);
         errorCount += 1;
         if (ex instanceof Error) {
           onError(ex.message);
         } else {
-          onError("An unknown error occurred");
+          // TODO: can JS throw non-Errors?
+          onError("An unknown error occurred. See the console for more information.");
         }
       }
     }
@@ -295,7 +365,6 @@ export async function runSync(
           undefined,
           undefined
         );
-        console.log(folder.commonPath);
         actionedFolders += 1;
       } catch (ex) {
         // TODO: would be nice if this could be done atomically, but that feels involved.
@@ -304,7 +373,7 @@ export async function runSync(
         console.log(ex);
         errorCount += 1;
         if (ex instanceof Error) {
-          onError(ex.message + " --- path: " + folder);
+          onError(ex.message + " --- sync root-relative path: " + folder);
         } else {
           onError("An unknown error occurred");
         }

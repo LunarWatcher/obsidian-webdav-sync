@@ -52,15 +52,25 @@ The [underlying bug](https://github.com/LunarWatcher/obsidian-webdav-sync/issues
 
 Although the plugin shouldn't cause any problems, I strongly suggest taking backups of your vault, **especially** before the first sync. After the first sync, your devices act as a form of backup that can push a clean state back to the WebDAV server, provided it's correctly configured. However, the process of verifying that everything has been set up correctly and works correctly together is somewhat risky. You should back your vault up before using the plugin for the first time. You should also keep regular backups even if the risk is low - this is just good practice in general.
 
-## Installation and setup
+## Installation
 
+### Via GitHub
 Once this plugin is release-ready, you can grab the latest release from [GitHub](https://github.com/LunarWatcher/obsidian-webdav-sync/releases). Download it, and add the `webdav-sync` folder to your vault's `.obsidian/plugins/` folder. The plugin is not yet available through the plugin store thing, so it'll need to be updated manually as well; this is done the same way.
 
-An upload to Obsidian's plugin registry is pending.
+### Via Obsidian's plugin registry [pending]
 
-### Additional devices
+An [upload to Obsidian's plugin registry is pending](https://github.com/obsidianmd/obsidian-releases/pull/7716), but will likely take weeks to months to actually merge because they're slow. The release and nightly artefacts are still usable in the meanwhile. 
 
-The major disadvantage with this plugin is that some setup is required to get the vault over to other devices. The suggested strategy is to manually copy your vault from your computer (or whereever you installed the plugin) over to your other devices. After that, usage should just be as usual.
+### Via BRAT
+
+There isn't a separate release cycle for preview versions, but until Obsidian reviews the plugin, you can install the plugin via [BRAT](https://github.com/TfTHacker/obsidian42-brat) to get automatic updates.
+
+
+## Setup
+
+### Adding additional devices
+
+The major disadvantage with this plugin is that some setup is required to get the vault over to other devices. The suggested strategy is to manually copy your vault from your computer (or whereever you installed the plugin) over to your other devices. After that, usage should just be as usual. In theory, you can get away with just copying the `.obsidian` folder and just pull that.
 
 ### DAV server setup
 

@@ -85,6 +85,9 @@ npm run dev
 # Create dist/webdav-sync and move the stuff into it
 # This is where the tests look for the plugin for copying into
 # the test vault
+# This needs to be done every time there's changes to the plugin files.
+# For Linux users, a script has been provided that does this before
+# running the tests. See the text after this code block.
 ./scripts/bundle.sh
 
 cd integration-tests
@@ -99,7 +102,9 @@ export OBSIDIAN_LOCATION=$(which obsidian)
 
 python3 -m pytest
 ```
-For Linux users, at least X11 users, you can run `xvfb-run python3 -m pytest` to hide the GUI.
+For Linux users, at least X11 users, you can run `xvfb-run python3 -m pytest` to hide the GUI. For this particular scenario, a utility script has been provided. Once the venv is set up and dependencies are installed, you can run `./scripts/e2e-test.sh`, which will re-bundle the plugin and run the tests with `xvfb-run`. This also means no manual commands need to be run to re-bundle the plugin after changes, and lets the integration tests be run from the git root.
+
+The script forwards arguments to pytest. If you want to run a single test, for example, you can run `./scripts/e2e-test.sh -k test_push_wipe_blocked`.
 
 #### Screenshots
 
@@ -134,6 +139,14 @@ Note that these are primarily test-specific problems that won't affect normal pl
 
 These conditions are not going to happen in the real world.
 
+### Vim setup
+
+A `.lvimrc` is provided for convenience. I suggest using [embear/vim-localvimrc](https://github.com/embear/vim-localvimrc), but manual sourcing should work as well.
+
+Aside setting compound filetypes for Python and Typescript (see "Comment standard" later in this document for context), it does some textwidth and shiftwidth-related options.
+
+Config for other editors are not provided, and doing so is left as an exercise to the reader.
+
 ## Making changes
 
 This section does not describe how to actually make the changes (it's assumed you know how to code and use git; if you don't, see https://opensource.guide/ ), but describes some pitfalls with certain specific changes.
@@ -144,6 +157,12 @@ One consequence of the integration tests being written in python rather than TS 
 
 The default settings correspond to the expected default behaviour of the vault, but these may differ from the real default values. For example, the default URL is null, while in `default_settings`, it's set to a test environment-specific URL. If you're unsure about what to set the value to, you can set it to match the default.
 
+### Comment standard
+
+For comments, doxygen syntax is used. Doxygen documentation is not currently generated, largely because this isn't a library, but the standard just makes it easier to write comments that are structurally similar.
+
+This applies to both TypeScript and Python. In Python, the `"""` doc blocks are still used. Support for this in doxygen is a bit weird, but because no docs are actually generated, this doesn't matter. To use the special backslash commands, use `r"""`.
+
 ## Making a release
 
 (You do not need to follow this unless you're me)
@@ -153,6 +172,4 @@ The version has to be bumped in two places:
 * `package.json`
 * `manifest.json`
 
-
-There's also a [`versions.json`, described by obsidian](https://docs.obsidian.md/Reference/Versions), but this is not in use yet, as it doesn't seem to be required (plus, nothing has been released yet).
-
+There's also a [`versions.json`, described by obsidian](https://docs.obsidian.md/Reference/Versions), but this is not in use yet, as it doesn't seem to be required (plus, nothing has been released yet, and I do not have a way to make it useful, as I'll mostly be operating on the latest versions).
