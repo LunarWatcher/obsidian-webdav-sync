@@ -1,4 +1,5 @@
 import os
+import platform
 import shutil
 from time import sleep
 from selenium.webdriver import Chrome
@@ -21,6 +22,10 @@ def test_push_wipe_blocked(
     # shutil nukes the root, which will likely cause other exotic errors. These are UB, so they're not tested, and we
     # need to recreate the directory to avoid them
     os.makedirs(vault)
+
+    if platform.system() == "Windows":
+        # required for windows. Copyparty needs time to recover after the deletion, because fuck windows
+        sleep(2)
 
     autoupload(obsidian, screenshotter, True)
     sleep(1)
