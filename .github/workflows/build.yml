@@ -97,3 +97,9 @@ jobs:
         working-directory: integration-test/
         run: |
           python3 -m pytest
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots-${{ matrix.os }}
+          path: integration-test/_screenshots
+          if-no-files-found: error
