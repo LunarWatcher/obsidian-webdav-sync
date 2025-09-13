@@ -7,6 +7,8 @@ from selenium.webdriver.remote.webelement import WebElement
 import json
 import platform
 
+from selenium.webdriver.support.wait import WebDriverWait
+
 from tests.constants import DOWNLOAD_BUTTON_ID, NOTICE_CLASS, UPLOAD_BUTTON_ID
 
 def execute(driver: Chrome, script: str):
@@ -155,6 +157,12 @@ def close_notices(driver: Chrome):
 def get_notice_messages(
     driver: Chrome
 ) -> list[str]:
+
+    WebDriverWait(
+        driver,
+        timeout=10,
+    ).until(lambda wd : wd.find_element(By.CLASS_NAME, "notice-container"))
+
     return driver.execute_script("""
     let containers = document.getElementsByClassName("notice-container");
     if (containers.length == 0) {
