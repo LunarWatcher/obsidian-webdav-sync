@@ -63,6 +63,7 @@ jobs:
         run: ls dist/webdav-sync
 
       - name: Install Obsidian
+        id: yoink
         timeout-minutes: 2
         uses: LunarWatcher/install-obsidian@master
 
@@ -76,6 +77,8 @@ jobs:
         working-directory: integration-test/
         run: |
           python3 -m pytest
+        env:
+          OBSIDIAN_LOCATION: ${{ steps.yoink.outputs.path }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
