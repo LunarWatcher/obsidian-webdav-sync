@@ -278,10 +278,17 @@ def _get_driver() -> Chrome:
     service = create_service()
     opts = ChromeOptions()
     # TODO: add defaults for windows
-    opts.binary_location = os.environ.get(
-        "OBSIDIAN_LOCATION",
-        "/usr/bin/obsidian"
-    )
+    if platform.system() != "Windows":
+        opts.binary_location = os.environ.get(
+            "OBSIDIAN_LOCATION",
+            "/usr/bin/obsidian"
+        )
+    else:
+        cache = os.environ.get("OBSIDIAN_LOCATION")
+        if opts.binary_location == None:
+            raise RuntimeError("You need to specify OBSIDIAN_LOCATION on Windows")
+        assert cache is not None
+        opts.binary_location = cache
     driver = Chrome(
         service=service,
         options=opts
