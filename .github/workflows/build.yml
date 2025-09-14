@@ -62,31 +62,9 @@ jobs:
       - name: Show artefact tree
         run: ls dist/webdav-sync
 
-      - name: Yoink Obsidian artefact
-        uses: robinraju/release-downloader@v1
-        with:
-          repository: obsidianmd/obsidian-releases
-          latest: true
-          tarBall: false
-          zipBall: false
-          fileName: ${{ matrix.artefact }}
-          out-file-path: obsidian_inst
-      - name: Install obsidian artefact (Ubuntu)
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: |
-          sudo apt install -y ./obsidian_inst/*.deb
-      - name: Install obsidian artefact (Windows)
-        timeout-minutes: 2
-        if: ${{ matrix.os == 'windows-2025' }}
-        run: |
-          .\obsidian_inst\*.exe /S
-          Do {
-            Start-Sleep -Seconds 5
-          } until (Test-Path -path "$env:LOCALAPPDATA\\Programs\\Obsidian\\Obsidian.exe" -PathType Leaf)
-          echo "OBSIDIAN_LOCATION=$env:LOCALAPPDATA\\Programs\\Obsidian\\Obsidian.exe" >> $env:GITHUB_ENV
-          ls 'C:\Program Files'
-          ls $env:LOCALAPPDATA\Programs\
-        shell: powershell
+      - name: Install Obsidian
+        uses: LunarWatcher/install-obsidian@master
+
       - name: Python deps
         working-directory: integration-test/
         run: |
