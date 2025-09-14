@@ -63,6 +63,7 @@ jobs:
         run: ls dist/webdav-sync
 
       - name: Install Obsidian
+        timeout-minutes: 2
         uses: LunarWatcher/install-obsidian@master
 
       - name: Python deps
