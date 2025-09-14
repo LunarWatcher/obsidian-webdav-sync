@@ -51,11 +51,8 @@ jobs:
       - name: Npm dev deps
         run: |
           npm i --include=dev
-      - uses: actions/download-artifact@v5
-        with:
-          name: webdav-sync
-          path: webdav-sync
-      - uses: actions/download-artifact@v5
+      - name: Download dist artefacts
+        uses: actions/download-artifact@v5
         with:
           name: webdav-sync
           path: dist/webdav-sync
