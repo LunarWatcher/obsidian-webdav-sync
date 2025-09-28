@@ -1,6 +1,6 @@
-# Obsidian WebDAV sync
+# WebDAV sync
 
-This is a very simple sync plugin based on WebDAV. You need to bring your own server to use this plugin. Theoretically, all WebDAV-compatible servers are supported, though there are some requirements for the general behaviour of the server. This is described in a later section.
+This is a very simple sync plugin for Obsidian based on WebDAV. You need to bring your own WebDAV server to use this plugin. Theoretically, all WebDAV-compatible servers are supported, though there are some requirements for the general behaviour of the server. This is described in a later section. No special, non-standard features are used, so this plugin (unlike far too many WebDAV implementations in general) is not vendorlocked to NextCloud.
 
 ## Features
 
