@@ -141,13 +141,16 @@ Note that these are primarily test-specific problems that won't affect normal pl
 
 These conditions are not going to happen in the real world.
 
-### Vim setup
+## Supporting Zellij layouts
 
-A `.lvimrc` is provided for convenience. I suggest using [embear/vim-localvimrc](https://github.com/embear/vim-localvimrc), but manual sourcing should work as well.
+There's a [Zellij](https://zellij.dev/) layout available for development. You can run it with:
+```
+zellij -n ./dev/zellij/default.kdl
+```
 
-Aside setting compound filetypes for Python and Typescript (see "Comment standard" later in this document for context), it does some textwidth and shiftwidth-related options.
+The layout runs integration tests, unit tests, and `npm run dev`, so the majority of actions needed.
 
-Config for other editors are not provided, and doing so is left as an exercise to the reader.
+(This can also be done in a much shorter command with [umbra](https://github.com/LunarWatcher/umbra): `umbra z`)
 
 ## Making changes
 
