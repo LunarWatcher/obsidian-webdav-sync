@@ -94,10 +94,10 @@ function approx(a: number, b: number): boolean {
     || Math.abs(a - b) <= 1;
 }
 
-export function resolveActions(dest: Files, actions: Actions, configDir: string = ".obsidian"): Set<string> {
+export function resolveActions(dest: Files, actions: Actions): Set<string> {
   let out = new Set<string>();
   // prepopulate the array with the destination vault
-  for (let [fn, _] of dest.entries()) {
+  for (let [fn] of dest.entries()) {
     out.add(fn);
   }
 
@@ -127,7 +127,7 @@ export function calculateSyncActions(
 ): ActionResult {
   const out: Actions = new Map<string, ActionType>();
 
-  for (let [file, _] of dest) {
+  for (let [file] of dest) {
     // Deletions are determined by finding files available in the remote that aren't available locally. These are deleted
     // in the destination.
     if (!src.has(file)) {
@@ -182,7 +182,7 @@ export function calculateSyncActions(
       }
     }
 
-    let resolvedFiles = resolveActions(dest, out, obsidianConfDir);
+    let resolvedFiles = resolveActions(dest, out);
     // The more likely scenario is the actions resolving to everything being removed due to a bug in the action
     // calculation system.
     if (resolvedFiles.size == 0) {
@@ -206,7 +206,7 @@ export function calculateSyncActions(
     if (!hasNonObsidianFiles && destHasNonObsidianFiles) {
       return {
         actions: null,
-        error: "WebDAV sync: Action blocked: identified vault content wipe (.obsidian untouched)"
+        error: `WebDAV sync: Action blocked: identified vault content wipe (${obsidianConfDir} untouched)`
       }
     }
   }
@@ -300,14 +300,6 @@ export async function runSync(
         actionedFolders: -1,
         errorCount: errorCount + 1
       };
-    } else if (typeof(file) != "string") {
-      onError("Fatal: expected string, found " + file);
-      console.error(source);
-      return {
-        actionedCount: -1,
-        actionedFolders: -1,
-        errorCount: errorCount + 1
-      };
     }
     // ADD_LOCAL needs to be first, so we don't have to redo value checks for action
     // TODO: this cannot be here, and needs to be refactored out. The conflict resolution
@@ -370,10 +362,10 @@ export async function runSync(
         // TODO: would be nice if this could be done atomically, but that feels involved.
         // Especially remotely. But I'm pretty sure there's move functions in the client,
         // so might be relatively easy
-        console.log(ex);
+        console.error(ex);
         errorCount += 1;
         if (ex instanceof Error) {
-          onError(ex.message + " --- sync root-relative path: " + folder);
+          onError(ex.message + " --- sync root-relative path: " + folder.realPath);
         } else {
           onError("An unknown error occurred");
         }

@@ -1,7 +1,7 @@
 {
     "id": "webdav-sync",
     "name": "WebDAV sync",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "minAppVersion": "1.9.10",
     "description": "Simple, manually-controlled WebDAV sync plugin",
     "author": "Olivia",

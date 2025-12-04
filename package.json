@@ -1,6 +1,6 @@
 {
     "name": "webdav-sync",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Simple, manually-controlled WebDAV sync plugin",
     "main": "main.js",
     "scripts": {

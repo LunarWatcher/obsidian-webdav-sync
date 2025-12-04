@@ -81,7 +81,7 @@ export class FileProvider {
     root: string = "/"
   ): Promise<Content> {
     //const files = this.app.vault.getFiles();
-    const queue: any[] = [];
+    const queue: string[] = [];
 
     if (!(await this.plugin.adapter().exists(normalizePath(root)))) {
       return {

@@ -83,7 +83,7 @@ export class SyncImpl {
     )
   }
 
-  async upload(_ev: any) {
+  async upload() {
     if (this.plugin.client == null) {
       return;
     }
@@ -118,21 +118,21 @@ export class SyncImpl {
           local,
           remote,
           actionResult.actions,
-          this.onError,
+          this.onError.bind(this),
           this.updateUpload.bind(
             this,
             this.plugin.settings.sync.root_folder.dest,
             null
           ),
-          this.resolveConflict,
+          this.resolveConflict.bind(this),
           this.deleteIsNoop,
         )
 
         new Notice(`Push complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
         this.onComplete(this.dryRun);
       } else {
-        console.log("remote: ", remote);
-        console.log("local: ", local);
+        console.debug("remote: ", remote);
+        console.debug("local: ", local);
         this.showTaskGraph(actionResult.actions, {
           direction: SyncDir.UP,
           subfolder: null
@@ -140,7 +140,7 @@ export class SyncImpl {
       }
     } else {
       for (const vaultPath in this.plugin.settings.sync.subfolders) {
-        const { dest } = this.plugin.settings.sync.subfolders[vaultPath] as FolderDestination;
+        const { dest } = this.plugin.settings.sync.subfolders[vaultPath];
         let local = await this.fileProvider.getVaultFiles(vaultPath);
         
         let remoteResult = await this.fileProvider.getRemoteFiles(dest);
@@ -169,13 +169,13 @@ export class SyncImpl {
             local,
             remote,
             actionResult.actions,
-            this.onError,
+            this.onError.bind(this),
             this.updateUpload.bind(
               this,
               dest,
               vaultPath
             ),
-            this.resolveConflict,
+            this.resolveConflict.bind(this),
             this.deleteIsNoop
           )
           new Notice(`Push complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
@@ -190,7 +190,7 @@ export class SyncImpl {
     }
   }
 
-  async download(_ev: any) {
+  async download() {
     if (this.plugin.client == null) {
       return;
     }
@@ -235,8 +235,8 @@ export class SyncImpl {
         new Notice(`Pull complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
         this.onComplete(this.dryRun);
       } else {
-        console.log("remote: ", remote);
-        console.log("local: ", local);
+        console.debug("remote: ", remote);
+        console.debug("local: ", local);
         this.showTaskGraph(actionResult.actions, {
           direction: SyncDir.DOWN,
           subfolder: null
@@ -244,8 +244,7 @@ export class SyncImpl {
       }
     } else {
       for (const vaultPath in this.plugin.settings.sync.subfolders) {
-        // Typescript: are you fucking stupid?
-        const { dest } = this.plugin.settings.sync.subfolders[vaultPath] as FolderDestination;
+        const { dest } = this.plugin.settings.sync.subfolders[vaultPath];
         let local = await this.fileProvider.getVaultFiles(vaultPath);
         
         let remoteResult = await this.fileProvider.getRemoteFiles(dest);
@@ -414,8 +413,5 @@ export class SyncImpl {
     // TODO: handle properly (and probably convert to a callback function)
     return ActionType.ADD;
   }
-}
-function getRemoteFiles(dest: string) {
-  throw new Error("Function not implemented.");
 }
 

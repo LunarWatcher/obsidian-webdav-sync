@@ -1,4 +1,16 @@
-import { Actions, ActionType, calculateSyncActions, Content, FileData, Files, findDeletedFolders, Folder, OnUpdateCallback, runSync, SyncDir } from "../src/sync/sync"
+import {
+  Actions,
+  ActionType,
+  calculateSyncActions,
+  Content,
+  FileData,
+  Files,
+  findDeletedFolders,
+  Folder,
+  OnUpdateCallback,
+  runSync,
+  SyncDir
+} from "../src/sync/sync"
 
 interface TestSyncStatus {
   upload: string[];

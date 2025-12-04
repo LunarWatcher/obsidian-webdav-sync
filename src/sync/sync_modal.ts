@@ -24,7 +24,7 @@ export class SyncModal extends Modal {
 
     this.syncImpl = new SyncImpl(
       this.plugin,
-      this.setError,
+      this.setError.bind(this),
       this.showTaskGraph.bind(this),
       this.close.bind(this),
       false,
@@ -73,7 +73,7 @@ export class SyncModal extends Modal {
       .setName("Block vault wipes")
       .setDesc(
         "Whether or not to prevent pushes or pulls that would wipe the entire vault, or everything outside the "
-        + ".obsidian folder. This should be left as true unless you really want to do something likely very dumb, "
+        + `${this.app.vault.configDir} folder. This should be left as true unless you really want to do something likely very dumb, `
         + "in which case, you're on your own."
       )
       .addToggle(toggle => 
@@ -92,16 +92,16 @@ export class SyncModal extends Modal {
         id: "webdav-sync-up"
       }
     });
-    up.addEventListener("click", async (ev) => {
-      await this.upload(ev);
+    up.addEventListener("click", () => {
+      void this.upload();
     });
     const down = btnWrapper.createEl("button", {
       attr: {
         id: "webdav-sync-down"
       }
     });
-    down.addEventListener("click", async (ev) => {
-      await this.download(ev);
+    down.addEventListener("click", (ev) => {
+      void this.download();
     });
 
     setIcon(up, "upload");
@@ -121,15 +121,15 @@ export class SyncModal extends Modal {
     });
   }
 
-  async download(ev: Event) {
+  async download() {
     this.checkClearDryRun();
 
-    await this.syncImpl.download(ev);
+    await this.syncImpl.download();
   }
-  async upload(ev: Event) {
+  async upload() {
     this.checkClearDryRun();
 
-    await this.syncImpl.upload(ev);
+    await this.syncImpl.upload();
   }
 
   showTaskGraph(actions: Actions, info: DryRunInfo) {
@@ -174,7 +174,7 @@ export class SyncModal extends Modal {
     }
   }
 
-  setLoading(elem: any) {
+  setLoading(elem: HTMLElement) {
     setIcon(elem, "loader");
     elem.innerText = "";
   }

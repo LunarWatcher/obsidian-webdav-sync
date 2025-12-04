@@ -131,7 +131,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
           .setButtonText("Test connection")
           .setCta()
           .onClick(async (ev) => {
-            this.plugin.reloadClient();
+            await this.plugin.reloadClient();
             if (this.plugin.client != null) {
               const client = this.plugin.client.client;
               if (this.plugin.settings.sync.root_folder.dest != "") {
@@ -217,8 +217,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
 
     // Fuck you javascript, why can I not `of` a dict?
     for (const path in this.plugin.settings.sync.subfolders) {
-      // Typescript: are you fucking stupid?
-      const dest = this.plugin.settings.sync.subfolders[path] as FolderDestination;
+      const dest = this.plugin.settings.sync.subfolders[path];
 
       new Setting(container)
         .setName("WebDAV target folder for vault path: " + path)
