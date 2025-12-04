@@ -66,7 +66,7 @@ There's both a ribbon entry and currently two actions that can be used to actual
 
 The sync modal (opened through the ribbon) offers all the available per-sync options. At the time of writing, these include:
 
-* **Dry run**: does everything a normal sync would do, but disables the actual push or pull step, and shows all the actions that would've been taken. Useful for debugging, or checking if you forgot to sync :) Also logs both the remote and local files to the console if you want to see even more data.
+* **Dry run**: does everything a normal sync would do, but disables the actual push or pull step, and shows all the actions that would've been taken. Useful for debugging, or checking if you forgot to sync :) Also logs both the remote and local files to the console if you want to see even more data. **Note that you need to update the log level in your console to see these logs**. Obsidian forbids `.log` calls in the submission process for whatever reason, even when it's explicitly requested.
 * **Don't delete anything**: disables deletion. Mainly useful if you forget to push, and made changes that you need to pull. Setting this preserves those files so you can push, but can also result in files you intentionally deleted being restored on a push. Like I said, deletion-aware sync is hard, and this plugin does not bother with it.
 
 Aside the modal, raw upload and download actions exist, accessible via Ctrl-P (search "WebDAV:" to see all the available actions). Unless otherwise specified, the actions use all default settings, which amy be undesirable. If you need more control, use the modal.
