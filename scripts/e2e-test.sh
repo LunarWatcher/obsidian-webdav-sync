@@ -7,4 +7,5 @@ ${git_root}/scripts/bundle.sh
 cd ${git_root}/integration-test
 
 source ./env/bin/activate
+pip3 install -r requirements.txt
 xvfb-run python3 -m pytest $@
