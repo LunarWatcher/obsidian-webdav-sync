@@ -93,7 +93,7 @@ Other WebDAV servers are likely supported with minimal or no special setup, but 
 
 ### First use
 
-See [Getting started.md](https://github.com/LunarWatcher/obsidian-webdav-sync/blob/master/docs/Getting%20started.md)
+See [Getting started.md](https://github.com/LunarWatcher/obsidian-webdav-sync/blob/master/docs/Getting%20started.md). It can also be read on an [mkdocs-generated website](https://lunarwatcher.github.io/obsidian-webdav-sync/Getting%20started/) if you prefer.
 
 ## Things to note
 
