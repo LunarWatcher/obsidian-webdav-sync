@@ -30,4 +30,4 @@ On Debian and derivatives, these come from `libnss3-tools`.
 
 ### Windows 
 
-Double-click the `.p12`. There's also `certutil.exe`, but there's a GUI option, so it's easier than trying to wrangle a windows shell. It's installed in a system store, so it'll work pretty much anywhere.
+Double-click the `.p12` and follow the instructions. There's also `certutil.exe`, but there's a GUI option, so it's easier than trying to wrangle a windows shell. It's installed in a system store, so it'll work pretty much anywhere.

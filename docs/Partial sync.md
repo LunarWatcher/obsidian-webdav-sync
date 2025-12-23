@@ -15,6 +15,7 @@ The end-result is notes being synced where they shouldn't be. For my use-case, t
 Partial folder sync in this plugin is a special kind of sync if combined with the right server settings. Through the power of using two accounts instead of one, provided your WebDAV server supports shadowed permissions, you can grant a secondary account read permissions only to subfolders.
 
 For example, given two accounts (`secure`, `insecure`):
+
 * `/vault` (read-write: secure, deny: insecure)
     * `/vault/Partially synced subfolder` (read-write: secure, insecure)
 
@@ -28,7 +29,7 @@ As long as your DAV server can be configured with permissions this granular, you
 
 To avoid that folder being an entire standalone vault, it then has to be added as a subfolder to the current vault. That is the feature this plugin supports:
 
-![Screenshot showing a folder mapping added for the local folder Tech, mapped to the WebDAV share /livi/obsidian/Tech](.github/images/folder mapping example.png)
+![Screenshot showing a folder mapping added for the local folder Tech, mapped to the WebDAV share /livi/obsidian/Tech](assets/folder mapping example.png)
 
 When doing it this way, the `Tech` folder appears structurally identical in both vaults. This is important for reasons described in the next section.
 

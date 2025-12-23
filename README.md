@@ -14,7 +14,7 @@ This plugin is intentionally simplistic merge-wise. As a result, content-level m
 
 ## Rationale
 
-I have 18TB of self-hosted NAS storage, and 500GB of Proton Drive storage (part of what my 120 EUR/year gets me when I wanted protonmail, Proton VPN, and Proton Pass); I do not want to pay another 96 USD/year + bank currency conversion costs, so my data can sync to a different cloud than either of the two options I already have available. Until August 2025, I used syncthing, but the official Android app was discontinued. Although the client was forked, jumping from an official app developed by one person to an unofficial app developed by one person does not sound particularly tempting.
+I have 18TB of self-hosted NAS storage, and 500GB of Proton Drive storage (part of what my 120 EUR/year gets me when I wanted protonmail, Proton VPN, and Proton Pass); I do not want to pay another 96 USD/year + bank currency conversion costs, so my data can sync to a different cloud than either of the two options I already have available. Until August 2025, I used syncthing, but the official Android app was discontinued months prior without me noticing. Although the client was forked, jumping from an official app developed by one person to an unofficial app developed by one person does not sound particularly tempting.
 
 WebDAV, although being an open standard, has been heavily undermined by cloud services using proprietary protocols to vendor lock people into their specific ecosystem - a strategy that has been wildly successful. The additional consequence of this is that no free options exist for syncing WebDAV in a similar way to Obsidian. The hardest part here is file deletion, and this is a hard problem the sync plugins are struggling with as well. The solutions that claim to solve this are proprietary or otherwise expensive.
 
@@ -33,7 +33,7 @@ WebDAV, on the other hand, is both simple enough and well-established enough tha
 ## Requirements
 
 * Android or desktop (Windows or Linux)
-    * macOS and iOS will not receive support from me, as I refuse to spend thousands of euros for inferior hardware and an inferior platform. If you need iOS or macOS support and it doesn't work due to Apple-specific problems, you're welcome to add it in a PR, but it will not be created, maintained, or tested any other way.
+    * macOS and iOS will not receive support from me, as I refuse to spend thousands of euros for inferior hardware and an inferior platform. If you need iOS or macOS support and it doesn't work due to Apple-specific problems, you're welcome to add it in a PR, but it will not be created, maintained, or tested any other way. It may work, but it probably won't.
 * A WebDAV server. In theory, it should work with any WebDAV-compatible server, though I only test against [copyparty](https://github.com/9001/copyparty). More specific requirements:
     * No inline  backups can be made, unless the calls to read the entire folder omits these as if they didn't exist, and only the latest version is exposed. For example, copyparty's default behaviour on push (without `daw`) is to create copies (such as `README.md-bunch of garbage here`), which then is exposed when accessing the directory. This means the vault is always out of sync, and treats the added history files as bad.
     * `X-OC-MTime` should be supported. It's supported in copyparty out of the box. Without this, the last modified time cannot be synced in the remote, so a pull is required after the push to sync mtimes to the client. This is obviously a waste of download and resources.
@@ -89,6 +89,8 @@ Other requirements:
 
 * [Copyparty](docs/webdav-servers/Copyparty.md)
 
+Other WebDAV servers are likely supported with minimal or no special setup, but I do not attempt to verify these. If you manage to verify another issue, please consider opening a PR with setup instructions.
+
 ### First use
 
 See [Getting started.md](https://github.com/LunarWatcher/obsidian-webdav-sync/blob/master/docs/Getting%20started.md)
@@ -97,7 +99,7 @@ See [Getting started.md](https://github.com/LunarWatcher/obsidian-webdav-sync/bl
 
 ### Race conditions
 
-WebDAV sync is not thread-safe. If you run two pushes at once, you will end up with an inconsistent state.
+WebDAV sync is not thread-safe. If you run two pushes at once, you will end up with an inconsistent state. It's therefore not recommended to use this plugin for collaborative note repositories, unless you have another way to avoid race conditions.
 
 Due to the lack of content-level merge, ending up in a situation like this requires manual recovery. 
 

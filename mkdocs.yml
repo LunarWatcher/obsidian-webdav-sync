@@ -1,0 +1,33 @@
+site_name: obsidian-webdav-sync documentation
+nav:
+  - Home: index.md
+  - Getting started: Getting started.md
+  - Features:
+    - Partial vault sync: Partial sync.md
+    - Using mTLS: Using mTLS.md
+  - Known working WebDAV servers and config:
+    - Copyparty: webdav-servers/Copyparty.md
+
+theme:
+  name: material
+  icon:
+    logo: material/heart
+  plugins:
+    - privacy:
+        enabled: true
+  palette:
+    primary: purple
+  highlightjs: true
+  hljs_languages:
+    - bash
+
+plugins:
+  - search
+  - callouts
+
+copyright: <a href="https://github.com/LunarWatcher/obsidian-webdav-sync/blob/master/LICENSE">All content licensed under the MIT license</a>
+repo_url: https://github.com/LunarWatcher/obsidian-webdav-sync
+
+markdown_extensions:
+  - pymdownx.magiclink
+  - admonition
