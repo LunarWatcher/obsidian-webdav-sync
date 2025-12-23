@@ -1,4 +1,4 @@
-site_name: obsidian-webdav-sync documentation
+site_name: Documentation for WebDAV sync
 nav:
   - Home: index.md
   - Getting started: Getting started.md
