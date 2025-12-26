@@ -4,11 +4,12 @@ import {
   calculateSyncActions,
   Content,
   FileData,
+  OnConflictCallback,
   OnErrorHandler,
+  OnUpdateCallback,
   runSync,
   SyncDir
 } from "./sync";
-import {FolderDestination} from "./sync_settings";
 import WebDAVSyncPlugin from "main";
 import {FileProvider} from "./files";
 import {prefixToStr, resolvePath} from "./pathutils";
@@ -118,13 +119,13 @@ export class SyncImpl {
           local,
           remote,
           actionResult.actions,
-          this.onError.bind(this),
+          this.onError.bind(this) as OnErrorHandler,
           this.updateUpload.bind(
             this,
             this.plugin.settings.sync.root_folder.dest,
             null
-          ),
-          this.resolveConflict.bind(this),
+          ) as OnUpdateCallback,
+          this.resolveConflict.bind(this) as OnConflictCallback,
           this.deleteIsNoop,
         )
 
@@ -169,13 +170,13 @@ export class SyncImpl {
             local,
             remote,
             actionResult.actions,
-            this.onError.bind(this),
+            this.onError.bind(this) as OnErrorHandler,
             this.updateUpload.bind(
               this,
               dest,
               vaultPath
-            ),
-            this.resolveConflict.bind(this),
+            ) as OnUpdateCallback,
+            this.resolveConflict.bind(this) as OnConflictCallback,
             this.deleteIsNoop
           )
           new Notice(`Push complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
@@ -223,13 +224,13 @@ export class SyncImpl {
           remote,
           local,
           actionResult.actions,
-          this.onError,
+          this.onError.bind(this) as OnErrorHandler,
           this.updateDownload.bind(
             this,
             this.plugin.settings.sync.root_folder.dest,
             null
-          ),
-          this.resolveConflict,
+          ) as OnUpdateCallback,
+          this.resolveConflict.bind(this) as OnConflictCallback,
           this.deleteIsNoop,
         )
         new Notice(`Pull complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
@@ -274,13 +275,13 @@ export class SyncImpl {
             remote,
             local,
             actionResult.actions,
-            this.onError,
+            this.onError.bind(this) as OnErrorHandler,
             this.updateDownload.bind(
               this,
               dest,
               vaultPath,
-            ),
-            this.resolveConflict,
+            ) as OnUpdateCallback,
+            this.resolveConflict.bind(this) as OnConflictCallback,
             this.deleteIsNoop,
           )
           new Notice(`Pull complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);

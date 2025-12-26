@@ -28,7 +28,7 @@ export class FileProvider {
         }
       ) as FileStat[];
       const folders = [] as Folder[];
-      const out = new Map();
+      const out = new Map<Path, FileData>();
 
       for (const file of files) {
         // Obsidian does not include directories, so this is necessary to avoid every folder
@@ -85,7 +85,7 @@ export class FileProvider {
 
     if (!(await this.plugin.adapter().exists(normalizePath(root)))) {
       return {
-        files: new Map(),
+        files: new Map<Path, FileData>(),
         folderPaths: []
       } as Content
     }

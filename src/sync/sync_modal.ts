@@ -1,8 +1,8 @@
 import {App, Modal, Notice, setIcon, Setting} from "obsidian";
 import WebDAVSyncPlugin from "../main";
 import {canConnectWithSettings} from "settings";
-import {Actions, actionToDescriptiveString, Content, SyncDir } from "./sync";
-import {DryRunInfo, SyncImpl} from "./sync_impl";
+import {Actions, actionToDescriptiveString, Content, OnErrorHandler, SyncDir } from "./sync";
+import {DryRunInfo, OnCompleteHandler, SyncImpl, TaskGraphHandler} from "./sync_impl";
 
 export interface RemoteFileResult {
   content: Content | null;
@@ -24,9 +24,9 @@ export class SyncModal extends Modal {
 
     this.syncImpl = new SyncImpl(
       this.plugin,
-      this.setError.bind(this),
-      this.showTaskGraph.bind(this),
-      this.close.bind(this),
+      this.setError.bind(this) as OnErrorHandler,
+      this.showTaskGraph.bind(this) as TaskGraphHandler,
+      this.close.bind(this) as OnCompleteHandler,
       false,
       false
     )

@@ -31,6 +31,14 @@ jobs:
           name: webdav-sync
           path: webdav-sync
           if-no-files-found: error
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deps
+        run: npm i -D
+      - name: Lint
+        run: npx eslint
   integration:
     needs: artefacts
     strategy:

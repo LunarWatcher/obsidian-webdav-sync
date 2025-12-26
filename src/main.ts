@@ -20,15 +20,19 @@ export default class WebDAVSyncPlugin extends Plugin {
       id: "webdav-upload",
       name: "Upload to WebDAV",
       icon: "upload",
+      // Fails to handle addCommand()'s signature being () => any
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       callback: this.uploadAction.bind(
         this,
         false
-      )
+      ) 
     });
     this.addCommand({
       id: "webdav-download",
       name: "Download from WebDAV",
       icon: "download",
+      // Fails to handle addCommand()'s signature being () => any
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       callback: this.downloadAction.bind(
         this,
         false
@@ -85,7 +89,7 @@ export default class WebDAVSyncPlugin extends Plugin {
   }
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<settings_t>);
   }
 
   async saveSettings() {
@@ -114,6 +118,9 @@ export default class WebDAVSyncPlugin extends Plugin {
         )
       } catch (ex) {
         console.error(ex);
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/message
+        // If something else is thrown it'll be undefined or weird, and I do not care
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access 
         new Notice(`Failed to connect to WebDAV server: ${ex.message} - have you run setup yet?`);
         return false;
       }
