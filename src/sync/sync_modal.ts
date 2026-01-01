@@ -14,6 +14,9 @@ export class SyncModal extends Modal {
   dryRunInfoContainer: HTMLDivElement;
   syncImpl: SyncImpl;
 
+  down: HTMLButtonElement;
+  up: HTMLButtonElement;
+
   constructor(app: App, plugin: WebDAVSyncPlugin) {
     super(app);
     this.plugin = plugin;
@@ -87,30 +90,31 @@ export class SyncModal extends Modal {
     });
     // TODO: These buttons really should be styled, but I don't know which colours make sense
     // to associate with each action, so might as well leave them plain for now.
-    const up = btnWrapper.createEl("button", {
+    this.up = btnWrapper.createEl("button", {
       attr: {
         id: "webdav-sync-up"
       }
     });
-    up.addEventListener("click", () => {
+    this.up.addEventListener("click", () => {
       void this.upload();
     });
-    const down = btnWrapper.createEl("button", {
+    this.down = btnWrapper.createEl("button", {
       attr: {
         id: "webdav-sync-down"
       }
     });
-    down.addEventListener("click", () => {
+    this.down.addEventListener("click", () => {
       void this.download();
     });
 
-    setIcon(up, "upload");
-    setIcon(down, "download");
+    this.setLoadingState(false);
+    setIcon(this.up, "upload");
+    setIcon(this.down, "download");
 
-    up.createSpan({
+    this.up.createSpan({
       text: "\u00A0Upload"
     });
-    down.createSpan({
+    this.down.createSpan({
       text: "\u00A0Download"
     });
 
@@ -122,14 +126,30 @@ export class SyncModal extends Modal {
   }
 
   async download() {
+    this.setLoadingState(true);
     this.checkClearDryRun();
 
-    await this.syncImpl.download();
+    await this.syncImpl.download()
+      .then(() => {
+        this.setLoadingState(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        this.setLoadingState(false);
+      });
   }
   async upload() {
+    this.setLoadingState(true);
     this.checkClearDryRun();
 
-    await this.syncImpl.upload();
+    await this.syncImpl.upload()
+      .then(() => {
+        this.setLoadingState(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        this.setLoadingState(false);
+      });
   }
 
   showTaskGraph(actions: Actions, info: DryRunInfo) {
@@ -171,6 +191,18 @@ export class SyncModal extends Modal {
       row.createEl("td", {
         text: actionToDescriptiveString(action)
       });
+    }
+  }
+
+  setLoadingState(
+    running: boolean
+  ) {
+    if (running) {
+      this.down.disabled = true;
+      this.up.disabled = true;
+    } else {
+      this.down.disabled = false;
+      this.up.disabled = false;
     }
   }
 
