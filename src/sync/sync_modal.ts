@@ -100,7 +100,7 @@ export class SyncModal extends Modal {
         id: "webdav-sync-down"
       }
     });
-    down.addEventListener("click", (ev) => {
+    down.addEventListener("click", () => {
       void this.download();
     });
 
@@ -172,11 +172,6 @@ export class SyncModal extends Modal {
         text: actionToDescriptiveString(action)
       });
     }
-  }
-
-  setLoading(elem: HTMLElement) {
-    setIcon(elem, "loader");
-    elem.innerText = "";
   }
 
   setError(err: string) {
