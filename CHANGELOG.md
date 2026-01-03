@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+### Changed
+
+* Clarified the wording near the WebDAV settings for the password so it's more obvious that it's pushed alongside the vault. This was already mentioned in the documentation, but this is much harder to miss.
+
 ## 0.1.0
 
 ### Fixed

@@ -54,7 +54,10 @@ export class WebDAVSettingsTab extends PluginSettingTab {
           }));
       new Setting(containerEl)
         .setName('WebDAV password')
-        .setDesc('The password to use for authentication (warning: will be stored in plain text)')
+        .setDesc(
+          'The password to use for authentication. WARNING: will be stored in plain text, and synced to the remote device. '
+          + 'Make sure you trust your DAV provider!'
+        )
         .addText(text => text
           .setPlaceholder('password69420')
           .setValue(this.plugin.settings.server_conf.password || "")
