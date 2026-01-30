@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0
+
+### Added
+
+* SecretStorage for the webdav password
+
 ## 0.1.1
 
 ### Changed

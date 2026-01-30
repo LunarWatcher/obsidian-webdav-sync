@@ -1,6 +1,6 @@
 import {DAVServerConfig, DEFAULT_DAV_CONFIG} from "./fs/webdav";
 import WebDAVSyncPlugin from "./main";
-import { App, Notice, PluginSettingTab, Setting } from "obsidian";
+import { App, Notice, PluginSettingTab, SecretComponent, Setting } from "obsidian";
 import { DEFAULT_SYNC_SETTINGS, FolderDestination, SyncSettings } from "./sync/sync_settings";
 import {FileStat} from "webdav";
 
@@ -55,18 +55,15 @@ export class WebDAVSettingsTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName('WebDAV password')
         .setDesc(
-          'The password to use for authentication. WARNING: will be stored in plain text, and synced to the remote device. '
-          + 'Make sure you trust your DAV provider!'
+          'The password to use for authentication.'
         )
-        .addText(text => text
-          .setPlaceholder('password69420')
+        .addComponent(el => new SecretComponent(this.app, el)
           .setValue(this.plugin.settings.server_conf.password || "")
           .onChange(async (value) => {
-            this.plugin.settings.server_conf.password = value == "" ? undefined : value;
+            this.plugin.settings.server_conf.password = value;
             await this.plugin.saveSettings();
           })
-          // Has to be last because this returns a void
-          .inputEl.setAttribute("type", "password")
+
         );
       new Setting(containerEl)
         .setName('Restart connection to WebDAV server')

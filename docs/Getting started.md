@@ -58,7 +58,7 @@ One major downside with this plugin is that adding extra devices requires having
 
 > [!note]
 >
-> Passwords are stored in plain text in `.obsidian/plugins/webdav-sync/data.json`, as that's how Obsidian does things. Remove this file before copying if you want to set up the plugin from scratch for whatever reason.
+> As of 0.2.0, SecretStorage is used, which means you'll need to relink the password after copying. Make sure you use the same key name on both devices. The key name is synced between devices via the settings file, so a conflict between devices on the key name will cause the password to keep delinking on sync. This is a weakness in how obsidian set up secret linkage.
 
 ## Day-to-day syncing
 

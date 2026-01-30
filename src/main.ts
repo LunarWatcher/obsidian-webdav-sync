@@ -114,6 +114,7 @@ export default class WebDAVSyncPlugin extends Plugin {
     } else {
       try {
         this.client = new Connection(
+          this.app,
           this.settings.server_conf
         )
       } catch (ex) {

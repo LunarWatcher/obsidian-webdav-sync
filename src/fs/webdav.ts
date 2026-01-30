@@ -1,3 +1,4 @@
+import { App } from "obsidian";
 import { AuthType, createClient, WebDAVClient } from "webdav";
 
 export type DAVServerConfig = {
@@ -17,10 +18,12 @@ export class Connection {
   client: WebDAVClient;
 
   constructor(
+    app: App,
     server_config: DAVServerConfig
   ) {
     if (
       server_config.url === null
+      || server_config.password == null
     ) {
       return
     }
@@ -28,7 +31,8 @@ export class Connection {
 
     this.client = createClient(server_config.url, {
       username: server_config.username,
-      password: server_config.password,
+      password: app.secretStorage.getSecret(server_config.password)
+        || /* fuck you typescript */ undefined,
       authType: AuthType.Auto,
       withCredentials: true,
     })
