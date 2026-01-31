@@ -8,6 +8,7 @@ that can describe obscure test failures in other tests. It's stuff I as a
 developer would check to debug anyway, so why not have it as explicit, separate
 tests?
 """
+import time
 import os
 from pytest import fail, raises
 import requests
@@ -17,13 +18,17 @@ from selenium.webdriver.common.by import By
 from tests.copyparty import Copyparty
 from tests.utils import click_settings_nav, default_settings, execute, find_setting, get_settings_data, inject_settings, open_settings
 
-def test_buttons_visible_and_functional(obsidian: Chrome):
+def test_buttons_visible_and_functional(
+    obsidian: Chrome,
+    screenshotter
+):
     """
     Canaries:
     1. Plugin load failure (Obsidian)
     2. Plugin failed to load
     3. Specific features (ribbon, settings) have stopped working
     """
+    screenshotter(f"Post-opened")
     assert obsidian.find_element(By.ID, "webdav-ribbon-btn") is not None
     open_settings(obsidian)
     click_settings_nav(obsidian)
@@ -106,6 +111,7 @@ def test_settings_sideloading(obsidian: Chrome):
     """
 
     obj = default_settings()
+    obj["server_conf"]["password"] = "webdav-password"
     inject_settings(obsidian)
     assert get_settings_data(obsidian) == obj
 

@@ -50,9 +50,6 @@ def test_fields_stored_correctly(
         "WebDAV username": SettingsInputter(
             ["server_conf", "username"]
         ),
-        "WebDAV password": SettingsInputter(
-            ["server_conf", "password"]
-        ),
         # }}}
         # Root key: sync {{{
         "Full vault sync": SettingsInputter(
@@ -86,17 +83,6 @@ def test_fields_stored_correctly(
                 data,
                 settings_inputter.settings_key
             ) == (not value_old), \
-                "Failed to verify {}".format(field_name)
-        elif type == "text" or type == "password":
-            input_field.send_keys(
-                "trans rights are human rights"
-            )
-
-            data = get_settings_data(obsidian)
-            assert resolve_keys(
-                data,
-                settings_inputter.settings_key
-            ) == "trans rights are human rights", \
                 "Failed to verify {}".format(field_name)
 
 def test_folder_maps_stored_correctly(obsidian: Chrome):

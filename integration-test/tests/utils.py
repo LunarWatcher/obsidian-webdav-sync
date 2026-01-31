@@ -111,7 +111,7 @@ def default_settings(
             "username": username,
             "password": {
                 "full": "password",
-                "limited": "password2"
+                "limited": "password2",
             }[username],
             "url": "http://localhost:62169"
         },
@@ -133,14 +133,24 @@ def inject_settings(driver: Chrome, settings_object = None):
     if settings_object is None:
         settings_object = default_settings()
 
+    real_pass = settings_object["server_conf"]["password"]
+    settings_object["server_conf"]["password"] = "webdav-password";
+
     out = execute(
         driver,
         """
-        app.plugins.plugins["webdav-sync"].settings = JSON.parse('{0}');
+        // I hate this so fucking much
+        app.plugins.plugins["webdav-sync"]._pushSecret(
+            "webdav-password", "{0}"
+        );
+        app.plugins.plugins["webdav-sync"].settings = JSON.parse('{1}');
         app.plugins.plugins["webdav-sync"].saveSettings();
         app.plugins.plugins["webdav-sync"].reloadClient();
         0
-        """.format(json.dumps(settings_object))
+        """.format(
+            real_pass,
+            json.dumps(settings_object)
+        )
     )
     assert "value" in out["result"], \
         json.dumps(out)

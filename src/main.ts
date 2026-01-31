@@ -88,6 +88,12 @@ export default class WebDAVSyncPlugin extends Plugin {
     )
   }
 
+  _pushSecret(k: string, v: string) {
+    this.app.secretStorage.setSecret(
+      k, v
+    );
+  }
+
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<settings_t>);
   }

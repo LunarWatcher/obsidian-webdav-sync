@@ -8,7 +8,8 @@ from selenium.webdriver.common.by import By
 import filecmp
 
 from tests.copyparty import Copyparty
-from tests.utils import autodownload, autoupload, click_settings_nav, get_notice_messages, get_ribbon_button, inject_settings, open_settings
+from tests.utils import autodownload, autoupload, click_settings_nav, \
+    get_notice_messages, get_ribbon_button, inject_settings, open_settings
 from time import sleep
 
 

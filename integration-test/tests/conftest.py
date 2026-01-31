@@ -1,3 +1,4 @@
+import tests.utils
 from functools import partial
 import os
 import shutil
@@ -5,6 +6,7 @@ import subprocess
 from time import sleep
 import platform
 import random
+from tests.helpers import driver as DriverUtil
 
 import pytest
 from selenium.common.exceptions import NoSuchWindowException
@@ -311,7 +313,6 @@ def _get_driver() -> Chrome:
 
 def create_service():
     return Service(
-        "../node_modules/.bin/chromedriver" if platform.system() != "Windows"
-        else r"..\node_modules\.bin\chromedriver.cmd"
+        DriverUtil.ensure_webdriver()
     )
 
