@@ -72,6 +72,7 @@ These tests may be harder to run locally, as you need the following installed:
 
 * Python (obviously)
 * Obsidian (surprised pikachu)
+    * Note: The **installer version** must be equal to the minimum app version, listed in manifest.json. In the integration tests, obsidian is only able to use the obsidian version equal to the installer version due to limitations in obsidian itself. If your installer version is lower  than the minimum app version, you will likely see weird failures.
 
 Plus an npm dependency.
 
@@ -98,9 +99,15 @@ python3 -m venv env
 source ./env/bin/activate
 
 pip3 install -r requirements.txt
+## OPTION 1 (Linux only): automated script
+# Note that the e2e-test script always runs with xvfb.
+./scripts/e2e-test.sh
+
+## OPTION 2: manual
 # Equivalent instructions for windows is left as an exercise to
 # the masochistic reader
 export OBSIDIAN_LOCATION=$(which obsidian)
+export WEBDRIVER_VERSION=$(./scripts/get-webdriver-version.sh)
 
 python3 -m pytest
 ```
