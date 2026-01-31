@@ -36,7 +36,7 @@ def get_driver_url(version):
 
     for i in list(reversed(versions)):
         if i["version"].startswith(version):
-            print("Matched", i["version"])
+            print("Matched", i["version"], "from", version)
             downloads = i["downloads"]["chromedriver"]
             for download in downloads:
                 if download["platform"] == get_os():
