@@ -39,8 +39,39 @@ jobs:
         run: npm i -D
       - name: Lint
         run: npx eslint
+  get-webdriver:
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.version.outputs.version }}
+    steps:
+      - run: printenv
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Npm dev deps
+        run: |
+          npm i --include=dev
+      - name: Download dist artefacts
+        uses: actions/download-artifact@v5
+        with:
+          name: webdav-sync
+          path: dist/webdav-sync
+      - name: Show artefact tree
+        run: ls dist/webdav-sync
+
+      - name: Install Obsidian
+        id: yoink
+        timeout-minutes: 2
+        uses: LunarWatcher/install-obsidian@master
+      - name: Grab version
+        id: version
+        run: |
+          OBSIDIAN_BIN="$(which obsidian)" echo "version=$(./scripts/get-webdriver-version.sh)" >> "$GITHUB_OUTPUT"
   integration:
-    needs: artefacts
+    needs:
+      - artefacts
+      - get-webdriver
     strategy:
       fail-fast: false
       matrix:
@@ -84,6 +115,7 @@ jobs:
           python3 -m pytest
         env:
           OBSIDIAN_LOCATION: ${{ steps.yoink.outputs.path }}
+          WEBDRIVER_VERSION: ${{ steps.get-webdriver.outputs.version }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
