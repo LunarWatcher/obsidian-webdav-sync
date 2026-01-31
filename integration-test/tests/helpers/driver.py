@@ -11,6 +11,7 @@ import zipfile
 def get_driver_version():
     version = os.getenv("WEBDRIVER_VERSION")
     assert version is not None
+    assert version != ""
     return version
 
 def get_os():

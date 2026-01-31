@@ -11,4 +11,4 @@ pip3 install -r requirements.txt
 
 export WEBDRIVER_VERSION=$("${git_root}/scripts/get-webdriver-version.sh")
 echo "Running with webdriver version $WEBDRIVER_VERSION"
-xvfb-run python3 -m pytest $@
+xvfb-run python3 -m pytest -v $@

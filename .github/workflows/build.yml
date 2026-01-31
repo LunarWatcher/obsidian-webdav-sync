@@ -53,7 +53,9 @@ jobs:
       - name: Grab version
         id: version
         run: |
-          OBSIDIAN_BIN="$(which obsidian)" echo "version=$(./scripts/get-webdriver-version.sh)" >> "$GITHUB_OUTPUT"
+          version=$(./scripts/get-webdriver-version.sh)
+          echo "Resolved driver version $version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
   integration:
     needs:
       - artefacts
@@ -98,7 +100,7 @@ jobs:
       - name: Run tests
         working-directory: integration-test/
         run: |
-          python3 -m pytest
+          python3 -m pytest -v
         env:
           OBSIDIAN_LOCATION: ${{ steps.yoink.outputs.path }}
           WEBDRIVER_VERSION: ${{ steps.get-webdriver.outputs.version }}
