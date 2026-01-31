@@ -42,7 +42,7 @@ jobs:
   get-webdriver:
     runs-on: ubuntu-latest
     outputs:
-      output1: ${{ steps.version.outputs.version }}
+      version: ${{ steps.version.outputs.version }}
     steps:
       - run: printenv
       - uses: actions/checkout@v4
