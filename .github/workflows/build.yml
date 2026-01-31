@@ -46,20 +46,6 @@ jobs:
     steps:
       - run: printenv
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      - name: Npm dev deps
-        run: |
-          npm i --include=dev
-      - name: Download dist artefacts
-        uses: actions/download-artifact@v5
-        with:
-          name: webdav-sync
-          path: dist/webdav-sync
-      - name: Show artefact tree
-        run: ls dist/webdav-sync
-
       - name: Install Obsidian
         id: yoink
         timeout-minutes: 2
