@@ -103,7 +103,7 @@ jobs:
           python3 -m pytest -v
         env:
           OBSIDIAN_LOCATION: ${{ steps.yoink.outputs.path }}
-          WEBDRIVER_VERSION: ${{ jobs.get-webdriver.outputs.version }}
+          WEBDRIVER_VERSION: ${{ needs.get-webdriver.outputs.version }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
