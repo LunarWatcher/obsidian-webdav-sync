@@ -136,7 +136,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
               const client = this.plugin.client.client;
               if (this.plugin.settings.sync.root_folder.dest != "") {
                 try {
-                  let contents = (await client.getDirectoryContents(this.plugin.settings.sync.root_folder.dest)) as FileStat[];
+                  let contents: FileStat[] = await client.getDirectoryContents(this.plugin.settings.sync.root_folder.dest);
                   new Notice(
                     `Connection succeeded. Found folder with ${contents.length} direct files and folders.`
                   )

@@ -36,6 +36,6 @@
     },
     "dependencies": {
         "obsidian": "^1.11.4",
-        "webdav": "^5.8.0"
+        "webdav": "^5.9.0"
     }
 }

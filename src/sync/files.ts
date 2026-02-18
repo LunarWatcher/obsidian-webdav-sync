@@ -22,11 +22,11 @@ export class FileProvider {
       };
     }
     try {
-      const files = await this.plugin.client.client.getDirectoryContents(
+      const files: FileStat[] = await this.plugin.client.client.getDirectoryContents(
         folder, {
           deep: true,
         }
-      ) as FileStat[];
+      );
       const folders = [] as Folder[];
       const out = new Map<Path, FileData>();
 

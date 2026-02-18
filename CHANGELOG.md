@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+Security and dep updates
+
 ## 0.2.0
 
 ### Added

@@ -69,5 +69,6 @@ export default tseslint.config(
         "integration-test",
         "tests",
         "jest.config.js",
+        "coverage",
     ]),
 );
