@@ -122,6 +122,7 @@ def default_settings(
             },
             "subfolders": {},
             "ignore_workspace": True,
+            "ignore_config_folder": False,
         }
     }
 

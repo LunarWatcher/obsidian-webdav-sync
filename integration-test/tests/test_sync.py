@@ -12,7 +12,6 @@ from tests.utils import autodownload, autoupload, click_settings_nav, \
     get_notice_messages, get_ribbon_button, inject_settings, open_settings
 from time import sleep
 
-
 def test_server_connection(obsidian: Chrome, copyparty, screenshotter):
     inject_settings(obsidian)
 

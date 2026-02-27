@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+### Added
+
+* Added option to not sync the config folder (`.obsidian`). Defaults to being disabled for compatibility and intended behaviour. 
+
 ## 0.2.1
 
 Security and dep updates

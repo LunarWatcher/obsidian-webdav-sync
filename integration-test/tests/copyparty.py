@@ -8,15 +8,15 @@ class Copyparty:
 
     # These properties are based on the shares defined in copyparty.conf
     @property
-    def root_vault_path(self):
+    def root_vault_path(self) -> str:
         return os.path.join(self.dataDir, "vault")
 
     @property
-    def subfolder_path(self):
+    def subfolder_path(self) -> str:
         return os.path.join(self.dataDir, "vault/subfolder")
 
     @property
-    def private_subfolder(self):
+    def private_subfolder(self) -> str:
         return os.path.join(
             self.dataDir,
             "vault/private_subfolder"

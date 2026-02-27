@@ -12,6 +12,7 @@ export interface SyncSettings {
   // Thanks, typescript. You're super good at making types reliable
   subfolders: SubfolderMap;
   ignore_workspace: boolean;
+  ignore_config_folder: boolean;
 };
 
 export const DEFAULT_SYNC_SETTINGS: SyncSettings = {
@@ -21,4 +22,5 @@ export const DEFAULT_SYNC_SETTINGS: SyncSettings = {
   },
   subfolders: {},
   ignore_workspace: true,
+  ignore_config_folder: false,
 };

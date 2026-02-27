@@ -31,22 +31,25 @@ export class FileProvider {
       const out = new Map<Path, FileData>();
 
       for (const file of files) {
+        const sanitised = file.filename.replace(folder + (folder.endsWith("/") ? "" : "/"), "");
         // Obsidian does not include directories, so this is necessary to avoid every folder
         // being marked for removal
         // TODO: this should mean that stub folders aren't deleted either. Separating them into a separate map
         // with special deletion logic is probably a good idea.
         if (file.type == "directory") {
+          if (this.shouldIgnoreFolder(sanitised)) {
+            continue;
+          }
           folders.push({
-            realPath: file.filename.replace(folder + "/", ""),
-            commonPath: file.filename.replace(folder + "/", "")
+            realPath: sanitised,
+            commonPath: sanitised
           })
           continue;
         }
-        if (this.shouldIgnore(file.filename)) {
+        if (this.shouldIgnoreFile(sanitised)) {
           continue;
         }
 
-        const sanitised = file.filename.replace(folder + (folder.endsWith("/") ? "" : "/"), "");
         out.set(
           sanitised,
           {
@@ -103,6 +106,9 @@ export class FileProvider {
       // means the entire vault or an entire shared subfolder has been deleted, and we can't delete root-level folders
       // in the webdav share. The plugin will also likely be gone at this point, at which point everything is UB anyway)
       if (elem != root) {
+        if (this.shouldIgnoreFolder(elem)) {
+          continue;
+        }
         if (root == "/") {
           outFolders.push({
             realPath: elem,
@@ -117,7 +123,7 @@ export class FileProvider {
       }
       queue.push(...next.folders);
       for (const file of next.files) {
-        if (this.shouldIgnore(file)) {
+        if (this.shouldIgnoreFile(file)) {
           continue;
         }
         const stat = await this.plugin.adapter().stat(file);
@@ -155,11 +161,25 @@ export class FileProvider {
     }
   }
 
-  shouldIgnore(file: string) {
-    return this.plugin.settings.sync.ignore_workspace
-      && (
-        file.replace("\\", "/") == this.plugin.configDir() + "/workspace.json" 
-        || file.replace("\\", "/") == this.plugin.configDir() + "/workspace-mobile.json"
+  _isPathPrefixDisabled(path: string) {
+
+    return this.plugin.settings.sync.ignore_config_folder 
+      && path.replace("\\", "/").startsWith(this.plugin.configDir())
+  }
+
+  shouldIgnoreFolder(folder: string) {
+    console.log(folder, this.plugin.configDir());
+    return this._isPathPrefixDisabled(folder)
+  }
+
+  shouldIgnoreFile(file: string) {
+    return this._isPathPrefixDisabled(file)
+      || (
+        this.plugin.settings.sync.ignore_workspace
+        && (
+          file.replace("\\", "/") == this.plugin.configDir() + "/workspace.json" 
+          || file.replace("\\", "/") == this.plugin.configDir() + "/workspace-mobile.json"
+        )
       )
   }
 }

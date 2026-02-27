@@ -115,6 +115,23 @@ export class WebDAVSettingsTab extends PluginSettingTab {
                 await this.plugin.saveSettings();
               })
         )
+      new Setting(containerEl)
+        .setName("Ignore config folder")
+        .setDesc(
+          "Whether or not to ignore the config folder (typically .obsidian). Mainly useful if you want to fully "
+          + "separate the workspaces, and only sync the content. Note that this means you'll need to manually "
+          + "install the sync plugin for other clients to be able to sync. This option will fully exclude the "
+          + "config folder, so if you've previously uploaded it, you'll need to manually delete it if you want "
+          + "it gone. This means the option to sync or not is fully device-local"
+        )
+        .addToggle(toggle =>
+            toggle
+              .setValue(this.plugin.settings.sync.ignore_config_folder)
+              .onChange(async (value) => {
+                this.plugin.settings.sync.ignore_config_folder = value
+                await this.plugin.saveSettings();
+              })
+        )
 
       new Setting(containerEl)
         .setName("WebDAV share for the full vault")
@@ -130,7 +147,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
         .addButton(button => button
           .setButtonText("Test connection")
           .setCta()
-          .onClick(async (ev) => {
+          .onClick(async (_ev) => {
             await this.plugin.reloadClient();
             if (this.plugin.client != null) {
               const client = this.plugin.client.client;
