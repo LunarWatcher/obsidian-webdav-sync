@@ -6,7 +6,6 @@ import { globalIgnores } from "eslint/config";
 export default tseslint.config(
     {
         plugins: {
-            obsidianmd
         },
         languageOptions: {
             globals: {
