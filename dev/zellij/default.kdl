@@ -27,10 +27,4 @@ layout {
             }
         }
     }
-    tab name="There's a special place in hell for eslint" {
-        pane name="But it isn't dead enough yet" {
-            command "bash"
-            args "-c" "npx eslint"
-        }
-    }
 }
