@@ -9,6 +9,7 @@
 ### Internals
 
 * Disabled Obsidian's eslint plugin, as the false positives are too annoying to deal with when the plugin is stuck in review purgatory for half a year regardless of whether it's enabled or not. I'm done playing along with that shit when all it does is make the dev experience orders of magnitude worse
+* ... and outright disabled eslint since it's a pile of shit that adds negative value to the code quality (and nothing of value was lost by doing so, aside my time for not having done it sooner)
 
 ## 0.2.1
 

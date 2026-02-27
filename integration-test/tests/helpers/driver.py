@@ -35,7 +35,7 @@ def get_driver_url(version):
     data = json.loads(r.text)
     versions: list = data["versions"]
 
-    for i in list(reversed(versions)):
+    for i in list(versions):
         if i["version"].startswith(version):
             print("Matched", i["version"], "from", version)
             downloads = i["downloads"]["chromedriver"]
