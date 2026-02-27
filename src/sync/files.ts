@@ -168,7 +168,6 @@ export class FileProvider {
   }
 
   shouldIgnoreFolder(folder: string) {
-    console.log(folder, this.plugin.configDir());
     return this._isPathPrefixDisabled(folder)
   }
 
