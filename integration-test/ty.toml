@@ -1,0 +1,2 @@
+[environment]
+python = "./env/bin/python3"
