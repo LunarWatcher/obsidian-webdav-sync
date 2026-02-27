@@ -6,6 +6,10 @@
 
 * Added option to not sync the config folder (`.obsidian`). Defaults to being disabled for compatibility and intended behaviour. 
 
+### Internals
+
+* Disabled Obsidian's eslint plugin, as the false positives are too annoying to deal with when the plugin is stuck in review purgatory for half a year regardless of whether it's enabled or not. I'm done playing along with that shit when all it does is make the dev experience orders of magnitude worse
+
 ## 0.2.1
 
 Security and dep updates
