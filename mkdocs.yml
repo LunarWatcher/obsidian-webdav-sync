@@ -5,6 +5,7 @@ nav:
   - Features:
     - Partial vault sync: Partial sync.md
     - Using mTLS: Using mTLS.md
+    - Config folder sync: Config folder sync.md
   - Known working WebDAV servers and config:
     - About the list: webdav-servers/README.md
     - Copyparty: webdav-servers/Copyparty.md
