@@ -1,10 +1,16 @@
 # Changelog
 
+## 0.4.0
+
+### Added
+
+* Deleted files now respect the default setting in obsidian for how files should be trashed, provided obsidian can report the file as existing. If obsidian can't, it's hard-deleted instead, as it would've been prior to this change.
+
 ## 0.3.0
 
 ### Added
 
-* Added option to not sync the config folder (`.obsidian`). Defaults to being disabled for compatibility and intended behaviour. 
+* Added option to not sync the config folder (`.obsidian`). Defaults to being disabled for compatibility and intended behaviour.
 
 ### Internals
 

@@ -25,4 +25,3 @@ module.exports = {
     "main.js",
   ]
 };
-// vim:sw=2

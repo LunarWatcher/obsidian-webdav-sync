@@ -44,7 +44,7 @@ Setting up in an obsidian vault is mostly just a matter of copying the right fil
 The vault location is sourced from `.env.dev`. Before using the scripts, make sure you initialise it:
 ```bash
 cp .env.dev-example .env.dev 
-vim .env.dev
+$EDITOR .env.dev
 ```
 
 `.env.dev` is sourced as a bash script, and uses bash syntax.
@@ -76,11 +76,11 @@ These tests may be harder to run locally, as you need the following installed:
 
 Plus an npm dependency.
 
-```
+```bash
 # Required for the electron-chromedriver
 npm i --include=dev
 # Build
-npm run build 
+npm run build
 # !!!OR!!!
 npm run dev
 # Both work
@@ -94,7 +94,7 @@ npm run dev
 ./scripts/bundle.sh
 
 cd integration-tests
-python3 -m venv env 
+python3 -m venv env
 # This varies by OS and shell
 source ./env/bin/activate
 

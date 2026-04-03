@@ -1,4 +1,4 @@
-import {normalizePath, Notice} from "obsidian";
+import {FileManager, normalizePath, Notice} from "obsidian";
 import {
   Actions, ActionType,
   calculateSyncActions,
@@ -354,9 +354,22 @@ export class SyncImpl {
             false
           );
         } else {
-          await this.plugin.app.vault.adapter.remove(
-            normalizePath(localPath)
+          let obsidianFile = this.plugin.app.vault.getAbstractFileByPath(
+            localPath
           );
+          if (obsidianFile == null) {
+            // If obsidian can't trash the file per the users' settings, we nuke it anyway. This is required for
+            // deletion in .obsidian to work, as getAbstractFileByPath will return null for those files because they're
+            // technically not in the vault. This may apply to other dotfiles as well.
+            await this.plugin.app.vault.adapter.remove(
+              normalizePath(localPath)
+            );
+            return;
+          } else {
+            await this.plugin.app.fileManager.trashFile(
+              obsidianFile
+            );
+          }
         }
         break;
     }
