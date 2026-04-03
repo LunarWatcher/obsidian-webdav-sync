@@ -1,5 +1,7 @@
 # WebDAV sync
 
+[![Test and build nightly artefacts](https://github.com/LunarWatcher/obsidian-webdav-sync/actions/workflows/build.yml/badge.svg)](https://github.com/LunarWatcher/obsidian-webdav-sync/actions/workflows/build.yml)
+
 This is a very simple sync plugin for Obsidian based on WebDAV. You need to bring your own WebDAV server to use this plugin. Theoretically, all WebDAV-compatible servers are supported, though there are some requirements for the general behaviour of the server. This is described in a later section. No special, non-standard features are used, so this plugin (unlike far too many WebDAV implementations in general) is not vendorlocked to NextCloud.
 
 ## Features
