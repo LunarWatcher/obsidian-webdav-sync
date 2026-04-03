@@ -1,4 +1,4 @@
-import {FileManager, normalizePath, Notice} from "obsidian";
+import {normalizePath, Notice} from "obsidian";
 import {
   Actions, ActionType,
   calculateSyncActions,

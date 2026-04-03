@@ -5,6 +5,12 @@
 ### Added
 
 * Deleted files now respect the default setting in obsidian for how files should be trashed, provided obsidian can report the file as existing. If obsidian can't, it's hard-deleted instead, as it would've been prior to this change.
+* Heavy input validation in the settings menu
+* Links to the docs straight from the settings menu as a failsafe for unclear settings options. Would be beneficial to get more input to make them better, but this will have to do for now.
+
+### Fixed
+
+* The button for adding a sub-folder split is now disabled if full vault sync is enabled.
 
 ## 0.3.0
 

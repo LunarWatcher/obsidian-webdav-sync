@@ -31,10 +31,18 @@ export class WebDAVSettingsTab extends PluginSettingTab {
     const {containerEl} = this;
 
     containerEl.empty();
-    { 
+    containerEl.createEl("p", {
+      text: 'For more help, see the '
+    })
+      .createEl("a", {
+        text: "documentation.",
+        href: "https://lunarwatcher.github.io/obsidian-webdav-sync/"
+      })
+    {
+
       new Setting(containerEl)
         .setName('WebDAV URL')
-        .setDesc('URL to your WebDAV share')
+        .setDesc('URL to your WebDAV server')
         .addText(text => text
           .setPlaceholder('https://dav.example.com')
           .setValue(this.plugin.settings.server_conf.url || "")
@@ -55,7 +63,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName('WebDAV password')
         .setDesc(
-          'The password to use for authentication.'
+          'The password to use for authentication'
         )
         .addComponent(el => new SecretComponent(this.app, el)
           .setValue(this.plugin.settings.server_conf.password || "")
@@ -96,6 +104,9 @@ export class WebDAVSettingsTab extends PluginSettingTab {
               .onChange(async (value) => {
                 this.plugin.settings.sync.full_vault_sync = value
                 await this.plugin.saveSettings();
+
+                (document.getElementById("webdav-sync-add-subvault-map-btn") as HTMLButtonElement)
+                  .disabled = value;
               })
         )
       new Setting(containerEl)
@@ -135,15 +146,32 @@ export class WebDAVSettingsTab extends PluginSettingTab {
 
       new Setting(containerEl)
         .setName("WebDAV share for the full vault")
-        .setDesc("Where to sync the full vault to. This is a path relative to the WebDAV server")
-        .addText(text => 
-          text.setPlaceholder("/livi/obsidian")
+        .setDesc(
+          "Where to sync the full vault to. This is a path relative to the WebDAV server, and must not include "
+          + "a full URL. Example of a legal value: /livi/obsidian"
+        )
+        .addText(text => {
+          let el = text.setPlaceholder("/livi/obsidian")
             .setValue(this.plugin.settings.sync.root_folder.dest)
             .onChange(async (value) => {
+              let el = document.getElementById("webdav-sync-full-vault-path") as HTMLInputElement;
+              if (value.length > 0 && el.validity.patternMismatch) {
+                // This triggers too often for it to be feasible to create a new notice on error.
+                // new Notice(
+                //   "The share path must be a path. The domain is defined by the WebDAV URL setting, and cannot be "
+                //   + "included here. Example valid value: /some/path/relative/to/the/webdav/root"
+                // )
+                return;
+              }
               this.plugin.settings.sync.root_folder.dest = value
               await this.plugin.saveSettings()
             })
-        )
+            .inputEl;
+
+          el.id = "webdav-sync-full-vault-path";
+          el.pattern = '\\/(?:|[^\\/].*)'
+          el.addClass("webdav-sync-validated");
+        })
         .addButton(button => button
           .setButtonText("Test connection")
           .setCta()
@@ -162,6 +190,10 @@ export class WebDAVSettingsTab extends PluginSettingTab {
                   new Notice("Connection failed");
                 }
               } else {
+                // TODO: is there really no way to extract all? I've failed to find a way to do it, but there surely has
+                // to be a way. Episteme Reader managed to read out both the root level folders I have after linking
+                // with DAVx5. But there's probably a backwards way to do it considering indexing `/` fails. Maybe
+                // that's what the `.well-known` is for?
                 new Notice(
                   "Can't test connection without a vault folder"
                 );
@@ -175,29 +207,53 @@ export class WebDAVSettingsTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName("Folder mapping")
         .setDesc("Used to add sub-maps of the obsidian vault, meaning a specific subfolder that's "
-                + "synced when the rest of the vault isn't.")
-        .addText(text => 
-          text.setPlaceholder("/webdav/share/path")
+          + "synced when the rest of the vault isn't. This is only enabled and only takes effect when the "
+          + "full vault sync setting is disabled."
+        )
+        .addText(text => {
+          let el: HTMLInputElement = text
+            .setPlaceholder("/webdav/share/path")
             .onChange(value => {
               newShare = value;
             })
-        )
-        .addText(text => 
-          text.setPlaceholder("absolute/path/in/vault")
+            .inputEl;
+          el.id = "webdav-subfolder-remote-path";
+          el.pattern = '\\/(?:|[^\\/].*)';
+          el.addClass("webdav-sync-validated");
+        })
+        .addText(text => {
+          let el: HTMLInputElement = text.setPlaceholder("absolute/path/in/vault")
             .onChange(value => {
               newVaultFolder = value;
             })
-        )
-        .addButton(button =>
-          button.setButtonText("Add")
+            .inputEl;
+          el.id = "webdav-subfolder-local-path";
+          el.pattern = '[^\\/].*';
+          el.addClass("webdav-sync-validated");
+        })
+        .addButton(button => {
+          let btn = button.setButtonText("Add")
             .setCta()
             .onClick(async () => {
-              if (!newShare?.startsWith("/")) {
-                new Notice("WebDAV share must start with a /");
+              if (newShare == null
+                || newVaultFolder == null
+                || newShare.length == 0
+                || newVaultFolder.length == 0) {
+                new Notice("You must supply both the webdav share and local folder");
                 return;
               }
-              if (newVaultFolder?.startsWith("/")) {
-                new Notice("Vault folder must not start with a /");
+              let localShare = document.getElementById("webdav-subfolder-local-path") as HTMLInputElement;
+              let remoteShare = document.getElementById("webdav-subfolder-remote-path") as HTMLInputElement;
+              if (remoteShare.validity.patternMismatch) {
+                new Notice(
+                  "The WebDAV share must be in the form of an absolute path in the WebDAV server, for example /some/folder"
+                );
+                return;
+              }
+              if (localShare.validity.patternMismatch) {
+                new Notice(
+                  "The local folder must be in the form of a vault-relative path, for example some/vault/folder"
+                );
                 return;
               }
 
@@ -207,7 +263,10 @@ export class WebDAVSettingsTab extends PluginSettingTab {
               await this.plugin.saveSettings()
               this.display();
             })
-        );
+          btn.buttonEl.id = "webdav-sync-add-subvault-map-btn";
+          btn.disabled = this.plugin.settings.sync.full_vault_sync;
+          return btn;
+        });
       containerEl.createDiv({
         attr: {
           id: "folder-mappings"
