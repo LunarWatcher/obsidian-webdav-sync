@@ -11,7 +11,7 @@ jobs:
   artefacts:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v6
       - name: Deps
         run: npm i
       - name: Build
@@ -37,7 +37,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     steps:
       - run: printenv
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v6
       - name: Install Obsidian
         id: yoink
         timeout-minutes: 2
@@ -63,7 +63,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - run: printenv
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v6
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
