@@ -276,11 +276,17 @@ export class WebDAVSettingsTab extends PluginSettingTab {
     }
     new Setting(containerEl).setName("Meta").setHeading();
 
-    containerEl.createEl("p", {
+    let issueContainer = containerEl.createEl("p", {
       text: "Running into issues? Open an issue on "
-    }).createEl("a", {
-      text: "GitHub.",
+    });
+    issueContainer.createEl("a", {
+      text: "GitHub",
       href: "https://github.com/LunarWatcher/obsidian-webdav-sync"
+    });
+    issueContainer.appendText(" or on ");
+    issueContainer.createEl("a", {
+      text: "Codeberg.",
+      href: "https://codeberg.org/LunarWatcher/obsidian-webdav-sync"
     });
     containerEl.createEl("p", {
       text: "Trans rights are human rights 🏳️‍⚧️ 🏳️‍🌈"
