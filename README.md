@@ -30,7 +30,7 @@ Sync algorithms are hard enough of a problem that my solution is to not bother. 
 
 I do need to mention [Vinzent03/obsidian-git](https://github.com/Vinzent03/obsidian-git), which is the closest you get in spirit to the idea behind this plugin. This is the plugin I would use if it was viable, as I already have an SSH port exposed, and a self-hosted instance of Forgejo available. In terms of setup, it would be the easiest alternative. Unfortunately, [it lacks Android support for SSH keys](https://github.com/Vinzent03/obsidian-git?tab=readme-ov-file#-mobile-support-%EF%B8%8F--experimental), as Git isn't Android-native, and reimplementing all of Git is bound to cause issues. On top of that, it appears that isomorphic-git (the underlying git-reimplementing library) [doesn't support SSH keys](https://github.com/isomorphic-git/isomorphic-git/issues/231#issuecomment-2699927384), which makes it incompatible with my security model, and unusable for my use-case. The trouble child called mobile operating systems strikes again.
 
-WebDAV, on the other hand, is both simple enough and well-established enough that it has decent clients in every programming language worth caring about. It does require some more work for a sync algorithm that would otherwise be bundled in Git, 
+WebDAV, on the other hand, is both simple enough and well-established enough that it has decent clients in every programming language worth caring about. It does require some more work for a sync algorithm that would otherwise be bundled in Git, but it's portable.
 
 ## Requirements
 
