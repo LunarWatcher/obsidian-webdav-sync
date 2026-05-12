@@ -1,7 +1,13 @@
 # Changelog
 
-## 0.5.0
+## 0.5.1
 
+### Fixed
+
+* Silenced a few new warnings from obsidian's new scan
+* `document` -> `activeDocument` (though I doubt it matters for this plugin)
+
+## 0.5.0
 
 > [!caution]
 > This plugin has a new ID and therefore a new folder. The existing copy of the plugin must be removed before updating

@@ -3,7 +3,7 @@
     "name": "WebDAV sync",
     "version": "0.5.0",
     "minAppVersion": "1.11.5",
-    "description": "Simple, manually-controlled WebDAV sync plugin",
+    "description": "Simple, manually-controlled WebDAV sync plugin.",
     "author": "Olivia",
     "authorUrl": "https://lunarwatcher.codeberg.page",
     "isDesktopOnly": false

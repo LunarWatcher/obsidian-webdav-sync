@@ -105,7 +105,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
                 this.plugin.settings.sync.full_vault_sync = value
                 await this.plugin.saveSettings();
 
-                (document.getElementById("livi-webdav-sync-add-subvault-map-btn") as HTMLButtonElement)
+                (activeDocument.getElementById("livi-webdav-sync-add-subvault-map-btn") as HTMLButtonElement)
                   .disabled = value;
               })
         )
@@ -154,7 +154,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
           let el = text.setPlaceholder("/livi/obsidian")
             .setValue(this.plugin.settings.sync.root_folder.dest)
             .onChange(async (value) => {
-              let el = document.getElementById("livi-webdav-sync-full-vault-path") as HTMLInputElement;
+              let el = activeDocument.getElementById("livi-webdav-sync-full-vault-path") as HTMLInputElement;
               if (value.length > 0 && el.validity.patternMismatch) {
                 // This triggers too often for it to be feasible to create a new notice on error.
                 // new Notice(
@@ -242,8 +242,8 @@ export class WebDAVSettingsTab extends PluginSettingTab {
                 new Notice("You must supply both the webdav share and local folder");
                 return;
               }
-              let localShare = document.getElementById("livi-webdav-subfolder-local-path") as HTMLInputElement;
-              let remoteShare = document.getElementById("livi-webdav-subfolder-remote-path") as HTMLInputElement;
+              let localShare = activeDocument.getElementById("livi-webdav-subfolder-local-path") as HTMLInputElement;
+              let remoteShare = activeDocument.getElementById("livi-webdav-subfolder-remote-path") as HTMLInputElement;
               if (remoteShare.validity.patternMismatch) {
                 new Notice(
                   "The WebDAV share must be in the form of an absolute path in the WebDAV server, for example /some/folder"
@@ -294,7 +294,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
   }
 
   regenerateFolderMappings() {
-    const container = document.getElementById("folder-mappings") as HTMLDivElement;
+    const container = activeDocument.getElementById("folder-mappings") as HTMLDivElement;
     container.empty();
 
     // Fuck you javascript, why can I not `of` a dict?

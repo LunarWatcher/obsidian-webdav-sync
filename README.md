@@ -61,7 +61,7 @@ Once this plugin is release-ready, you can grab the latest release from [GitHub]
 
 ### Via Obsidian's plugin registry [pending]
 
-An [upload to Obsidian's plugin registry is pending](https://github.com/obsidianmd/obsidian-releases/pull/7716), but will likely take weeks to months to actually merge because they're slow. The release and nightly artefacts are still usable in the meanwhile. 
+https://community.obsidian.md/plugins/livi-webdav-sync
 
 ### Via BRAT
 
