@@ -38,7 +38,7 @@ export class SyncModal extends Modal {
     contentEl.createEl("h1", {
       text: "WebDAV sync controls",
       attr: {
-        id: "webdav-sync-modal-header"
+        id: "livi-webdav-sync-modal-header"
       }
     });
     
@@ -86,13 +86,13 @@ export class SyncModal extends Modal {
       )
 
     const btnWrapper = contentEl.createDiv({
-      cls: ["webdav-button-wrapper", "webdav-flex"]
+      cls: ["livi-webdav-button-wrapper", "livi-webdav-flex"]
     });
     // TODO: These buttons really should be styled, but I don't know which colours make sense
     // to associate with each action, so might as well leave them plain for now.
     this.up = btnWrapper.createEl("button", {
       attr: {
-        id: "webdav-sync-up"
+        id: "livi-webdav-sync-up"
       }
     });
     this.up.addEventListener("click", () => {
@@ -100,7 +100,7 @@ export class SyncModal extends Modal {
     });
     this.down = btnWrapper.createEl("button", {
       attr: {
-        id: "webdav-sync-down"
+        id: "livi-webdav-sync-down"
       }
     });
     this.down.addEventListener("click", () => {

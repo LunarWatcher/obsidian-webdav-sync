@@ -93,7 +93,7 @@ def get_settings_data(driver: Chrome):
     return json.loads(execute(
         driver,
         """
-        JSON.stringify(app.plugins.plugins["webdav-sync"].settings)
+        JSON.stringify(app.plugins.plugins["livi-webdav-sync"].settings)
         """
     )["result"]["value"])
 
@@ -141,12 +141,12 @@ def inject_settings(driver: Chrome, settings_object = None):
         driver,
         """
         // I hate this so fucking much
-        app.plugins.plugins["webdav-sync"]._pushSecret(
+        app.plugins.plugins["livi-webdav-sync"]._pushSecret(
             "webdav-password", "{0}"
         );
-        app.plugins.plugins["webdav-sync"].settings = JSON.parse('{1}');
-        app.plugins.plugins["webdav-sync"].saveSettings();
-        app.plugins.plugins["webdav-sync"].reloadClient();
+        app.plugins.plugins["livi-webdav-sync"].settings = JSON.parse('{1}');
+        app.plugins.plugins["livi-webdav-sync"].saveSettings();
+        app.plugins.plugins["livi-webdav-sync"].reloadClient();
         0
         """.format(
             real_pass,
@@ -198,12 +198,12 @@ def assert_sync_modal_shown(obsidian: Chrome, screenshotter = None):
     try:
         obsidian.find_element(
             By.ID,
-            "webdav-sync-modal-header"
+            "livi-webdav-sync-modal-header"
         )
     except:
         if screenshotter is not None:
             screenshotter("Fail-OpenModal")
-        pytest.fail("Failed to find #webdav-sync-modal-header")
+        pytest.fail("Failed to find #livi-webdav-sync-modal-header")
 
 def autoupload(obsidian: Chrome, screenshotter, expect_error: bool = False):
     try:

@@ -20,7 +20,7 @@ jobs:
         run: npm run test
       - name: Assemble artefacts
         run: |
-          OUTPUT=webdav-sync
+          OUTPUT=livi-webdav-sync
           mkdir $OUTPUT
           cp styles.css $OUTPUT
           cp main.js $OUTPUT
@@ -28,8 +28,8 @@ jobs:
           ls $OUTPUT
       - uses: actions/upload-artifact@v7
         with:
-          name: webdav-sync
-          path: webdav-sync
+          name: livi-webdav-sync
+          path: livi-webdav-sync
           if-no-files-found: error
   get-webdriver:
     runs-on: ubuntu-latest
@@ -73,10 +73,10 @@ jobs:
       - name: Download dist artefacts
         uses: actions/download-artifact@v5
         with:
-          name: webdav-sync
-          path: dist/webdav-sync
+          name: livi-webdav-sync
+          path: dist/livi-webdav-sync
       - name: Show artefact tree
-        run: ls dist/webdav-sync
+        run: ls dist/livi-webdav-sync
 
       - name: Install Obsidian
         id: yoink

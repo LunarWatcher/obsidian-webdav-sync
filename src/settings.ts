@@ -105,7 +105,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
                 this.plugin.settings.sync.full_vault_sync = value
                 await this.plugin.saveSettings();
 
-                (document.getElementById("webdav-sync-add-subvault-map-btn") as HTMLButtonElement)
+                (document.getElementById("livi-webdav-sync-add-subvault-map-btn") as HTMLButtonElement)
                   .disabled = value;
               })
         )
@@ -154,7 +154,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
           let el = text.setPlaceholder("/livi/obsidian")
             .setValue(this.plugin.settings.sync.root_folder.dest)
             .onChange(async (value) => {
-              let el = document.getElementById("webdav-sync-full-vault-path") as HTMLInputElement;
+              let el = document.getElementById("livi-webdav-sync-full-vault-path") as HTMLInputElement;
               if (value.length > 0 && el.validity.patternMismatch) {
                 // This triggers too often for it to be feasible to create a new notice on error.
                 // new Notice(
@@ -168,9 +168,9 @@ export class WebDAVSettingsTab extends PluginSettingTab {
             })
             .inputEl;
 
-          el.id = "webdav-sync-full-vault-path";
+          el.id = "livi-webdav-sync-full-vault-path";
           el.pattern = '\\/(?:|[^\\/].*)'
-          el.addClass("webdav-sync-validated");
+          el.addClass("livi-webdav-sync-validated");
         })
         .addButton(button => button
           .setButtonText("Test connection")
@@ -199,7 +199,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
                 );
               }
             }
-          }).buttonEl.id = "webdav-settings-test-connection"
+          }).buttonEl.id = "livi-webdav-settings-test-connection"
         )
 
       let newShare: string = "";
@@ -217,9 +217,9 @@ export class WebDAVSettingsTab extends PluginSettingTab {
               newShare = value;
             })
             .inputEl;
-          el.id = "webdav-subfolder-remote-path";
+          el.id = "livi-webdav-subfolder-remote-path";
           el.pattern = '\\/(?:|[^\\/].*)';
-          el.addClass("webdav-sync-validated");
+          el.addClass("livi-webdav-sync-validated");
         })
         .addText(text => {
           let el: HTMLInputElement = text.setPlaceholder("absolute/path/in/vault")
@@ -227,9 +227,9 @@ export class WebDAVSettingsTab extends PluginSettingTab {
               newVaultFolder = value;
             })
             .inputEl;
-          el.id = "webdav-subfolder-local-path";
+          el.id = "livi-webdav-subfolder-local-path";
           el.pattern = '[^\\/].*';
-          el.addClass("webdav-sync-validated");
+          el.addClass("livi-webdav-sync-validated");
         })
         .addButton(button => {
           let btn = button.setButtonText("Add")
@@ -242,8 +242,8 @@ export class WebDAVSettingsTab extends PluginSettingTab {
                 new Notice("You must supply both the webdav share and local folder");
                 return;
               }
-              let localShare = document.getElementById("webdav-subfolder-local-path") as HTMLInputElement;
-              let remoteShare = document.getElementById("webdav-subfolder-remote-path") as HTMLInputElement;
+              let localShare = document.getElementById("livi-webdav-subfolder-local-path") as HTMLInputElement;
+              let remoteShare = document.getElementById("livi-webdav-subfolder-remote-path") as HTMLInputElement;
               if (remoteShare.validity.patternMismatch) {
                 new Notice(
                   "The WebDAV share must be in the form of an absolute path in the WebDAV server, for example /some/folder"
@@ -263,7 +263,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
               await this.plugin.saveSettings()
               this.display();
             })
-          btn.buttonEl.id = "webdav-sync-add-subvault-map-btn";
+          btn.buttonEl.id = "livi-webdav-sync-add-subvault-map-btn";
           btn.disabled = this.plugin.settings.sync.full_vault_sync;
           return btn;
         });

@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-DEST=dist/webdav-sync
+DEST=dist/livi-webdav-sync
 mkdir -p dist
 mkdir -p $DEST
 

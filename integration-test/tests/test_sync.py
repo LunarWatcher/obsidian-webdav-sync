@@ -21,7 +21,7 @@ def test_server_connection(obsidian: Chrome, copyparty, screenshotter):
 
     elem = obsidian.find_element(
         By.ID,
-        "webdav-settings-test-connection"
+        "livi-webdav-settings-test-connection"
     )
     elem.click()
     screenshotter("After button click")
@@ -124,7 +124,7 @@ def test_obsidian_folder_logic(
     # TODO: this test is proof enough that Map()s need to be dropped. They're
     # absolutely horrid to work with, and do not serialise properly
     data = obsidian.execute_async_script("""
-    let plugin = app.plugins.plugins["webdav-sync"];
+    let plugin = app.plugins.plugins["livi-webdav-sync"];
     let fileInterface = plugin._getFileInterface();
     let content = await fileInterface.getVaultFiles();
     arguments[arguments.length - 1](JSON.stringify({

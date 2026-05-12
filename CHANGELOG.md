@@ -1,6 +1,17 @@
 # Changelog
 
+## 0.5.0
+
+
+> [!caution]
+> This plugin has a new ID and therefore a new folder. The existing copy of the plugin must be removed before updating
+
+Re-release of 0.4.0 with a new plugin id (`livi-webdav-sync`). Because Obsidian [redid their entire plugin submission system](https://obsidian.md/blog/future-of-plugins/), and due to [another plugin having the same id (`webdav-sync`)](https://github.com/hesprs/obsidian-webdav-sync) also being pending at the time of the migration of existing submissions, this plugin lost its ID in spite of being submitted ~6 months prior to hesprs' plugin.
+
 ## 0.4.0
+
+> [!caution]
+> 0.5.0 was forced to changed the plugin ID due to changes to obsidian's publication process resulting in the plugin's ID (still in use in this version) being lost. Installs of this version are wholly unsupported and discouraged. See the changelog for 0.5.0 for upgrade instructions. 0.5.0 is otherwise indentical to 0.4.0, but requires manual intervention to update.
 
 ### Added
 
@@ -15,6 +26,9 @@
 
 ## 0.3.0
 
+> [!caution]
+> 0.5.0 was forced to changed the plugin ID due to changes to obsidian's publication process resulting in the plugin's ID (still in use in this version) being lost. Installs of this version are wholly unsupported and discouraged. See the changelog for 0.5.0 for upgrade instructions.
+
 ### Added
 
 * Added option to not sync the config folder (`.obsidian`). Defaults to being disabled for compatibility and intended behaviour.
@@ -26,9 +40,15 @@
 
 ## 0.2.1
 
+> [!caution]
+> 0.5.0 was forced to changed the plugin ID due to changes to obsidian's publication process resulting in the plugin's ID (still in use in this version) being lost. Installs of this version are wholly unsupported and discouraged. See the changelog for 0.5.0 for upgrade instructions.
+
 Security and dep updates
 
 ## 0.2.0
+
+> [!caution]
+> 0.5.0 was forced to changed the plugin ID due to changes to obsidian's publication process resulting in the plugin's ID (still in use in this version) being lost. Installs of this version are wholly unsupported and discouraged. See the changelog for 0.5.0 for upgrade instructions.
 
 ### Added
 
@@ -36,11 +56,17 @@ Security and dep updates
 
 ## 0.1.1
 
+> [!caution]
+> 0.5.0 was forced to changed the plugin ID due to changes to obsidian's publication process resulting in the plugin's ID (still in use in this version) being lost. Installs of this version are wholly unsupported and discouraged. See the changelog for 0.5.0 for upgrade instructions.
+
 ### Changed
 
 * Clarified the wording near the WebDAV settings for the password so it's more obvious that it's pushed alongside the vault. This was already mentioned in the documentation, but this is much harder to miss.
 
 ## 0.1.0
+
+> [!caution]
+> 0.5.0 was forced to changed the plugin ID due to changes to obsidian's publication process resulting in the plugin's ID (still in use in this version) being lost. Installs of this version are wholly unsupported and discouraged. See the changelog for 0.5.0 for upgrade instructions.
 
 ### Fixed
 
@@ -48,10 +74,16 @@ Security and dep updates
 
 ## 0.0.4
 
+> [!caution]
+> 0.5.0 was forced to changed the plugin ID due to changes to obsidian's publication process resulting in the plugin's ID (still in use in this version) being lost. Installs of this version are wholly unsupported and discouraged. See the changelog for 0.5.0 for upgrade instructions.
+
 ### Added
 * Safeguards for deleting everything, or nearly everything. Pushes deleting either everything, or everything outside the .obsidian folder is now hard blocked. It is left open as an option in the sync dialog, but it's default-enabled.
 
 
 ## 0.0.1 through 0.0.3
+
+> [!caution]
+> 0.5.0 was forced to changed the plugin ID due to changes to obsidian's publication process resulting in the plugin's ID (still in use in this version) being lost. Installs of this version are wholly unsupported and discouraged. See the changelog for 0.5.0 for upgrade instructions.
 
 Initial version plus tweaks for the upload to the obsidian registry.

@@ -1,18 +1,18 @@
-.webdav-flex {
+.livi-webdav-flex {
     display: flex;
     gap: 8px;
 }
 
-.webdav-button-wrapper > button {
+.livi-webdav-button-wrapper > button {
     flex-grow: 1;
 }
 
 /** 
  * hack classes for obsidian not really doing HTML-based validation on input fields.
  */
-input.webdav-sync-validated:invalid {
+input.livi-webdav-sync-validated:invalid {
     border-color: red;
 }
-input.webdav-sync-validated:valid {
+input.livi-webdav-sync-validated:valid {
     border-color: green;
 }

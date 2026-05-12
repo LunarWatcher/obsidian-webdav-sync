@@ -85,7 +85,7 @@ npm run build
 npm run dev
 # Both work
 
-# Create dist/webdav-sync and move the stuff into it
+# Create dist/livi-webdav-sync and move the stuff into it
 # This is where the tests look for the plugin for copying into
 # the test vault
 # This needs to be done every time there's changes to the plugin files.
