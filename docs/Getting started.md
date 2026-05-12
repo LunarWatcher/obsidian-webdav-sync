@@ -1,8 +1,12 @@
 # Getting started
 
+
+> [!caution]
+> Do not use 0.4.0 or earlier. These versions use an old plugin ID that was yoinked by another plugin by the same name submitted 6 months after this plugin. See [#25](https://github.com/LunarWatcher/obsidian-webdav-sync/issues/25) (GitHub) or [the changelog](https://codeberg.org/LunarWatcher/obsidian-webdav-sync/src/branch/master/CHANGELOG.md#0.5.0) for more information, and migration steps if you currently use 0.4.0 or older.
+
 ## Words of warning
 
-The plugin is designed to minimise risk during normal operation. No automatic sync means that every device you have acts as a separate backup of the vault, so even if something goes wrong, you have a path to recovery. 
+The plugin is designed to minimise risk during normal operation. No automatic sync means that every device you have acts as a separate backup of the vault, so even if something goes wrong, you have a path to recovery.
 
 However, during setup, there are a few failure points that the plugin hasn't been configured to protect you from. Worst-case, you wipe your vault.
 
