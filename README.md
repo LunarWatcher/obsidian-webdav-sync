@@ -57,7 +57,7 @@ Although the plugin shouldn't cause any problems, I strongly suggest taking back
 ## Installation
 
 ### Via GitHub
-Once this plugin is release-ready, you can grab the latest release from [GitHub](https://github.com/LunarWatcher/obsidian-webdav-sync/releases). Download it, and add the `webdav-sync` folder to your vault's `.obsidian/plugins/` folder. The plugin is not yet available through the plugin store thing, so it'll need to be updated manually as well; this is done the same way.
+Once this plugin is release-ready, you can grab the latest release from [GitHub](https://github.com/LunarWatcher/obsidian-webdav-sync/releases). Download it, and add the `livi-webdav-sync` folder to your vault's `.obsidian/plugins/` folder. The plugin is not yet available through the plugin store thing, so it'll need to be updated manually as well; this is done the same way.
 
 ### Via Obsidian's plugin registry [pending]
 
