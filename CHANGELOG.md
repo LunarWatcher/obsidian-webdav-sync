@@ -7,6 +7,10 @@
 * Silenced a few new warnings from obsidian's new scan
 * `document` -> `activeDocument` (though I doubt it matters for this plugin)
 
+### Chores
+
+* Bump deps
+
 ## 0.5.0
 
 > [!caution]
