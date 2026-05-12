@@ -3,7 +3,7 @@
 ## 0.5.0
 
 
-> [!critical]
+> [!caution]
 > This plugin has a new ID and therefore a new folder. The existing copy of the plugin must be removed before updating
 
 Re-release of 0.4.0 with a new plugin id (`livi-webdav-sync`). Because Obsidian [redid their entire plugin submission system](https://obsidian.md/blog/future-of-plugins/), and due to [another plugin having the same id (`webdav-sync`)](https://github.com/hesprs/obsidian-webdav-sync) also being pending at the time of the migration of existing submissions, this plugin lost its ID in spite of being submitted ~6 months prior to hesprs' plugin.
