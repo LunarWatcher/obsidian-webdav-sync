@@ -35,7 +35,7 @@ def test_buttons_visible_and_functional(
 
     test_button = obsidian.find_element(
         By.ID,
-        "webdav-settings-test-connection"
+        "livi-webdav-settings-test-connection"
     )
     assert test_button.text == "Test connection"
 
