@@ -11,8 +11,8 @@ If you're using copyparty, note that your user needs access to dotfiles (the `.`
     allow-csrf
     dav-inf
 
-    # Enables full webdav writes - for copyparty, this means redundant files aren't 
-    # made on PUT that require deleting. 
+    # Enables full webdav writes - for copyparty, this means redundant files aren't
+    # made on PUT that require deleting.
     # Omitting this means the actual files will always be out of sync.
     daw
 ```
@@ -24,7 +24,7 @@ The setup for a vault is mostly completely standard. The minimum identified set 
 [/livi/obsidian]
     /media/NAS/Documents/mdwiki
     accs:
-      # the a is optional, but I use it here because this is my 
+      # the a is optional, but I use it here because this is my
       # superuser account, and it should get access to everything
       rwmda.: olivia
 ```
@@ -40,7 +40,7 @@ The setup for a vault is mostly completely standard. The minimum identified set 
 
 # Subfolders are stored relative to the regular share
 # There's technically nothing preventing fully separate shares
-# with partial vault sync, but the general assumption is that 
+# with partial vault sync, but the general assumption is that
 # the partial sync is from a vault, not an arbitrary markdown
 # directory.
 [/livi/obsidian/Tech]

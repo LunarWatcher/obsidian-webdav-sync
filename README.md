@@ -4,33 +4,18 @@
 
 This is a very simple sync plugin for Obsidian based on WebDAV. You need to bring your own WebDAV server to use this plugin. Theoretically, all WebDAV-compatible servers are supported, though there are some requirements for the general behaviour of the server. This is described in a later section. No special, non-standard features are used, so this plugin (unlike far too many WebDAV implementations in general) is not vendorlocked to NextCloud.
 
+[Documentation](https://lunarwatcher.github.io/obsidian-webdav-sync/) · [Source code (Codeberg)](https://codeberg.org/LunarWatcher/obsidian-webdav-sync) · [Source code (GitHub)](https://github.com/LunarWatcher/obsidian-webdav-sync)
+
 ## Features
 
 * Sync is not automatic, so there's no need for a proper deletion-aware merge algorithm. Merging is relatively easy, but _deletion_ merge is not if you need to do a two-way merge with arbitrary sync times. That said, there is no content-level merge algorithm; there's handling of file-level conflicts, but it's assumed you're able to track those yourself and know what you changed. If you regularly make changes to the same files and forget pulling, this plugin is probably not right for you.
 * Support for partial vault sync, where specific folders can be imported. This primarily exists because I want to sync some folders between my private and work vaults, but without syncing everything (work notes stay at work, private notes stay at home). **This is currently mutually exclusive with full vault sync**, but this will change in the future.
+* `.obsidian` is synced by default - but it can be excluded if desired.
 * [TODO] An optional webhook can be run on push. The intent here is to allow for push-aware backup systems to do their thing only when it's needed. Versioning shouldn't need be a feature of the sync plugin itself when the specific needs for sync are diverse.
 
 ### Non-goals
 
 This plugin is intentionally simplistic merge-wise. As a result, content-level merging will never be a feature. If this is something you need, I suggest finding another plugin. The merge algorithms explode in complexity when file content is involved, and especially if automatic sync ever becomes a potential option.
-
-## Rationale
-
-I have 18TB of self-hosted NAS storage, and 500GB of Proton Drive storage (part of what my 120 EUR/year gets me when I wanted protonmail, Proton VPN, and Proton Pass); I do not want to pay another 96 USD/year + bank currency conversion costs, so my data can sync to a different cloud than either of the two options I already have available. Until August 2025, I used syncthing, but the official Android app was discontinued months prior without me noticing. Although the client was forked, jumping from an official app developed by one person to an unofficial app developed by one person does not sound particularly tempting.
-
-WebDAV, although being an open standard, has been heavily undermined by cloud services using proprietary protocols to vendor lock people into their specific ecosystem - a strategy that has been wildly successful. The additional consequence of this is that no free options exist for syncing WebDAV in a similar way to Obsidian. The hardest part here is file deletion, and this is a hard problem the sync plugins are struggling with as well. The solutions that claim to solve this are proprietary or otherwise expensive.
-
-Unfortunately, the options available for syncing either to my self-hosted NAS or to Proton Drive are limited thanks to one important detail; the problem child called mobile operating systems. [DAVx5](https://www.davx5.com/), a fantastic app may I add, doesn't support syncing files locally. They provide an Android Storage Framework adapter thing that apps can use, but that [Obsidian does not support](https://forum.obsidian.md/t/android-support-the-storage-access-framework/23234). On Linux, a mounted filesystem makes no distinction on whether it's local or remote, and desktop Obsidian can happily work straight off a WebDAV folder. The only disadvantage with this strategy is that no data is stored locally, which isn't great if I'm sitting remotely (or worse, on a)
-
-As far as I know, Proton Drive can't be easily supported, and the options for webdav are limited to a few obscure and abandoned plugins, and the fairly well-established [remotely-save plugin](https://github.com/remotely-save/remotely-save), which does quite a few supported target locations. Unfortunately, its development capacity is limited, and at the time of writing, the last commit was 9 months ago, and there are nearly 150 issues and 13 open PRs, all 13 of which have been opened in the last year. Several of the bugs describe problems with the sync algorithm, which is a huge problem. A plugin that has to state "ALWAYS, ALWAYS, back up your vault before using this plugin" for something that's supposed to be used continuously does not inspire confidence.[^1]
-
-Sync algorithms are hard enough of a problem that my solution is to not bother. With manual sync and overriding, many entire categories of bugs and edge-cases that can wipe vaults are avoided. There are almost certainly still some such bugs, but it's much easier to safeguard against them, especially because faults don't automatically propagate to all available devices - if you have two devices, you already have a backup.
-
----
-
-I do need to mention [Vinzent03/obsidian-git](https://github.com/Vinzent03/obsidian-git), which is the closest you get in spirit to the idea behind this plugin. This is the plugin I would use if it was viable, as I already have an SSH port exposed, and a self-hosted instance of Forgejo available. In terms of setup, it would be the easiest alternative. Unfortunately, [it lacks Android support for SSH keys](https://github.com/Vinzent03/obsidian-git?tab=readme-ov-file#-mobile-support-%EF%B8%8F--experimental), as Git isn't Android-native, and reimplementing all of Git is bound to cause issues. On top of that, it appears that isomorphic-git (the underlying git-reimplementing library) [doesn't support SSH keys](https://github.com/isomorphic-git/isomorphic-git/issues/231#issuecomment-2699927384), which makes it incompatible with my security model, and unusable for my use-case. The trouble child called mobile operating systems strikes again.
-
-WebDAV, on the other hand, is both simple enough and well-established enough that it has decent clients in every programming language worth caring about. It does require some more work for a sync algorithm that would otherwise be bundled in Git, but it's portable.
 
 ## Requirements
 
@@ -46,7 +31,7 @@ WebDAV, on the other hand, is both simple enough and well-established enough tha
 
 Due to a [16 year old bug](https://issuetracker.google.com/issues/36906982), the vault shouldn't be on an SD card. If you put it on an SD card, when pulling the vault, the last modified time of the file won't be correctly set. This results in a situation where the android copy of the vault is always considered fully out of sync with the WebDAV server.
 
-Sync will still work if you put the vault on an SD card, but if you have a large vault, you'll need to download and upload the entire thing every time you sync. 
+Sync will still work if you put the vault on an SD card, but if you have a large vault, you'll need to download and upload the entire thing every time you sync.
 
 The [underlying bug](https://github.com/LunarWatcher/obsidian-webdav-sync/issues/1) could be resolved by relying on hashes rather than `mtime`, but these are difficult to generate on the fly. Since it requires reading the full contents of the files, it'll still tank performance in large vaults, so it's not particularly helpful. Alternate solutions are welcome.
 
@@ -66,7 +51,6 @@ https://community.obsidian.md/plugins/livi-webdav-sync
 ### Via BRAT
 
 There isn't a separate release cycle for preview versions, but until Obsidian reviews the plugin, you can install the plugin via [BRAT](https://github.com/TfTHacker/obsidian42-brat) to get automatic updates.
-
 
 ## Setup
 
@@ -103,6 +87,24 @@ See [Getting started.md](https://github.com/LunarWatcher/obsidian-webdav-sync/bl
 
 WebDAV sync is not thread-safe. If you run two pushes at once, you will end up with an inconsistent state. It's therefore not recommended to use this plugin for collaborative note repositories, unless you have another way to avoid race conditions.
 
-Due to the lack of content-level merge, ending up in a situation like this requires manual recovery. 
+Due to the lack of content-level merge, ending up in a situation like this requires manual recovery.
 
-[^1]: This is not to say that vault backups are a bad idea, but the way it's phrased makes it sound like breaking errors happen on a regular basis. Especially considering the number of issues, it looks like this is the case.
+## Plugin rationale
+
+WebDAV, although being an open standard, has been heavily undermined by cloud services using proprietary protocols to vendor lock people into their specific ecosystem - a strategy that, unfortunately, has been wildly successful. I'm also counting Nextcloud as a cloud service in this context, as many webdav implementations end up prioritizing Nextcloud to the point where it's really a Nextcloud integration rather than a WebDAV integration.
+
+The options available for syncing either to my self-hosted NAS or to Proton Drive are limited thanks to one important detail; the problem child called mobile operating systems. [DAVx5](https://www.davx5.com/)[^3] doesn't support syncing files locally. Instead, they provide an Android Storage Framework adapter thing that apps can use, but that [Obsidian does not support](https://forum.obsidian.md/t/android-support-the-storage-access-framework/23234). On Linux, a mounted filesystem makes no distinction on whether it's local or remote, and desktop Obsidian can happily work straight off a WebDAV folder. The only disadvantage with this strategy is that no data is stored locally, which isn't great if I'm sitting remotely (or worse, somewhere without internet access). Therefore, a plugin is still needed to support local states.
+
+As far as I know, Proton Drive can't be easily supported, and the options for webdav are limited to a few obscure and abandoned plugins[^2], and the fairly well-established [remotely-save plugin](https://github.com/remotely-save/remotely-save), which does quite a few supported target locations. Unfortunately, its development capacity is limited, and at the time of writing, the last commit was in 2024.
+
+Sync algorithms are hard enough of a problem that my solution is to not bother. With manual sync and overriding, many entire categories of bugs and edge-cases that can wipe vaults are avoided. There are almost certainly still some such bugs, but it's much easier to safeguard against them, especially because faults don't automatically propagate to all available devices - if you have two devices, you already have a backup.
+
+---
+
+I do need to mention [Vinzent03/obsidian-git](https://github.com/Vinzent03/obsidian-git), which is the closest you get in spirit to the idea behind this plugin. This is the plugin I would use if it was viable, as I already have an SSH port exposed, and a self-hosted instance of Forgejo available. In terms of setup, it would be the easiest alternative. Unfortunately, [it lacks Android support for SSH keys](https://github.com/Vinzent03/obsidian-git?tab=readme-ov-file#-mobile-support-%EF%B8%8F--experimental), as Git isn't Android-native, and reimplementing all of Git is bound to cause issues. On top of that, it appears that isomorphic-git (the underlying git-reimplementing library) [doesn't support SSH keys](https://github.com/isomorphic-git/isomorphic-git/issues/231#issuecomment-2699927384), which makes it incompatible with my security model, and unusable for my use-case. The trouble child called mobile operating systems strikes again.
+
+WebDAV, on the other hand, is both simple enough and well-established enough that it has decent clients in every programming language worth caring about. It does require some more work for a sync algorithm that would otherwise be bundled in Git, but it's portable.
+
+
+[^2]: Another plugin was made ~6 months after this one, and consequently after this sentence was initially written. However, it's built on an AI slop foundation, so I do not trust it.
+[^3]: DAVx5 is a fantastic app. The only reason it doesn't cut it here is that Obsidian limits itself from being able to use the DAVx5 shares.
