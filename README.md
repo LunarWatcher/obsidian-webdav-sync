@@ -21,11 +21,7 @@ This plugin is intentionally simplistic merge-wise. As a result, content-level m
 
 * Android or desktop (Windows or Linux)
     * macOS and iOS will not receive support from me, as I refuse to spend thousands of euros for inferior hardware and an inferior platform. If you need iOS or macOS support and it doesn't work due to Apple-specific problems, you're welcome to add it in a PR, but it will not be created, maintained, or tested any other way. It may work, but it probably won't.
-* A WebDAV server. In theory, it should work with any WebDAV-compatible server, though I only test against [copyparty](https://github.com/9001/copyparty). More specific requirements:
-    * No inline  backups can be made, unless the calls to read the entire folder omits these as if they didn't exist, and only the latest version is exposed. For example, copyparty's default behaviour on push (without `daw`) is to create copies (such as `README.md-bunch of garbage here`), which then is exposed when accessing the directory. This means the vault is always out of sync, and treats the added history files as bad.
-    * `X-OC-MTime` should be supported. It's supported in copyparty out of the box. Without this, the last modified time cannot be synced in the remote, so a pull is required after the push to sync mtimes to the client. This is obviously a waste of download and resources.
-    * Dotfile reading; if folders and files starting with `.` are omitted, the obsidian folder cannot be synced across devices. This is described later
-    * **Not sure how to toggle these?** Some known DAV servers are described later in this documentation.
+* A WebDAV server. In theory, it should work with any WebDAV-compatible server, though I only test against [copyparty](https://github.com/9001/copyparty). Additional requirements are described in [the documentation](https://lunarwatcher.github.io/obsidian-webdav-sync/getting-started.html#setting-up-a-webdav-server)
 
 ### Android notes
 
@@ -41,16 +37,7 @@ Although the plugin shouldn't cause any problems, I strongly suggest taking back
 
 ## Installation
 
-### Via GitHub
-Once this plugin is release-ready, you can grab the latest release from [GitHub](https://github.com/LunarWatcher/obsidian-webdav-sync/releases). Download it, and add the `livi-webdav-sync` folder to your vault's `.obsidian/plugins/` folder. The plugin is not yet available through the plugin store thing, so it'll need to be updated manually as well; this is done the same way.
-
-### Via Obsidian's plugin registry
-
-https://community.obsidian.md/plugins/livi-webdav-sync
-
-### Via BRAT
-
-There isn't a separate release cycle for preview versions, but until Obsidian reviews the plugin, you can install the plugin via [BRAT](https://github.com/TfTHacker/obsidian42-brat) to get automatic updates.
+See [the docs](https://lunarwatcher.github.io/obsidian-webdav-sync/#installing-the-plugin)
 
 ## Setup
 
@@ -58,28 +45,9 @@ There isn't a separate release cycle for preview versions, but until Obsidian re
 
 The major disadvantage with this plugin is that some setup is required to get the vault over to other devices. The suggested strategy is to manually copy your vault from your computer (or whereever you installed the plugin) over to your other devices. After that, usage should just be as usual. In theory, you can get away with just copying the `.obsidian` folder and just pull that.
 
-### DAV server setup
+### First use and WebDAV server requirements
 
-#### General requirements (all servers)
-
-Due to how obsidian works, CORS is in play. CORS is just as much of a pain in the ass here as anywhere else. For obsidian to work, if your WebDAV server has CORS, you need to do one of two things:
-
-1. Disable CORS; this is, by far, the easiest option, but obviously has security tradeoffs.
-2. Set up CORS to allow `app://obsidian.md` and [a whole bunch of other stuff](https://github.com/remotely-save/remotely-save/blob/34db181af002f8d71ea0a87e7965abc57b294914/docs/remote_services/webdav_general/webav_cors.md?plain=1#L5) that I cannot easily summarise. Even that documentation does not include an exhaustive list.
-
-Other requirements:
-
-* It must be possible to fully and recursively index the DAV folder, as no manual recursion logic is implemented on the client side.
-
-#### Setup of known WebDAV servers
-
-* [Copyparty](docs/webdav-servers/Copyparty.md)
-
-Other WebDAV servers are likely supported with minimal or no special setup, but I do not attempt to verify these. If you manage to verify another issue, please consider opening a PR with setup instructions.
-
-### First use
-
-See [Getting started.md](https://github.com/LunarWatcher/obsidian-webdav-sync/blob/master/docs/Getting%20started.md). It can also be read on an [mkdocs-generated website](https://lunarwatcher.github.io/obsidian-webdav-sync/Getting%20started/) if you prefer.
+See [Getting started.md](https://github.com/LunarWatcher/obsidian-webdav-sync/blob/master/docs/Getting%20started.md). It can also be read on a [violet-generated website](https://lunarwatcher.github.io/obsidian-webdav-sync/getting-started.html) if you prefer.
 
 ## Things to note
 
