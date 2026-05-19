@@ -105,6 +105,9 @@ I do need to mention [Vinzent03/obsidian-git](https://github.com/Vinzent03/obsid
 
 WebDAV, on the other hand, is both simple enough and well-established enough that it has decent clients in every programming language worth caring about. It does require some more work for a sync algorithm that would otherwise be bundled in Git, but it's portable.
 
+## License
+
+The plugin itself is licensed under the [MIT license](LICENSE). The documentation is licensed under [CC-By-SA 4.0](docs/LICENSE)
 
 [^2]: Another plugin was made ~6 months after this one, and consequently after this sentence was initially written. However, it's built on an AI slop foundation, so I do not trust it.
 [^3]: DAVx5 is a fantastic app. The only reason it doesn't cut it here is that Obsidian limits itself from being able to use the DAVx5 shares.

@@ -1,0 +1,17 @@
+{
+    "name": "Obsidian WebDAV sync",
+    "description": "This page contains the documentation for WebDAV sync, an unofficial Obsidian plugin for syncing vaults with WebDAV.",
+    "site_prefix": "/obsidian-webdav-sync",
+    "theme": "_default",
+    "data": {
+        "language": "en-GB",
+        "repo": {
+            "name": "LunarWatcher/obsidian-webdav-sync",
+            "url": "https://codeberg.org/LunarWatcher/obsidian-webdav-sync",
+            "license": "WebDAV sync is licensed under the <a href=\"https://codeberg.org/LunarWatcher/obsidian-webdav-sync/src/branch/master/LICENSE\">MIT license</a>. The documentation is licensed under <a href=\"https://codeberg.org/LunarWatcher/obsidian-webdav-sync/src/branch/master/docs/LICENSE\">CC-By-SA 4.0</a>"
+        }
+    },
+    "exclude": [
+        "LICENSE"
+    ]
+}

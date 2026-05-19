@@ -17,7 +17,7 @@ Partial folder sync in this plugin is a special kind of sync if combined with th
 For example, given two accounts (`secure`, `insecure`):
 
 * `/vault` (read-write: secure, deny: insecure)
-    * `/vault/Partially synced subfolder` (read-write: secure, insecure)
+  * `/vault/Partially synced subfolder` (read-write: secure, insecure)
 
 As long as your DAV server can be configured with permissions this granular, you can fully prevent access to the rest of the vault, while only exposing one folder. This can be set up much more broadly as well. There's nothing preventing you from only giving read permissions to some users, or giving additional users access to specific folders.
 
@@ -43,7 +43,7 @@ You're free to decide whether or not you think this is a problem, and what you w
 
 1. The folder must be self-contained, and cannot link _to_ other folders in the vault. It can _be_ linked _from_ other folders, but not the other way around.
 2. In "Files and links", images are set to "In subfolder under current folder", with the folder set to `_images`. 
-    * Though any image storing method relative to the files work, images must be within the partially synced tree for them to be included.
+  * Though any image storing method relative to the files work, images must be within the partially synced tree for them to be included.
 
 I also have a content policy that states only information that could be public can go in that folder. If it can't (or shouldn't), it must be in a non-partial folder.
 

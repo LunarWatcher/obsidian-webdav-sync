@@ -1,8 +1,9 @@
 name: Build docs
+
 on:
   push:
     branches:
-      - master 
+      - master
 
 permissions:
   contents: read
@@ -20,18 +21,15 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.x
-      - run: |
-          pip3 install mkdocs-material mkdocs-callouts==1.16.0
-      - run: |
-          mkdocs build
+      - uses: actions/checkout@v4
+      - uses: LunarWatcher/install-violet@master
+      - name: "Build page"
+        run: |
+          cd docs
+          violet generate
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: 'site/'
+          path: 'docs/pages'
       - uses: actions/deploy-pages@v4
         id: deployment
-

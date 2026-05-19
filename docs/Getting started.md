@@ -27,10 +27,10 @@ Before you can do any syncing, go to the WebDAV sync settings. Here, you'll need
 * WebDAV URL
 * WebDAV username
 * WebDAV password
-    * **Note:** as of v0.2.0, the password uses Obsidian's SecretStorage. Prior to this, the password is kept directly in the config file. If you're using 0.1.1 or older, you must trust your webdav provider, as teh password is synced in plain text in older versions.
+  * **Note:** as of v0.2.0, the password uses Obsidian's SecretStorage. Prior to this, the password is kept directly in the config file. If you're using 0.1.1 or older, you must trust your webdav provider, as teh password is synced in plain text in older versions.
 * One of:
-    * A share for full vault sync
-    * A set of folder mappings for partial sync. See [Partial sync](docs/Partial sync.md). This is best matched with full vault sync, but should work standalone as well. This is untested though.
+  * A share for full vault sync
+  * A set of folder mappings for partial sync. See [Partial sync](docs/Partial sync.md). This is best matched with full vault sync, but should work standalone as well. This is untested though.
 
 ## Your first sync
 
