@@ -1,3 +1,8 @@
+---
+{
+    "title": "Known good WebDAV servers"
+}
+---
 # Known good WebDAV servers
 
 This folder contains documentation for known good WebDAV servers.
