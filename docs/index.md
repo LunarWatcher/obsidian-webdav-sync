@@ -17,7 +17,7 @@ Once this plugin is release-ready, you can grab the latest release from [GitHub]
 
 ### Via Obsidian's plugin registry
 
-https://community.obsidian.md/plugins/livi-webdav-sync
+[https://community.obsidian.md/plugins/livi-webdav-sync](https://community.obsidian.md/plugins/livi-webdav-sync)
 
 ### Via BRAT
 
