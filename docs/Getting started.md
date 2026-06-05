@@ -54,7 +54,9 @@ Before you can do any syncing, go to the WebDAV sync settings. Here, you'll need
 
 ## Your first sync
 
-The first push is relatively straight-forward. In the ribbon, a sync button is added by default. When clicked, you'll get a modal asking whether you want to push or pull. **You should use this for your first sync**, even if you don't want to keep the button around. It gives you access to more options than the commands do, so you can see more clearly what's going to happen before you do it.
+The first push is relatively straight-forward. In the ribbon, a sync button is added by default. The ribbon is the sidebar on the left on desktop, or in the hamburger menu (three vertical lines) on mobile. An action is also available that can be run from the command palette, or bound to a key ("WebDAV sync: Open sync menu")
+
+When clicked, you'll get a modal asking whether you want to push or pull. **You should use this for your first sync**, even if you don't want to keep the button around. It gives you access to more options than the commands do, so you can see more clearly what's going to happen before you do it.
 
 > [!caution]
 >

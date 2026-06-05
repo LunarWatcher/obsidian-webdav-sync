@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.2
+
+### Added
+
+* An action with the same functionality as the ribbon button
+* Docs for where the actions are located
+
 ## 0.5.1
 
 ### Fixed
