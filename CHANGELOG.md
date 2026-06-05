@@ -5,7 +5,7 @@
 ### Added
 
 * An action with the same functionality as the ribbon button
-* Docs for where the actions are located
+* Docs for where the sync actions are located
 
 ## 0.5.1
 
