@@ -34,6 +34,12 @@ export default class WebDAVSyncPlugin extends Plugin {
         false
       )
     });
+    this.addCommand({
+      id: "webdav-modal",
+      name: "Open sync menu",
+      icon: "cloud",
+      callback: this.openModal.bind(this)
+    })
   }
 
   onunload() {
@@ -64,14 +70,17 @@ export default class WebDAVSyncPlugin extends Plugin {
 
   async initRibbon() {
     const ribbonIconEl = this.addRibbonIcon('cloud', 'Open WebDAV sync panel', (evt: MouseEvent) => {
-      if (this.client == null) {
-        new Notice("You don't appear to have set up the plugin. Go to settings before continuing.");
-        return;
-      }
-      new SyncModal(this.app, this).open();
+      this.openModal();
     });
     ribbonIconEl.id = "webdav-ribbon-btn"
+  }
 
+  openModal() {
+    if (this.client == null) {
+      new Notice("You don't appear to have set up the plugin. Go to settings before continuing.");
+      return;
+    }
+    new SyncModal(this.app, this).open();
   }
 
   /**
