@@ -22,6 +22,10 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Install deps
+        run: |
+          apt update && apt upgrade -y
+          apt install -y cmake gcc build-essential make git libssl-dev libcurl4-openssl-dev
       - uses: actions/checkout@main
       - name: Fix git ownership
         run: |
