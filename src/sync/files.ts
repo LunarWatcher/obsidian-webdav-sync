@@ -113,12 +113,12 @@ export class FileProvider {
           outFolders.push({
             realPath: elem,
             commonPath: elem
-          } as Folder);
+          });
         } else {
           outFolders.push({
             realPath: elem,
             commonPath: stripPrefix(elem, root)
-          } as Folder);
+          });
         }
       }
       queue.push(...next.folders);

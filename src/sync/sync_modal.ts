@@ -33,8 +33,8 @@ export class SyncModal extends Modal {
 
     this.syncImpl = new SyncImpl(
       this.plugin,
-      this.setError.bind(this) as OnErrorHandler,
-      this.showTaskGraph.bind(this) as TaskGraphHandler,
+      this.setError.bind(this),
+      this.showTaskGraph.bind(this),
       this.close.bind(this) as OnCompleteHandler,
       false,
       false
@@ -141,13 +141,13 @@ export class SyncModal extends Modal {
   }
 
   async download() {
-    this.doFileTransfer(
+    void this.doFileTransfer(
       this.syncImpl.download.bind(this.syncImpl)
     )
   }
 
   async upload() {
-    this.doFileTransfer(
+    void this.doFileTransfer(
       this.syncImpl.upload.bind(this.syncImpl)
     )
   }

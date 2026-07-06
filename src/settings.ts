@@ -259,7 +259,7 @@ export class WebDAVSettingsTab extends PluginSettingTab {
 
               this.plugin.settings.sync.subfolders[newVaultFolder] = {
                 dest: newShare
-              } as FolderDestination;
+              };
               await this.plugin.saveSettings()
               this.display();
             })

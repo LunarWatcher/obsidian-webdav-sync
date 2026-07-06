@@ -125,7 +125,7 @@ export class SyncImpl {
             this,
             this.plugin.settings.sync.root_folder.dest,
             null
-          ) as OnUpdateCallback,
+          ),
           this.resolveConflict.bind(this) as OnConflictCallback,
           this.deleteIsNoop,
         )) {
@@ -178,12 +178,12 @@ export class SyncImpl {
             local,
             remote,
             actionResult.actions,
-            this.onError.bind(this) as OnErrorHandler,
+            this.onError.bind(this),
             this.updateUpload.bind(
               this,
               dest,
               vaultPath
-            ) as OnUpdateCallback,
+            ),
             this.resolveConflict.bind(this) as OnConflictCallback,
             this.deleteIsNoop
           )) {
@@ -242,12 +242,12 @@ export class SyncImpl {
           remote,
           local,
           actionResult.actions,
-          this.onError.bind(this) as OnErrorHandler,
+          this.onError.bind(this),
           this.updateDownload.bind(
             this,
             this.plugin.settings.sync.root_folder.dest,
             null
-          ) as OnUpdateCallback,
+          ),
           this.resolveConflict.bind(this) as OnConflictCallback,
           this.deleteIsNoop,
         )) {
@@ -303,12 +303,12 @@ export class SyncImpl {
             remote,
             local,
             actionResult.actions,
-            this.onError.bind(this) as OnErrorHandler,
+            this.onError.bind(this),
             this.updateDownload.bind(
               this,
               dest,
               vaultPath,
-            ) as OnUpdateCallback,
+            ),
             this.resolveConflict.bind(this) as OnConflictCallback,
             this.deleteIsNoop,
           )) {

@@ -3,7 +3,7 @@
  * Status object associated with an individual item being synced.
  */
 export interface ActionedItem {
-  lastFile: String;
+  lastFile: string;
   lastProgress: number;
   // TODO: add ActionType?
 }
