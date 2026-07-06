@@ -10,6 +10,8 @@ Generative AI uses training data [based on plagiarism and piracy](https://web.ar
 
 PRs should be made to the `master` branch, which is also the main development branch. Releases don't go on a branch, they're tags.
 
+This repo has a Codeberg mirror; PRs can be made to either Codeberg or GitHub, but GitHub is currently preferred, since that's where the CI runs. Do not make the same PR to both codeforges; I'll deal with syncing the two.
+
 ### Aside: Windows and Mac users
 
 Windows and Linux are the only two desktop operating systems receiving active support. Mac does not. This  section contains things to look out for as a result.
