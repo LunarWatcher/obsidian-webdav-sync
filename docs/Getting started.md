@@ -88,3 +88,5 @@ The sync modal (opened through the ribbon) offers all the available per-sync opt
 * **Don't delete anything**: disables deletion. Mainly useful if you forget to push, and made changes that you need to pull. Setting this preserves those files so you can push, but can also result in files you intentionally deleted being restored on a push. Like I said, deletion-aware sync is hard, and this plugin does not bother with it.
 
 Aside the modal, raw upload and download actions exist, accessible via Ctrl-P (search "WebDAV:" to see all the available actions). Unless otherwise specified, the actions use all default settings, which amy be undesirable. If you need more control, use the modal.
+
+As of v0.6.0, the plugin supports some amount of conflict resolution. See [Conflict resolution](Conflict resolution.md) for more information.

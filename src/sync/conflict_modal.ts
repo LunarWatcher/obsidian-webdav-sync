@@ -43,7 +43,8 @@ export class ConflictModal extends Modal {
     const dropdown = contentEl.createEl("select", {
       attr: {
         id: CONFLICT_MODAL_SELECT_ACTION
-      }
+      },
+      cls: ["livi-webdav-override"]
     });
     dropdown.createEl("option", {
       text: `Do nothing (to update, do a ${this.direction == SyncDir.DOWN ? "push" : "pull"} after this sync)`,
@@ -54,12 +55,22 @@ export class ConflictModal extends Modal {
       value: "add"
     });
 
-    contentEl.createEl("button", {
+    const btnWrapper = contentEl.createDiv({
+      cls: ["livi-webdav-button-wrapper", "livi-webdav-flex"]
+    });
+    btnWrapper.createEl("button", {
       text: "OK",
     })
       .addEventListener(
         "click",
         this.yieldResult.bind(this)
+      );
+    btnWrapper.createEl("button", {
+      text: "Abort sync",
+    })
+      .addEventListener(
+        "click",
+        this.abort.bind(this)
       );
   }
 
@@ -80,6 +91,10 @@ export class ConflictModal extends Modal {
       diag.value == "add" ? ActionType.ADD : ActionType.NOOP
     );
     this.hasYielded = true;
+    this.close();
+  }
+
+  abort() {
     this.close();
   }
 
