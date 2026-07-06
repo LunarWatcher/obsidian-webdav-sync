@@ -66,19 +66,16 @@ When writing code, anything that can be  tested standalone without any obsidian 
 The integration tests make up the majority of the tests, as the majority of the functionality requires obsidian available to be reliably tested. These tests are written in python for two major reasons:
 
 1. It gives easier access to copyparty, a fantastic WebDAV server that happens to be written in Python
-2. Fuck TypeScript, with a cactus. 
+2. Fuck TypeScript, with a cactus.
 
 These tests may be harder to run locally, as you need the following installed:
 
 * Python (obviously)
 * Obsidian (surprised pikachu)
-    * Note: The **installer version** must be equal to the minimum app version, listed in manifest.json. In the integration tests, obsidian is only able to use the obsidian version equal to the installer version due to limitations in obsidian itself. If your installer version is lower  than the minimum app version, you will likely see weird failures.
+    * Note: The **installer version** must be equal to the minimum app version, listed in manifest.json. In the integration tests, obsidian is only able to use the obsidian version equal to the installer version due to limitations in obsidian itself. If your installer version is lower than the minimum app version, you will likely see weird failures.
 
-Plus an npm dependency.
 
 ```bash
-# Required for the electron-chromedriver
-npm i --include=dev
 # Build
 npm run build
 # !!!OR!!!

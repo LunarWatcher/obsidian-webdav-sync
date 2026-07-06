@@ -16,3 +16,11 @@ input.livi-webdav-sync-validated:invalid {
 input.livi-webdav-sync-validated:valid {
     border-color: green;
 }
+
+progress#livi-webdav-sync-modal-progress {
+    width: 100%;
+}
+
+progress#livi-webdav-sync-modal-progress[value="-1"] {
+    display: none;
+}

@@ -3,11 +3,14 @@ import WebDAVSyncPlugin from "../main";
 import {canConnectWithSettings} from "settings";
 import {Actions, actionToDescriptiveString, Content, OnErrorHandler, SyncDir } from "./sync";
 import {DryRunInfo, OnCompleteHandler, SyncImpl, TaskGraphHandler} from "./sync_impl";
+import { AsyncProgressGenerator, AsyncStatusGenerator } from "./status";
 
 export interface RemoteFileResult {
   content: Content | null;
   error: string | null;
 };
+
+const MODAL_PROGRESS_ID = "livi-webdav-sync-modal-progress";
 
 export class SyncModal extends Modal {
   plugin: WebDAVSyncPlugin;
@@ -16,6 +19,7 @@ export class SyncModal extends Modal {
 
   down: HTMLButtonElement;
   up: HTMLButtonElement;
+
 
   constructor(app: App, plugin: WebDAVSyncPlugin) {
     super(app);
@@ -41,7 +45,7 @@ export class SyncModal extends Modal {
         id: "livi-webdav-sync-modal-header"
       }
     });
-    
+
     if (!canConnectWithSettings(this.plugin.settings)) {
       contentEl.createEl("h2", {
         text: "No vault configured"
@@ -57,7 +61,7 @@ export class SyncModal extends Modal {
         + "Meaning tell you which files it would change, but not actually do the changes. Useful "
         + "for debugging, or just making sure you trust the plugin"
       )
-      .addToggle(toggle => 
+      .addToggle(toggle =>
         toggle
           .setValue(this.syncImpl.dryRun)
           .onChange(value => { this.syncImpl.dryRun = value })
@@ -67,11 +71,11 @@ export class SyncModal extends Modal {
       .setDesc("If set, files that would've been deleted are not actually deleted. This should mainly be set if you failed "
         + "to download before making changes, and don't wish to discard the changes you made. "
       )
-      .addToggle(toggle => 
+      .addToggle(toggle =>
         toggle
           .setValue(this.syncImpl.deleteIsNoop)
           .onChange(value => { this.syncImpl.deleteIsNoop = value })
-      )
+      );
     new Setting(contentEl)
       .setName("Block vault wipes")
       .setDesc(
@@ -79,7 +83,7 @@ export class SyncModal extends Modal {
         + `${this.app.vault.configDir} folder. This should be left as true unless you really want to do something likely very dumb, `
         + "in which case, you're on your own."
       )
-      .addToggle(toggle => 
+      .addToggle(toggle =>
         toggle
           .setValue(this.syncImpl.blockWipes)
           .onChange(value => { this.syncImpl.blockWipes = value })
@@ -118,38 +122,44 @@ export class SyncModal extends Modal {
       text: "\u00A0Download"
     });
 
+    contentEl.createEl("progress", {
+      attr: {
+        id: MODAL_PROGRESS_ID,
+        value: "-1",
+        max: "100",
+      },
+    });
+
     this.dryRunInfoContainer = this.contentEl.createEl("div", {
       attr: {
         id: "dry-run-info-container"
       }
     });
+
   }
 
   async download() {
-    this.setLoadingState(true);
-    this.checkClearDryRun();
-
-    await this.syncImpl.download()
-      .then(() => {
-        this.setLoadingState(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        this.setLoadingState(false);
-      });
+    this.doFileTransfer(
+      this.syncImpl.download.bind(this.syncImpl)
+    )
   }
+
   async upload() {
+    this.doFileTransfer(
+      this.syncImpl.upload.bind(this.syncImpl)
+    )
+  }
+
+  async doFileTransfer(actionFunction: AsyncProgressGenerator) {
     this.setLoadingState(true);
     this.checkClearDryRun();
 
-    await this.syncImpl.upload()
-      .then(() => {
-        this.setLoadingState(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        this.setLoadingState(false);
-      });
+    for await (const sig of actionFunction()) {
+      const { unused, lastProgress } = sig;
+      const el = document.getElementById(MODAL_PROGRESS_ID) as HTMLProgressElement;
+      el.setAttr("value", lastProgress);
+    }
+    this.setLoadingState(false);
   }
 
   showTaskGraph(actions: Actions, info: DryRunInfo) {

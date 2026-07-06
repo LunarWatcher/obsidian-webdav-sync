@@ -1,11 +1,7 @@
+import { Status } from "./status";
+
 export interface FileData {
   lastModified: number | null;
-};
-
-export interface SyncResult {
-  actionedCount: number;
-  actionedFolders: number;
-  errorCount: number;
 };
 
 export enum ActionType {
@@ -276,7 +272,7 @@ export function findDeletedFolders(
  * \param onConflict  Called when a conflict happens. In production, this just shows a dialog to the user. In unit tests,
  *                    it's a noop or an otherwise fixed result.
  */
-export async function runSync(
+export async function* runSync(
   direction: SyncDir,
   source: Content,
   dest: Content,
@@ -285,23 +281,33 @@ export async function runSync(
   onUpdate: OnUpdateCallback,
   onConflict: OnConflictCallback,
   deleteIsNoop: boolean
-): Promise<SyncResult> {
+): AsyncGenerator<Status> {
   let actionedCount = 0;
   let errorCount = 0;
-  for (let [file, action] of actions) {
+  let totalActions = actions.size;
+  let processedActions = 0;
+  for (let [file, action] of actions.entries()) {
     let srcData = source.files.get(file);
     let destData = dest.files.get(file);
+    yield {
+      result: {
+        lastFile: file,
+        lastProgress: processedActions / totalActions,
+      }
+    };
 
     if (
       srcData == null
-      && action != ActionType.REMOVE // Removing is obviously going to lack srcData
+      && action != ActionType.REMOVE
     ) {
       onError("Fatal: " + file + " lacks srcData");
       console.error(file, action, srcData, destData, direction);
-      return {
-        actionedCount: -1,
-        actionedFolders: -1,
-        errorCount: errorCount + 1
+      yield {
+        result: {
+          actionedCount: -1,
+          actionedFolders: -1,
+          errorCount: errorCount + 1
+        }
       };
     }
     // ADD_LOCAL needs to be first, so we don't have to redo value checks for action
@@ -318,8 +324,10 @@ export async function runSync(
       );
     }
 
+    // IIRC, calculateSyncActions::includeNoop = false everywhere that isn't tests, so we don't need to care much about
+    // progress reporting there
     if (action == ActionType.NOOP) {
-      continue; 
+      continue;
     } else {
       try {
         await onUpdate(
@@ -343,6 +351,12 @@ export async function runSync(
         }
       }
     }
+    yield {
+      result: {
+        lastFile: file,
+        lastProgress: ++processedActions / totalActions,
+      }
+    };
   }
 
   let actionedFolders = 0;
@@ -375,10 +389,11 @@ export async function runSync(
       }
     }
   }
-
-  return {
-    actionedCount,
-    actionedFolders,
-    errorCount,
+  yield {
+    result: {
+      actionedCount,
+      actionedFolders,
+      errorCount,
+    }
   }
 }
