@@ -11,7 +11,6 @@ This is a very simple sync plugin for Obsidian based on WebDAV. You need to brin
 * Sync is not automatic, so there's no need for a proper deletion-aware merge algorithm. Merging is relatively easy, but _deletion_ merge is not if you need to do a two-way merge with arbitrary sync times. That said, there is no content-level merge algorithm; there's handling of file-level conflicts, but it's assumed you're able to track those yourself and know what you changed. If you regularly make changes to the same files and forget pulling, this plugin is probably not right for you.
 * Support for partial vault sync, where specific folders can be imported. This primarily exists because I want to sync some folders between my private and work vaults, but without syncing everything (work notes stay at work, private notes stay at home). **This is currently mutually exclusive with full vault sync**, but this will change in the future.
 * `.obsidian` is synced by default - but it can be excluded if desired.
-* [TODO] An optional webhook can be run on push. The intent here is to allow for push-aware backup systems to do their thing only when it's needed. Versioning shouldn't need be a feature of the sync plugin itself when the specific needs for sync are diverse.
 
 ### Non-goals
 
