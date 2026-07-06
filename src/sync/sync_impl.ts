@@ -133,8 +133,8 @@ export class SyncImpl {
             // Progres report; yield back out
             yield result
           } else {
-            new Notice(`Push complete. ${result.actionedCount} files were updated, "
-              + "and ${result.actionedFolders} stale folders were removed (${result.errorCount} errors).`);
+            new Notice(`Push complete. ${result.actionedCount} files were updated, `
+              + `and ${result.actionedFolders} stale folders were removed (${result.errorCount} errors).`);
           }
         }
         this.onComplete(this.dryRun);
