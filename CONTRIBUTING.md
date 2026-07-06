@@ -116,9 +116,9 @@ The script forwards arguments to pytest. If you want to run a single test, for e
 
 At strategic points during the tests, some tests take screenshots. These are output into `<git root>/integration-test/_screenshots/<test name>/<identifier>`.
 
-These are primarily taken to aid with debugging of test failures. 
+These are primarily taken to aid with debugging of test failures.
 
-Note that the screenshots folder is never deleted, so if the code creating a given screenshot is removed, the screenshot files stay around. This is actually a feature, and in compatible image viewers, result in the opened images automatically being refreshed. XViewer is one such known example. 
+Note that the screenshots folder is never deleted, so if the code creating a given screenshot is removed, the screenshot files stay around. This is actually a feature, and in compatible image viewers, result in the opened images automatically being refreshed. XViewer and KDE's Gwenview are two such known examples.
 
 ##### Taking screenshots
 

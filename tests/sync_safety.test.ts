@@ -1,4 +1,5 @@
-import {ActionType, calculateSyncActions, FileData, resolveActions} from "../src/sync/sync";
+import {calculateSyncActions, FileData, resolveActions} from "../src/sync/sync";
+import {ActionType} from "../src/sync/actiontype";
 
 describe("Action resolution", () => {
   it("should correctly identify file removals", () => {

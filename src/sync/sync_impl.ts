@@ -7,12 +7,13 @@ import {
   OnConflictCallback,
   OnErrorHandler,
   OnUpdateCallback,
-  runSync,
-  SyncDir
+  runSync
 } from "./sync";
 import WebDAVSyncPlugin from "main";
 import {FileProvider} from "./files";
 import {prefixToStr, resolvePath} from "./pathutils";
+import { SyncDir } from "./syncdir";
+import { ConflictModal } from "./conflict_modal";
 
 export interface DryRunInfo {
   direction: SyncDir;
@@ -130,7 +131,7 @@ export class SyncImpl {
         )) {
           const { result } = sig;
           if ("lastFile" in result) {
-            // Progres report; yield back out
+            // Progress report; yield back out
             yield result
           } else {
             new Notice(`Push complete. ${result.actionedCount} files were updated, `
@@ -150,7 +151,7 @@ export class SyncImpl {
       for (const vaultPath in this.plugin.settings.sync.subfolders) {
         const { dest } = this.plugin.settings.sync.subfolders[vaultPath];
         let local = await this.fileProvider.getVaultFiles(vaultPath);
-        
+
         let remoteResult = await this.fileProvider.getRemoteFiles(dest);
         if (remoteResult.error) {
           this.onError(remoteResult.error);
@@ -461,8 +462,24 @@ export class SyncImpl {
   }
 
   async resolveConflict(file: string, src: FileData, dest: FileData, dir: SyncDir): Promise<ActionType> {
-    // TODO: handle properly (and probably convert to a callback function)
-    return ActionType.ADD;
+    const p = new Promise<ActionType | null>((resolve) => {
+      const conflictModal = new ConflictModal(
+        this.plugin.app,
+        file,
+        dir,
+        src,
+        dest,
+        resolve
+      );
+      conflictModal.open();
+    });
+    const result = await p
+    if (result == null) {
+      throw Error(
+        `Aborting sync: conflict on ${file} was not resolved`
+      );
+    }
+    return result
   }
 }
 

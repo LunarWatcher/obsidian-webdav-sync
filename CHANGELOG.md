@@ -5,6 +5,7 @@
 ### Added
 
 * Added progress bar to sync modal
+* Actual conflict resolution handling ([#8](https://github.com/LunarWatcher/obsidian-webdav-sync/issues/8))
 
 ## 0.5.2
 
