@@ -1,5 +1,11 @@
 # Changelog
 
+## unreleased
+
+### Added
+
+* Added progress bar to sync modal
+
 ## 0.5.2
 
 ### Added

@@ -292,7 +292,7 @@ export async function* runSync(
     yield {
       result: {
         lastFile: file,
-        lastProgress: processedActions / totalActions,
+        lastProgress: 100 * processedActions / totalActions,
       }
     };
 
@@ -354,7 +354,7 @@ export async function* runSync(
     yield {
       result: {
         lastFile: file,
-        lastProgress: ++processedActions / totalActions,
+        lastProgress: 100 * (++processedActions) / totalActions,
       }
     };
   }
