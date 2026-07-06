@@ -155,7 +155,7 @@ export class SyncModal extends Modal {
     this.checkClearDryRun();
 
     for await (const sig of actionFunction()) {
-      const { unused, lastProgress } = sig;
+      const { lastProgress } = sig;
       const el = document.getElementById(MODAL_PROGRESS_ID) as HTMLProgressElement;
       el.setAttr("value", lastProgress);
     }
