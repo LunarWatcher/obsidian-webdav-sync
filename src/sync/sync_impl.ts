@@ -84,7 +84,7 @@ export class SyncImpl {
     )
   }
 
-  async upload() {
+  async *upload() {
     if (this.plugin.client == null) {
       return;
     }
@@ -114,7 +114,7 @@ export class SyncImpl {
       }
       
       if (!this.dryRun) {
-        const { actionedCount, actionedFolders, errorCount } = await runSync(
+        for await (const sig of runSync(
           SyncDir.UP,
           local,
           remote,
@@ -127,9 +127,16 @@ export class SyncImpl {
           ) as OnUpdateCallback,
           this.resolveConflict.bind(this) as OnConflictCallback,
           this.deleteIsNoop,
-        )
-
-        new Notice(`Push complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
+        )) {
+          const { result } = sig;
+          if ("lastFile" in result) {
+            // Progres report; yield back out
+            yield result
+          } else {
+            new Notice(`Push complete. ${result.actionedCount} files were updated, `
+              + `and ${result.actionedFolders} stale folders were removed (${result.errorCount} errors).`);
+          }
+        }
         this.onComplete(this.dryRun);
       } else {
         console.debug("remote: ", remote);
@@ -165,7 +172,7 @@ export class SyncImpl {
         }
 
         if (!this.dryRun) {
-          const { actionedCount, actionedFolders, errorCount } = await runSync(
+          for await (const sig of runSync(
             SyncDir.UP,
             local,
             remote,
@@ -178,8 +185,18 @@ export class SyncImpl {
             ) as OnUpdateCallback,
             this.resolveConflict.bind(this) as OnConflictCallback,
             this.deleteIsNoop
-          )
-          new Notice(`Push complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
+          )) {
+            const { result } = sig;
+            if ("lastFile" in result) {
+              // Progres report; yield back out
+              yield result
+            } else {
+              new Notice(
+                `Push complete. ${result.actionedCount} files were updated, `
+                  + `and ${result.actionedFolders} stale folders were removed (${result.errorCount} errors).`
+              );
+            }
+          }
           this.onComplete(this.dryRun);
         } else {
           this.showTaskGraph(actionResult.actions, {
@@ -191,7 +208,7 @@ export class SyncImpl {
     }
   }
 
-  async download() {
+  async *download() {
     if (this.plugin.client == null) {
       return;
     }
@@ -219,7 +236,7 @@ export class SyncImpl {
       }
 
       if (!this.dryRun) {
-        const { actionedCount, actionedFolders, errorCount } = await runSync(
+        for await (const sig of runSync(
           SyncDir.DOWN,
           remote,
           local,
@@ -232,8 +249,18 @@ export class SyncImpl {
           ) as OnUpdateCallback,
           this.resolveConflict.bind(this) as OnConflictCallback,
           this.deleteIsNoop,
-        )
-        new Notice(`Pull complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
+        )) {
+          const { result } = sig;
+          if ("lastFile" in result) {
+            // Progres report; yield back out
+            yield result
+          } else {
+            new Notice(
+              `Pull complete. ${result.actionedCount} files were updated, `
+                + `and ${result.actionedFolders} stale folders were removed (${result.errorCount} errors).`
+            );
+          }
+        }
         this.onComplete(this.dryRun);
       } else {
         console.debug("remote: ", remote);
@@ -270,7 +297,7 @@ export class SyncImpl {
         }
 
         if (!this.dryRun) {
-          const { actionedCount, actionedFolders, errorCount } = await runSync(
+          for await (const sig of runSync(
             SyncDir.DOWN,
             remote,
             local,
@@ -283,8 +310,18 @@ export class SyncImpl {
             ) as OnUpdateCallback,
             this.resolveConflict.bind(this) as OnConflictCallback,
             this.deleteIsNoop,
-          )
-          new Notice(`Pull complete. ${actionedCount} files were updated, and ${actionedFolders} stale folders were removed (${errorCount} errors).`);
+          )) {
+            const { result } = sig;
+            if ("lastFile" in result) {
+              // Progres report; yield back out
+              yield result
+            } else {
+              new Notice(
+                `Pull complete. ${result.actionedCount} files were updated, `
+                  + `and ${result.actionedFolders} stale folders were removed (${result.errorCount} errors).`
+              );
+            }
+          }
           this.onComplete(this.dryRun);
         } else {
           this.showTaskGraph(actionResult.actions, {

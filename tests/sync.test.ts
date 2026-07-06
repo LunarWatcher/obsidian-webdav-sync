@@ -1,3 +1,4 @@
+import { Status, SyncResult } from "../src/sync/status";
 import {
   Actions,
   ActionType,
@@ -11,6 +12,7 @@ import {
   runSync,
   SyncDir
 } from "../src/sync/sync"
+import { fromAsync } from "./util/collectAsync";
 
 interface TestSyncStatus {
   upload: string[];
@@ -128,25 +130,30 @@ describe("Sync with no files remotely means all are added", () => {
   });
   test("The sync actions handled correctly", async () => {
     const testData = lazyTestData();
-    await runSync(
-      SyncDir.UP,
-      nofolders(src),
-      nofolders(dest),
-      actions,
-      failHardOnError,
-      onUpdate.bind(this, testData, async (
-        type: ActionType,
-        _path: string,
-        _localData: FileData | undefined,
-        remoteData: FileData | undefined
-      ) => {
-        if (type == ActionType.ADD) {
-          expect(remoteData).toBeUndefined();
-        }
-      }),
-      addOnConflict,
-      false
+    const it = await fromAsync<Status>(
+      runSync.bind(
+        this,
+        SyncDir.UP,
+        nofolders(src),
+        nofolders(dest),
+        actions,
+        failHardOnError,
+        onUpdate.bind(this, testData, async (
+          type: ActionType,
+          _path: string,
+          _localData: FileData | undefined,
+          remoteData: FileData | undefined
+        ) => {
+          if (type == ActionType.ADD) {
+            expect(remoteData).toBeUndefined();
+          }
+        }),
+        addOnConflict,
+        false
+      )
     );
+
+    expect(it.length).toBe(7); // 2 * 3 actions + 1 closing status
 
     expect(testData.upload.length).toBe(3);
     expect(testData.remove.length).toBe(0);
@@ -176,15 +183,18 @@ describe("Sync with one file matching in the remote means only two files are add
   });
   test("The sync actions handled correctly", async () => {
     const testData = lazyTestData();
-    await runSync(
-      SyncDir.UP,
-      nofolders(src),
-      nofolders(dest),
-      actions,
-      failHardOnError,
-      onUpdate.bind(this, testData, null),
-      addOnConflict,
-      false
+    await fromAsync<Status>(
+      runSync.bind(
+        this,
+        SyncDir.UP,
+        nofolders(src),
+        nofolders(dest),
+        actions,
+        failHardOnError,
+        onUpdate.bind(this, testData, null),
+        addOnConflict,
+        false
+      )
     );
 
     expect(testData.upload.length).toBe(2);
@@ -215,28 +225,31 @@ describe("One outdated file in the remote means all three files are added", () =
   });
   test("The sync actions handled correctly", async () => {
     const testData = lazyTestData();
-    await runSync(
-      SyncDir.UP,
-      nofolders(src),
-      nofolders(dest),
-      actions,
-      failHardOnError,
-      onUpdate.bind(this, testData, async (
-        type: ActionType,
-        path: string,
-        _localData: FileData | undefined,
-        remoteData: FileData | undefined
-      ) => {
-        if (type == ActionType.ADD) {
-          if (!path.startsWith(".obsidian")) {
-            expect(remoteData).toBeUndefined();
-          } else {
-            expect(remoteData).not.toBeUndefined();
+    await fromAsync<Status>(
+      runSync.bind(
+        this,
+        SyncDir.UP,
+        nofolders(src),
+        nofolders(dest),
+        actions,
+        failHardOnError,
+        onUpdate.bind(this, testData, async (
+          type: ActionType,
+          path: string,
+          _localData: FileData | undefined,
+          remoteData: FileData | undefined
+        ) => {
+          if (type == ActionType.ADD) {
+            if (!path.startsWith(".obsidian")) {
+              expect(remoteData).toBeUndefined();
+            } else {
+              expect(remoteData).not.toBeUndefined();
+            }
           }
-        }
-      }),
-      addOnConflict,
-      false
+        }),
+        addOnConflict,
+        false
+      )
     );
 
     expect(testData.upload.length).toBe(3);
@@ -286,28 +299,31 @@ describe("Files missing locally should be removed", () => {
   });
   test("The sync actions handled correctly", async () => {
     const testData = lazyTestData();
-    await runSync(
-      SyncDir.UP,
-      nofolders(src),
-      nofolders(dest),
-      actions,
-      failHardOnError,
-      onUpdate.bind(this, testData, async (
-        type: ActionType,
-        path: string,
-        _localData: FileData | undefined,
-        remoteData: FileData | undefined
-      ) => {
-        if (type == ActionType.ADD) {
-          if (!path.startsWith(".obsidian")) {
-            expect(remoteData).toBeUndefined();
-          } else {
-            expect(remoteData).not.toBeUndefined();
+    await fromAsync<Status>(
+      runSync.bind(
+        this,
+        SyncDir.UP,
+        nofolders(src),
+        nofolders(dest),
+        actions,
+        failHardOnError,
+        onUpdate.bind(this, testData, async (
+          type: ActionType,
+          path: string,
+          _localData: FileData | undefined,
+          remoteData: FileData | undefined
+        ) => {
+          if (type == ActionType.ADD) {
+            if (!path.startsWith(".obsidian")) {
+              expect(remoteData).toBeUndefined();
+            } else {
+              expect(remoteData).not.toBeUndefined();
+            }
           }
-        }
-      }),
-      addOnConflict,
-      false
+        }),
+        addOnConflict,
+        false
+      )
     );
 
     expect(testData.upload.length).toBe(2);
@@ -372,30 +388,35 @@ describe("Folders", () => {
     const actions = actionResult.actions as Actions;
 
     const testData = lazyTestData();
-    let selfReported = await runSync(
-      SyncDir.UP,
-      src,
-      dest,
-      actions,
-      failHardOnError,
-      laxOnUpdate.bind(this, testData, async (
-        type: ActionType,
-        path: string,
-        _localData: FileData | undefined,
-        remoteData: FileData | undefined
-      ) => {
-        if (type == ActionType.ADD) {
-          if (!path.startsWith(".obsidian")) {
-            expect(remoteData).toBeUndefined();
-          } else {
-            expect(remoteData).not.toBeUndefined();
+    const it = await fromAsync<Status>(
+      runSync.bind(
+        this,
+        SyncDir.UP,
+        src,
+        dest,
+        actions,
+        failHardOnError,
+        laxOnUpdate.bind(this, testData, async (
+          type: ActionType,
+          path: string,
+          _localData: FileData | undefined,
+          remoteData: FileData | undefined
+        ) => {
+          if (type == ActionType.ADD) {
+            if (!path.startsWith(".obsidian")) {
+              expect(remoteData).toBeUndefined();
+            } else {
+              expect(remoteData).not.toBeUndefined();
+            }
           }
-        }
-      }),
-      addOnConflict,
-      false
+        }),
+        addOnConflict,
+        false
+      )
     );
 
+    const lastStatus = it[it.length - 1];
+    const selfReported = lastStatus.result as SyncResult;
     expect(selfReported.actionedCount).toBe(1);
     expect(selfReported.actionedFolders).toBe(1);
     expect(selfReported.errorCount).toBe(0);
