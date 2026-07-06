@@ -1,9 +1,11 @@
 import {App, Modal, Notice, setIcon, Setting} from "obsidian";
 import WebDAVSyncPlugin from "../main";
 import {canConnectWithSettings} from "settings";
-import {Actions, actionToDescriptiveString, Content, OnErrorHandler, SyncDir } from "./sync";
+import {Actions, Content, OnErrorHandler } from "./sync";
 import {DryRunInfo, OnCompleteHandler, SyncImpl, TaskGraphHandler} from "./sync_impl";
-import { AsyncProgressGenerator, AsyncStatusGenerator } from "./status";
+import { AsyncProgressGenerator } from "./status";
+import { SyncDir } from "./syncdir";
+import { actionToDescriptiveString } from "./actiontype";
 
 export interface RemoteFileResult {
   content: Content | null;
@@ -59,7 +61,7 @@ export class SyncModal extends Modal {
       .setName("Dry run")
       .setDesc("If set, the plugin will only tell you what it would've done, but not actually do it. "
         + "Meaning tell you which files it would change, but not actually do the changes. Useful "
-        + "for debugging, or just making sure you trust the plugin"
+        + "for debugging, or just making sure you trust the plugin's judgement about the state of your vault"
       )
       .addToggle(toggle =>
         toggle
@@ -150,14 +152,20 @@ export class SyncModal extends Modal {
     )
   }
 
+  setProgress(progress: number) {
+    const el = activeDocument.getElementById(MODAL_PROGRESS_ID) as HTMLProgressElement;
+    el.setAttr("value", progress);
+  }
+
   async doFileTransfer(actionFunction: AsyncProgressGenerator) {
     this.setLoadingState(true);
     this.checkClearDryRun();
+    // Make the bar visible immediately so it still makes sense for like one big/otherwise slow upload
+    this.setProgress(0);
 
     for await (const sig of actionFunction()) {
       const { lastProgress } = sig;
-      const el = document.getElementById(MODAL_PROGRESS_ID) as HTMLProgressElement;
-      el.setAttr("value", lastProgress);
+      this.setProgress(lastProgress);
     }
     this.setLoadingState(false);
   }

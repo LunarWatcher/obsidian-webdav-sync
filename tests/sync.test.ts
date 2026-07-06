@@ -1,7 +1,7 @@
+import { ActionType } from "../src/sync/actiontype";
 import { Status, SyncResult } from "../src/sync/status";
 import {
   Actions,
-  ActionType,
   calculateSyncActions,
   Content,
   FileData,
@@ -10,8 +10,8 @@ import {
   Folder,
   OnUpdateCallback,
   runSync,
-  SyncDir
 } from "../src/sync/sync"
+import { SyncDir } from "../src/sync/syncdir";
 import { fromAsync } from "./util/collectAsync";
 
 interface TestSyncStatus {

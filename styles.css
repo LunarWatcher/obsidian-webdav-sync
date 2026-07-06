@@ -24,3 +24,17 @@ progress#livi-webdav-sync-modal-progress {
 progress#livi-webdav-sync-modal-progress[value="-1"] {
     display: none;
 }
+
+select.livi-webdav-override {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    /*
+     * Required for the dropdown arrow to not be disappeared. Obsidian's default stylesheet
+     * makes the dropdown indistinguishable from a button without this though
+     * (Not really too surprising, most of the good semantic HTML elements seem to be nerfed, with shitty fucking react
+     * shit with <div><div><div><div> preferred over literally one tag. This is why I hate modern webdev - do better.
+     * It isn't even that hard anymore, sheesh)
+     */
+    appearance: auto;
+}
+

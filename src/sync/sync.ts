@@ -1,35 +1,10 @@
+import { ActionType } from "./actiontype";
 import { Status } from "./status";
+import { SyncDir } from "./syncdir";
 
 export interface FileData {
   lastModified: number | null;
 };
-
-export enum ActionType {
-  ADD,
-  REMOVE,
-  /**
-   * Used for files that have changed remotely. This should result in a notification to the user before actually making
-   * changes, just in case it's wrong.
-   *
-   * This field must be filtered out prior to passing to the sync implementation functions. Specifically, it MUST decay
-   *to ADD, REMOVE, or NOOP, as the sync implementations assume all conflict resolution has already been done.
-   */
-  ADD_LOCAL,
-  NOOP
-};
-
-export function actionToDescriptiveString(action: ActionType): string {
-  switch (action) {
-  case ActionType.ADD:
-    return "Add or update";
-  case ActionType.REMOVE:
-    return "Remove";
-  case ActionType.ADD_LOCAL:
-    return "Conflict identified; ask user [not implemented, falls back to adding or updating instead]";
-  case ActionType.NOOP:
-    return "No changes made";
-  }
-}
 
 export type Path = string;
 export type Files = Map<Path, FileData>;
@@ -66,11 +41,6 @@ export type OnConflictCallback = (
   dest: FileData | undefined,
   direction: SyncDir
 ) => Promise<ActionType>;
-
-export enum SyncDir {
-  UP,
-  DOWN
-};
 
 /**
  * Utility function that turns millisecond timestamps into second timestamps. 
@@ -309,19 +279,33 @@ export async function* runSync(
           errorCount: errorCount + 1
         }
       };
+      return;
     }
     // ADD_LOCAL needs to be first, so we don't have to redo value checks for action
-    // TODO: this cannot be here, and needs to be refactored out. The conflict resolution
-    // needs to take place before anything else happens so it can be done in bulk with 
-    // obsidian's clunky input stuff.
-    // Hijacking the dry run stuff with input fields might be an idea as well
+    // ADD_LOCAL is when the remote has a change newer than anything local, i.e. a pull was not done in advance.
     if (action == ActionType.ADD_LOCAL) {
-      action = await onConflict(
-        file,
-        srcData,
-        destData,
-        direction
-      );
+      try {
+        action = await onConflict(
+          file,
+          srcData,
+          destData,
+          direction
+        );
+      } catch (e) {
+        if (e instanceof Error) {
+          onError(`Abort: Conflict resolution failed: ${e.message}`);
+        } else {
+          onError("Abort: Conflict resolution failed");
+        }
+        yield {
+          result: {
+            actionedCount: -1,
+            actionedFolders: -1,
+            errorCount: errorCount + 1
+          }
+        };
+        return;
+      }
     }
 
     // IIRC, calculateSyncActions::includeNoop = false everywhere that isn't tests, so we don't need to care much about
@@ -397,3 +381,5 @@ export async function* runSync(
     }
   }
 }
+export { ActionType };
+
