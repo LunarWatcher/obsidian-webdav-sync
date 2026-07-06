@@ -47,25 +47,29 @@ export default class WebDAVSyncPlugin extends Plugin {
   }
 
   async uploadAction(dryRun: boolean) {
-    await new SyncImpl(
+    for await (const _unused of new SyncImpl(
       this,
       onActionError,
       showActionTaskGraph,
       () => {},
       dryRun,
       false
-    ).upload();
+    ).upload()) {
+      // ignored
+    }
   }
 
   async downloadAction(dryRun: boolean) {
-    await new SyncImpl(
+    for await (const _unused of new SyncImpl(
       this,
       onActionError,
       showActionTaskGraph,
       () => {},
       dryRun,
       false
-    ).download();
+    ).download()) {
+      // ignored
+    }
   }
 
   async initRibbon() {

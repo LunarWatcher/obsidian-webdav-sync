@@ -2,6 +2,12 @@
 
 ## unreleased
 
+## 0.6.1
+
+### Fixed
+
+* `downloadAction` and `uploadAction` were not patched to deal with internal changes to the `upload` and `download` APIs
+
 ## 0.6.0
 
 ### Added
