@@ -2,7 +2,7 @@ import {App, Modal, Notice, setIcon, Setting} from "obsidian";
 import WebDAVSyncPlugin from "../main";
 import {canConnectWithSettings} from "settings";
 import {Actions, Content } from "./sync";
-import {DryRunInfo, OnCompleteHandler, SyncImpl} from "./sync_impl";
+import {DryRunInfo, SyncImpl} from "./sync_impl";
 import { AsyncProgressGenerator } from "./status";
 import { SyncDir } from "./syncdir";
 import { actionToDescriptiveString } from "./actiontype";

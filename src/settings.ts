@@ -1,6 +1,6 @@
 import {DAVServerConfig, DEFAULT_DAV_CONFIG} from "./fs/webdav";
 import WebDAVSyncPlugin from "./main";
-import { App, Notice, PluginSettingTab, SecretComponent, Setting, SettingDefinitionItem, SettingGroupItem } from "obsidian";
+import { App, Notice, PluginSettingTab, SecretComponent, SettingDefinitionItem, SettingGroupItem } from "obsidian";
 import { DEFAULT_SYNC_SETTINGS, FolderDestination, SyncSettings } from "./sync/sync_settings";
 import {FileStat} from "webdav";
 
