@@ -1,8 +1,8 @@
 {
     "id": "livi-webdav-sync",
     "name": "WebDAV sync",
-    "version": "0.7.1",
-    "minAppVersion": "1.11.5",
+    "version": "0.7.2",
+    "minAppVersion": "1.13.4",
     "description": "Simple, manually-controlled WebDAV sync plugin.",
     "author": "Olivia",
     "authorUrl": "https://lunarwatcher.codeberg.page",

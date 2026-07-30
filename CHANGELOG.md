@@ -2,6 +2,10 @@
 
 ## unreleased
 
+## 0.7.2
+
+Fixes minAppVersion bump being eaten in a `git reset --hard`
+
 ## 0.7.1
 
 ### Changed
