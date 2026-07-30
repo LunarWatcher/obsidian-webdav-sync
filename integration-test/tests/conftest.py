@@ -1,3 +1,4 @@
+from tests.helpers.ids import CLASS_MODAL_CLOSE_BUTTON
 import time
 import tests.utils
 from functools import partial
@@ -265,7 +266,7 @@ def _load_vault(driver: Chrome, vault_path: str):
         # instead of "modal-close-button". This feels a lot more fragile, since
         # I imagine there can be non-close buttons. I don't think this matters
         # for the settings modal, but it might at some point and break this code
-        driver.find_element(By.CLASS_NAME, "modal-header-button") \
+        driver.find_element(By.CLASS_NAME, CLASS_MODAL_CLOSE_BUTTON) \
             .click()
         return
     # No exception means the window wasn't closed. When obsidian boots, it

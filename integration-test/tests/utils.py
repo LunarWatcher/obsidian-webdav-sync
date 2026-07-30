@@ -1,3 +1,4 @@
+from tests.helpers.ids import CLASS_MODAL_CLOSE_BUTTON
 from time import sleep
 from typing import Literal
 import pytest
@@ -232,7 +233,7 @@ def autoupload(obsidian: Chrome, screenshotter, expect_error: bool = False):
 def close_sync_modal(obsidian: Chrome):
     assert_sync_modal_shown(obsidian)
     # Note: if this starts failing, the class has likely changed. The class is not controlled by the plugin
-    obsidian.find_element(By.CLASS_NAME, "modal-close-button").click()
+    obsidian.find_element(By.CLASS_NAME, CLASS_MODAL_CLOSE_BUTTON).click()
 
 def autodownload(obsidian: Chrome, screenshotter, expect_error: bool = False):
     try:
