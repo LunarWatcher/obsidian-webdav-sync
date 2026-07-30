@@ -1,8 +1,8 @@
 import {App, Modal, Notice, setIcon, Setting} from "obsidian";
 import WebDAVSyncPlugin from "../main";
 import {canConnectWithSettings} from "settings";
-import {Actions, Content, OnErrorHandler } from "./sync";
-import {DryRunInfo, OnCompleteHandler, SyncImpl, TaskGraphHandler} from "./sync_impl";
+import {Actions, Content } from "./sync";
+import {DryRunInfo, OnCompleteHandler, SyncImpl} from "./sync_impl";
 import { AsyncProgressGenerator } from "./status";
 import { SyncDir } from "./syncdir";
 import { actionToDescriptiveString } from "./actiontype";
@@ -35,7 +35,7 @@ export class SyncModal extends Modal {
       this.plugin,
       this.setError.bind(this),
       this.showTaskGraph.bind(this),
-      this.close.bind(this) as OnCompleteHandler,
+      this.close.bind(this),
       false,
       false
     )

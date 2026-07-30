@@ -2,6 +2,15 @@
 
 ## unreleased
 
+## 0.7.1
+
+### Changed
+
+* (1.13.4 fix): Fixed deprecation of `setWarning()`
+* (1.13.4 fix): Fixed the entire fucking settings API being broken
+  * Words cannot express how fucking stupid this particular change is. This plugin relies on a fair bit of custom logic that does not migrate cleanly, and it's overall a downgrade.
+  * This change nearly resulted in the settings UI being abandoned in favour of raw JSON editing, which I still assert would've been a better use of time than this bullshit.
+
 ## 0.7.0
 
 ### Changed

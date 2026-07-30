@@ -1,4 +1,4 @@
-import {normalizePath, Notice, TFolder} from "obsidian";
+import {normalizePath, Notice} from "obsidian";
 import {
   Actions, ActionType,
   calculateSyncActions,
@@ -6,7 +6,6 @@ import {
   FileData,
   OnConflictCallback,
   OnErrorHandler,
-  OnUpdateCallback,
   runSync
 } from "./sync";
 import WebDAVSyncPlugin from "main";
