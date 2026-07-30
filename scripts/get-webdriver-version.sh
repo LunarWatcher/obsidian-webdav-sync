@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-obsidian=${OBSIDIAN_BIN:-/usr/bin/obsidian}
+obsidian=${OBSIDIAN_LOCATION:-/usr/bin/obsidian}
 
 if cat $obsidian | grep -aoE '^exec electron[0-9]+ /usr/lib/obsidian/app.asar' > /dev/null;
 then

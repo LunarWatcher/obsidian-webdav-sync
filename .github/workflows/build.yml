@@ -91,7 +91,7 @@ jobs:
         run: |
           pip3 install --break-system-packages -r requirements.txt 
       - name: Setup headless display
-        uses: pyvista/setup-headless-display-action@v3
+        uses: pyvista/setup-headless-display-action@v4
       - name: Run tests
         working-directory: integration-test/
         run: |
