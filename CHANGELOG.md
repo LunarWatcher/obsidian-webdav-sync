@@ -2,6 +2,10 @@
 
 ## unreleased
 
+### Changed
+
+* Min obsidian version is now 1.13.4 due to breaking changes in Obsidian (see changelog entries marked `(1.13.4):`)
+
 ## 0.6.1
 
 ### Fixed
