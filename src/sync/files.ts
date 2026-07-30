@@ -90,7 +90,7 @@ export class FileProvider {
       return {
         files: new Map<Path, FileData>(),
         folderPaths: []
-      } as Content
+      }
     }
 
     const outFolders = [] as Folder[];
