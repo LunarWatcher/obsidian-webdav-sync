@@ -14,7 +14,7 @@
         "src/**/*"
     ],
     "keywords": [],
-    "author": "",
+    "author": "LunarWatcher",
     "license": "MIT",
     "devDependencies": {
         "@jest/globals": "^30.2.0",
@@ -29,7 +29,7 @@
         "typescript": "^5.9.3"
     },
     "dependencies": {
-        "obsidian": "^1.11.4",
+        "obsidian": "^1.13.1",
         "webdav": "^5.9.0"
     }
 }

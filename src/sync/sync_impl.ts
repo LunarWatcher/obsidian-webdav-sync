@@ -1,4 +1,4 @@
-import {normalizePath, Notice} from "obsidian";
+import {normalizePath, Notice, TFolder} from "obsidian";
 import {
   Actions, ActionType,
   calculateSyncActions,
@@ -189,7 +189,7 @@ export class SyncImpl {
           )) {
             const { result } = sig;
             if ("lastFile" in result) {
-              // Progres report; yield back out
+              // Progress report; yield back out
               yield result
             } else {
               new Notice(
@@ -253,7 +253,7 @@ export class SyncImpl {
         )) {
           const { result } = sig;
           if ("lastFile" in result) {
-            // Progres report; yield back out
+            // Progress report; yield back out
             yield result
           } else {
             new Notice(
@@ -389,7 +389,8 @@ export class SyncImpl {
         if (destData == undefined) {
           await this.plugin.app.vault.adapter.rmdir(
             normalizePath(localPath),
-            false
+            // Obsidian 1.13 broke rmdir(..., false) with "rm returned EISDIR (is a directory) /home/runner/work/obsidian-webdav-sync/obsidian-webdav-sync/integration-test/test_vault/private_subfolder"
+            true
           );
         } else {
           let obsidianFile = this.plugin.app.vault.getAbstractFileByPath(

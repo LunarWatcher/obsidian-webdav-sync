@@ -4,7 +4,11 @@
 
 ### Changed
 
-* Min obsidian version is now 1.13.4 due to breaking changes in Obsidian (see changelog entries marked `(1.13.4):`)
+* Min obsidian version is now 1.13.4 due to breaking changes in Obsidian (see changelog entries marked `(1.13.4 fix):`)
+
+### Fixed
+
+* (1.13.4 fix): Fixed non-recursive folder removal breaking in obsidian 1.13.4. Folder removals are unfortunately now recursive by default, by need.
 
 ## 0.6.1
 
