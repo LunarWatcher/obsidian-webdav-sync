@@ -1,3 +1,4 @@
+import time
 import tests.utils
 from functools import partial
 import os
@@ -43,9 +44,11 @@ def vault():
 def obsidian(vault: str):
     driver = _get_driver()
     _load_vault(driver, vault)
-    yield driver
-
-    driver.quit()
+    try:
+        yield driver
+    finally:
+        driver.quit()
+        time.sleep(1)
 
 def screenshot_impl(obsidian: Chrome, prefix: str, identifier: str, index: int):
     path = os.path.join(
@@ -230,7 +233,6 @@ def _load_vault(driver: Chrome, vault_path: str):
     try:
         sleep(1)
         driver.page_source
-
     except NoSuchWindowException:
         assert len(driver.window_handles) == 1
         driver.switch_to.window(driver.window_handles[0])
@@ -259,7 +261,11 @@ def _load_vault(driver: Chrome, vault_path: str):
             """
         )
         close_notices(driver)
-        driver.find_element(By.CLASS_NAME, "modal-close-button") \
+        # TODO: as of 1.13, the close button is of type "modal-header-button"
+        # instead of "modal-close-button". This feels a lot more fragile, since
+        # I imagine there can be non-close buttons. I don't think this matters
+        # for the settings modal, but it might at some point and break this code
+        driver.find_element(By.CLASS_NAME, "modal-header-button") \
             .click()
         return
     # No exception means the window wasn't closed. When obsidian boots, it
