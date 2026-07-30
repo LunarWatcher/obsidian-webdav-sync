@@ -1,6 +1,6 @@
 {
     "name": "livi-webdav-sync",
-    "version": "0.6.1",
+    "version": "0.7.0",
     "description": "Simple, manually-controlled WebDAV sync plugin",
     "main": "main.js",
     "scripts": {
