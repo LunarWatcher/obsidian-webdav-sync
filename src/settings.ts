@@ -323,13 +323,6 @@ export class WebDAVSettingsTab extends PluginSettingTab {
     this.update()
   }
 
-  display(): void {
-    const {containerEl} = this;
-
-    new Setting(containerEl).setName("Meta").setHeading();
-
-  }
-
   regenerateFolderMappings(): SettingGroupItem<string>[] {
 
     const out: SettingGroupItem<string>[] = [];
