@@ -132,7 +132,7 @@ export class SyncModal extends Modal {
       },
     });
 
-    this.dryRunInfoContainer = this.contentEl.createEl("div", {
+    this.dryRunInfoContainer = contentEl.createEl("div", {
       attr: {
         id: "dry-run-info-container"
       }

@@ -2,6 +2,12 @@
 
 ## unreleased
 
+## 0.7.4
+
+### Fixed
+
+* The sync modal accidentally referenced the wrong content container. Likely has 0 impact, but probably results in the dry run info container moving slightly in the DOM.
+
 ## 0.7.3
 
 Silences more warnings
